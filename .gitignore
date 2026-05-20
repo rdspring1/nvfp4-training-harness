@@ -1,0 +1,4 @@
+llama3_results/
+__pycache__/
+*.log
+save.md

@@ -58,7 +58,10 @@ def data_iterator(
     while True:
         if data_source == "wikitext":
             ds = load_dataset(
-                "wikitext", "wikitext-103-raw-v1", split="train", streaming=True
+                "Salesforce/wikitext",
+                "wikitext-103-raw-v1",
+                split="train",
+                streaming=True,
             )
             ds = ds.shuffle(seed=epoch, buffer_size=10_000)
         else:
@@ -306,11 +309,8 @@ def nvfp4_rht_sign_vectors(model):
     from torchao.prototype.moe_training.nvfp4_training.nvfp4_training import (
         NVFP4Linear,
     )
-    from torchao.prototype.moe_training.nvfp4_training.nvfp4_tensor_parallel import (
-        _TP_RHT_SIGN_VECTOR,
-    )
 
-    sign_vectors = [tuple(_TP_RHT_SIGN_VECTOR)]
+    sign_vectors = []
     for module in model.modules():
         if isinstance(module, NVFP4Linear):
             sign_vectors.append(tuple(module.rht_sign_vector))

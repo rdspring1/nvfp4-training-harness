@@ -62,7 +62,10 @@ def data_iterator(
     while True:
         if data_source == "wikitext":
             ds = load_dataset(
-                "wikitext", "wikitext-103-raw-v1", split="train", streaming=True
+                "Salesforce/wikitext",
+                "wikitext-103-raw-v1",
+                split="train",
+                streaming=True,
             )
             ds = ds.shuffle(seed=epoch, buffer_size=10_000)
         else:
@@ -255,10 +258,26 @@ class TELlama(nn.Module):
 # ---------------------------------------------------------------------------
 def install_fixed_rht_sign_vector():
     """Bind TE's NVFP4 RHT helpers to TorchAO's TP kernel sign vector."""
-    from torchao.prototype.mx_formats.nvfp4_tensor_parallel import (
-        _TP_RHT_SIGN_VECTOR,
-    )
     import transformer_engine.pytorch.tensor.nvfp4_tensor as nvfp4_tensor
+
+    _TP_RHT_SIGN_VECTOR = (
+        1,
+        1,
+        1,
+        -1,
+        1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        1,
+        -1,
+        1,
+        -1,
+        -1,
+    )
 
     def fixed_wgrad_sign_vector(device):
         return torch.tensor(_TP_RHT_SIGN_VECTOR, dtype=torch.float32, device=device)

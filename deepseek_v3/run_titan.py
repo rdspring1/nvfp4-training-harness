@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""Single-GPU TorchTitan launcher for DeepSeek V3 debugmodel."""
+"""TorchTitan launcher for DeepSeek V3 debugmodel and 16B smoke runs."""
 
 import argparse
 import datetime
 import os
 import re
 import subprocess
+import sys
 import threading
 from pathlib import Path
 
@@ -15,9 +16,20 @@ DEEPSEEK_MODEL_DIR = TORCHTITAN_DIR / "torchtitan" / "models" / "deepseek_v3"
 RESULTS_DIR = ROOT_DIR / "deepseek_v3_results"
 
 MODULE = "deepseek_v3"
-CONFIG = "deepseek_v3_debugmodel"
-LOCAL_BATCH_SIZE = 8
-SEQ_LEN = 2048
+FLAVOR_CONFIGS = {
+    "debugmodel": "deepseek_v3_debugmodel",
+    "16b": "deepseek_v3_16b",
+}
+FLAVOR_DEFAULTS = {
+    "debugmodel": {"batch_size": 8, "seq_len": 2048, "steps": 10},
+    "16b": {"batch_size": 1, "seq_len": 1024, "steps": 1},
+}
+HF_ASSET_PATHS = {
+    "16b": TORCHTITAN_DIR / "assets" / "hf" / "deepseek-moe-16b-base",
+}
+HF_ASSET_REPOS = {
+    "16b": "deepseek-ai/deepseek-moe-16b-base",
+}
 
 _ANSI_RE = re.compile(r"\x1b\[[0-9;]*m")
 _STEP_RE = re.compile(
@@ -39,18 +51,71 @@ def _check_torchtitan() -> None:
         )
 
 
+def _download_tokenizer(flavor: str) -> None:
+    repo_id = HF_ASSET_REPOS[flavor]
+    cmd = [
+        sys.executable,
+        "scripts/download_hf_assets.py",
+        "--repo_id",
+        repo_id,
+        "--assets",
+        "tokenizer",
+    ]
+    print(
+        f"DeepSeek V3 {flavor} tokenizer assets are missing; "
+        f"downloading tokenizer from {repo_id}."
+    )
+    try:
+        subprocess.run(cmd, cwd=TORCHTITAN_DIR, check=True)
+    except subprocess.CalledProcessError as exc:
+        raise SystemExit(
+            f"Failed to download DeepSeek V3 {flavor} tokenizer assets. Run:\n"
+            "  cd third_party/torchtitan\n"
+            f"  python scripts/download_hf_assets.py --repo_id {repo_id} "
+            "--assets tokenizer"
+        ) from exc
+
+
+def _ensure_assets(flavor: str) -> None:
+    hf_assets_path = HF_ASSET_PATHS.get(flavor)
+    if hf_assets_path is None:
+        return
+    tokenizer_path = hf_assets_path / "tokenizer.json"
+    if not tokenizer_path.exists():
+        _download_tokenizer(flavor)
+
+    if not tokenizer_path.exists():
+        raise SystemExit(
+            f"DeepSeek V3 {flavor} tokenizer assets are still missing after download. "
+            "Run:\n"
+            "  cd third_party/torchtitan\n"
+            "  python scripts/download_hf_assets.py "
+            f"--repo_id {HF_ASSET_REPOS[flavor]} --assets tokenizer"
+        )
+
+
+def _parse_gpus(args: argparse.Namespace) -> list[str]:
+    if args.gpus is None:
+        return [str(args.gpu)] if args.flavor == "debugmodel" else ["0", "1", "2", "3"]
+
+    gpus = [gpu.strip() for gpu in args.gpus.split(",") if gpu.strip()]
+    if not gpus:
+        raise SystemExit("--gpus must contain at least one GPU index")
+    return gpus
+
+
 def _cmd(args: argparse.Namespace) -> list[str]:
-    return [
+    cmd = [
         "torchrun",
         "--standalone",
         "--nproc_per_node",
-        "1",
+        str(args.nproc_per_node),
         "-m",
         "torchtitan.train",
         "--module",
         MODULE,
         "--config",
-        CONFIG,
+        FLAVOR_CONFIGS[args.flavor],
         "--training.local_batch_size",
         str(args.batch_size),
         "--training.seq_len",
@@ -62,6 +127,14 @@ def _cmd(args: argparse.Namespace) -> list[str]:
         "--metrics.log_freq",
         str(args.log_freq),
     ]
+    if args.flavor == "16b":
+        cmd += [
+            "--parallelism.data_parallel_shard_degree",
+            "4",
+            "--parallelism.expert_parallel_degree",
+            "2",
+        ]
+    return cmd
 
 
 def _stream_to_file(proc: subprocess.Popen, log_path: Path) -> None:
@@ -127,16 +200,24 @@ def run(args: argparse.Namespace) -> None:
     if args.log_freq <= 0:
         raise SystemExit("--log-freq must be positive")
 
+    gpus = _parse_gpus(args)
+    args.nproc_per_node = len(gpus)
+    if args.flavor == "16b" and args.nproc_per_node != 4:
+        raise SystemExit("--flavor 16b requires exactly 4 GPUs via --gpus")
+
+    _ensure_assets(args.flavor)
+
     RESULTS_DIR.mkdir(exist_ok=True)
     ts = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    log_path = RESULTS_DIR / f"{ts}_titan_deepseek_v3_debugmodel.txt"
+    log_path = RESULTS_DIR / f"{ts}_titan_deepseek_v3_{args.flavor}.txt"
     cmd = _cmd(args)
-    env = {**os.environ, "CUDA_VISIBLE_DEVICES": str(args.gpu)}
+    env = {**os.environ, "CUDA_VISIBLE_DEVICES": ",".join(gpus)}
 
     print()
     print("=" * 72)
-    print("TorchTitan DeepSeek V3 debugmodel")
-    print(f"GPU: {args.gpu}")
+    print(f"TorchTitan DeepSeek V3 {args.flavor}")
+    print(f"GPUs: {','.join(gpus)}")
+    print(f"Processes: {args.nproc_per_node}")
     print(f"Batch {args.batch_size} x seq {args.seq_len}")
     print(f"Steps: {args.steps}")
     print(f"Log: {log_path}")
@@ -170,24 +251,43 @@ def run(args: argparse.Namespace) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Run TorchTitan DeepSeek V3 debugmodel on one GPU"
+        description="Run TorchTitan DeepSeek V3 debugmodel or 16B smoke"
     )
-    parser.add_argument("--steps", type=int, default=10, help="Training steps")
+    parser.add_argument(
+        "--flavor",
+        choices=sorted(FLAVOR_CONFIGS),
+        default="debugmodel",
+        help="DeepSeek V3 model flavor",
+    )
+    parser.add_argument("--steps", type=int, default=None, help="Training steps")
     parser.add_argument("--gpu", type=int, default=0, help="GPU index")
+    parser.add_argument(
+        "--gpus",
+        type=str,
+        default=None,
+        help="Comma-separated visible GPU indices; defaults to --gpu for debugmodel and 0,1,2,3 for 16b",
+    )
     parser.add_argument(
         "--batch-size",
         type=int,
-        default=LOCAL_BATCH_SIZE,
-        help=f"Local batch size (default {LOCAL_BATCH_SIZE})",
+        default=None,
+        help="Local batch size",
     )
     parser.add_argument(
         "--seq-len",
         type=int,
-        default=SEQ_LEN,
-        help=f"Sequence length (default {SEQ_LEN})",
+        default=None,
+        help="Sequence length",
     )
     parser.add_argument("--log-freq", type=int, default=1, help="Metrics log frequency")
     args = parser.parse_args()
+    defaults = FLAVOR_DEFAULTS[args.flavor]
+    if args.steps is None:
+        args.steps = defaults["steps"]
+    if args.batch_size is None:
+        args.batch_size = defaults["batch_size"]
+    if args.seq_len is None:
+        args.seq_len = defaults["seq_len"]
     run(args)
 
 

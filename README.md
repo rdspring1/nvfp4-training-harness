@@ -21,8 +21,7 @@ the harness dependencies:
 python -m pip install --upgrade pip
 python -m pip install 'transformer-engine[pytorch]'
 
-git clone https://github.com/rspring/ao.git ../ao
-git -C ../ao checkout nvfp4_linear_poc_stack
+git clone https://github.com/pytorch/ao.git ../ao
 USE_CPP=0 python -m pip install -e ../ao --no-build-isolation
 
 git clone https://github.com/meta-pytorch/MSLK.git ../MSLK

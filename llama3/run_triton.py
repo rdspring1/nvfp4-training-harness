@@ -29,12 +29,14 @@ from pathlib import Path
 # ---------------------------------------------------------------------------
 # Configuration — edit here before launching
 # ---------------------------------------------------------------------------
+SCRIPT_DIR = Path(__file__).resolve().parent
+ROOT_DIR = SCRIPT_DIR.parent
 WALL_HOURS = 8
 STEPS_CEILING = 500_000  # wall clock kills first; this is just a ceiling
 BATCH_SIZE = 4
 SEQ_LEN = 2048  # 8192 tok/step with batch=4
 LR = 3e-4
-RESULTS_DIR = Path("llama3_results")
+RESULTS_DIR = ROOT_DIR / "llama3_results"
 SMOKE_STEPS = 3_000  # warn if any run ends before this
 
 EXPERIMENTS = [
@@ -104,16 +106,17 @@ def launch_experiments(
     for exp in exps:
         compile_suffix = f"_{compile_mode.replace('-', '_')}" if compile_mode else ""
         log_path = RESULTS_DIR / f"{ts}_{exp['tag']}_{exp['name']}{compile_suffix}.txt"
-        script = "ao_llama3_train.py"
+        script = SCRIPT_DIR / "ao_llama3_train.py"
         extra = exp["extra"]
         if compile_mode:
             extra = extra + ["--compile", compile_mode]
-        cmd = [sys.executable, "-u", script] + base_args + extra
+        cmd = [sys.executable, "-u", str(script)] + base_args + extra
         gpu = gpu_override if gpu_override is not None else exp["gpu"]
         env = {**os.environ, "CUDA_VISIBLE_DEVICES": str(gpu)}
 
         proc = subprocess.Popen(
             cmd,
+            cwd=ROOT_DIR,
             env=env,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,

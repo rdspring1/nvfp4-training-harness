@@ -1,4 +1,6 @@
 llama3_results/
+deepseek_v3_results/
 __pycache__/
 *.log
 save.md
+debug-session.md

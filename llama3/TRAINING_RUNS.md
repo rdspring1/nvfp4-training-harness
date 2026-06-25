@@ -1,6 +1,7 @@
 # Training Run Reproduction
 
 This note captures how the LLaMA 3 runs were reproduced.
+Commands are written to run from the repository root.
 
 ## Context
 
@@ -19,8 +20,9 @@ This note captures how the LLaMA 3 runs were reproduced.
 - AO multi GPU: `ao_llama3_fsdp2_tp_train.py`
 - TE single GPU: `te_llama3_train.py`
 - TE multi GPU: `te_llama3_fsdp2_tp_train.py`
-- Launchers: `run_comparison.py`, `run_triton.py`, `run_te.py`,
-  `run_comparison_multi.py`, `run_triton_multi.py`, and `run_te_multi.py`
+- Launchers: `llama3/run_comparison.py`, `llama3/run_triton.py`,
+  `llama3/run_te.py`, `llama3/run_comparison_multi.py`,
+  `llama3/run_triton_multi.py`, and `llama3/run_te_multi.py`
 
 TorchAO BF16 runs leave `nn.Linear` unquantized. TorchAO NVFP4 runs apply
 `torchao.quantization.quantize_()` with `NVFP4TrainingConfig` and the Triton
@@ -29,12 +31,12 @@ kernel. TE NVFP4 runs use TransformerEngine modules with `NVFP4BlockScaling`.
 ## Execution Modes
 
 - Eager is the default: omit `--compile`.
-- AO single-GPU `run_comparison.py` requires an explicit compile mode, for
+- AO single-GPU `llama3/run_comparison.py` requires an explicit compile mode, for
   example `--compile reduce-overhead`.
 - The other launchers accept bare `--compile` as `reduce-overhead`.
 - Accepted compile modes are `reduce-overhead`, `default`, `max-autotune`, and
   `max-autotune-no-cudagraphs`.
-- TE single-GPU `run_te.py` uses the compile option as a compatibility label:
+- TE single-GPU `llama3/run_te.py` uses the compile option as a compatibility label:
   `reduce-overhead` and `max-autotune` enable CUDA graphs instead of calling
   `torch.compile`.
 
@@ -51,13 +53,13 @@ The AO NVFP4 and TE NVFP4 multi-GPU launchers support these 4-GPU layouts:
 Use the shape with `--only`, for example:
 
 ```bash
-CUDA_VISIBLE_DEVICES=0,1,2,3 python run_triton_multi.py --only fsdp4 --compile
-CUDA_VISIBLE_DEVICES=0,1,2,3 python run_triton_multi.py --only tp4 --compile
-CUDA_VISIBLE_DEVICES=0,1,2,3 python run_triton_multi.py --only tp2_fsdp2 --compile
+CUDA_VISIBLE_DEVICES=0,1,2,3 python llama3/run_triton_multi.py --only fsdp4 --compile
+CUDA_VISIBLE_DEVICES=0,1,2,3 python llama3/run_triton_multi.py --only tp4 --compile
+CUDA_VISIBLE_DEVICES=0,1,2,3 python llama3/run_triton_multi.py --only tp2_fsdp2 --compile
 
-CUDA_VISIBLE_DEVICES=0,1,2,3 python run_te_multi.py --only fsdp4
-CUDA_VISIBLE_DEVICES=0,1,2,3 python run_te_multi.py --only tp4
-CUDA_VISIBLE_DEVICES=0,1,2,3 python run_te_multi.py --only tp2_fsdp2
+CUDA_VISIBLE_DEVICES=0,1,2,3 python llama3/run_te_multi.py --only fsdp4
+CUDA_VISIBLE_DEVICES=0,1,2,3 python llama3/run_te_multi.py --only tp4
+CUDA_VISIBLE_DEVICES=0,1,2,3 python llama3/run_te_multi.py --only tp2_fsdp2
 ```
 
 The BF16 comparison launcher currently wraps the `tp2_fsdp2` baseline.
@@ -68,11 +70,11 @@ The public quick-start commands in `README.md` launch the six runs with the
 same 8-hour wall-clock configuration:
 
 ```bash
-nohup python run_comparison.py --only bf16 --gpu 0 --compile reduce-overhead > run_ao_bf16.log 2>&1 &
-nohup python run_triton.py --gpu 1 --compile > run_ao_nvfp4.log 2>&1 &
-nohup python run_te.py --only nvfp4 --gpu 2 > run_te_nvfp4.log 2>&1 &
+nohup python llama3/run_comparison.py --only bf16 --gpu 0 --compile reduce-overhead > run_ao_bf16.log 2>&1 &
+nohup python llama3/run_triton.py --gpu 1 --compile > run_ao_nvfp4.log 2>&1 &
+nohup python llama3/run_te.py --only nvfp4 --gpu 2 > run_te_nvfp4.log 2>&1 &
 
-CUDA_VISIBLE_DEVICES=0,1,2,3 nohup python run_comparison_multi.py --compile > run_ao_bf16_multi.log 2>&1 &
-CUDA_VISIBLE_DEVICES=0,1,2,3 nohup python run_triton_multi.py --only tp2_fsdp2 --compile > run_ao_nvfp4_multi.log 2>&1 &
-CUDA_VISIBLE_DEVICES=0,1,2,3 nohup python run_te_multi.py --only tp2_fsdp2 > run_te_nvfp4_multi.log 2>&1 &
+CUDA_VISIBLE_DEVICES=0,1,2,3 nohup python llama3/run_comparison_multi.py --compile > run_ao_bf16_multi.log 2>&1 &
+CUDA_VISIBLE_DEVICES=0,1,2,3 nohup python llama3/run_triton_multi.py --only tp2_fsdp2 --compile > run_ao_nvfp4_multi.log 2>&1 &
+CUDA_VISIBLE_DEVICES=0,1,2,3 nohup python llama3/run_te_multi.py --only tp2_fsdp2 > run_te_nvfp4_multi.log 2>&1 &
 ```

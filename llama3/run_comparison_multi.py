@@ -21,12 +21,14 @@ import threading
 import time
 from pathlib import Path
 
+SCRIPT_DIR = Path(__file__).resolve().parent
+ROOT_DIR = SCRIPT_DIR.parent
 WALL_HOURS = 8
 SMOKE_WALL_HOURS = 10 / 60
 TARGET_TOKENS = 200_000_000
 SEQ_LEN = 2048
 LR = 3e-4
-RESULTS_DIR = Path("llama3_results")
+RESULTS_DIR = ROOT_DIR / "llama3_results"
 SMOKE_STEPS = 10
 
 # Batch size from:
@@ -102,7 +104,7 @@ def build_cmd(exp: dict, steps: int, compile_mode: str | None, data: str):
         "--standalone",
         "--nproc_per_node",
         str(world_size),
-        "ao_llama3_fsdp2_tp_train.py",
+        str(SCRIPT_DIR / "ao_llama3_fsdp2_tp_train.py"),
         "--steps",
         str(steps),
         "--batch-size",
@@ -192,6 +194,7 @@ def launch_experiments(
 
         proc = subprocess.Popen(
             cmd,
+            cwd=ROOT_DIR,
             env=env,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,

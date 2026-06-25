@@ -4,8 +4,8 @@ import os
 
 import torch
 
+from torchtitan.config import derive, override
 from torchtitan.models.common import Linear
-from torchtitan.registry import register
 
 from .nvfp4 import TritonNVFP4Linear
 
@@ -18,7 +18,7 @@ if torch._dynamo.config.recompile_limit < _NVFP4_RECOMPILE_LIMIT:
     torch._dynamo.config.recompile_limit = _NVFP4_RECOMPILE_LIMIT
 
 
-@register(
+@override(
     "triton_nvfp4_linear",
     target=Linear.Config,
     description="Replace Linear with torchao Triton NVFP4Linear (Blackwell)",
@@ -34,11 +34,5 @@ def triton_nvfp4_linear_override(
     tp = int(os.environ.get("TORCHTITAN_AO_TP_DEGREE", "1"))
     local_block = 128 * max(tp, 1)
     if cfg.in_features % local_block != 0 or cfg.out_features % local_block != 0:
-        return None
-    return TritonNVFP4Linear.Config(
-        in_features=cfg.in_features,
-        out_features=cfg.out_features,
-        bias=cfg.bias,
-        param_init=cfg.param_init,
-        sharding_config=cfg.sharding_config,
-    )
+        return cfg
+    return derive(cfg, TritonNVFP4Linear.Config)

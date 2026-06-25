@@ -1,65 +1,75 @@
 #!/usr/bin/env python3
 """
-TransformerEngine low-precision training launcher.
+BF16 vs NVFP4 comparison launcher.
 
-Runs TE-native NVFP4 and MXFP8 experiments on separate GPUs with an 8-hour
-wall clock. GPU 0 is reserved for user use.
+Runs three experiments in parallel on separate GPUs with an 8-hour wall clock.
+GPU 0 is reserved for user use.
 
 Usage:
     # Smoke test (5 minutes, 10 steps):
-    python run_te.py --smoke
+    python run_comparison.py --smoke
 
     # Full 8-hour run in background:
-    nohup python run_te.py > run_te.log 2>&1 &
-    echo $!
-    tail -f run_te.log
-    tail -f llama3_results/*te_native*.txt
+    nohup python run_comparison.py > run_comparison.log 2>&1 &
+    echo $!                                  # note the PID
+    tail -f run_comparison.log               # follow launcher log
+    tail -f llama3_results/*bf16*.txt        # follow individual experiment
 """
 
 import argparse
-import datetime
 import os
 import re
 import subprocess
 import sys
 import threading
 import time
+import datetime
 from pathlib import Path
 
 # ---------------------------------------------------------------------------
-# Configuration
+# Configuration — edit here before launching
 # ---------------------------------------------------------------------------
+SCRIPT_DIR = Path(__file__).resolve().parent
+ROOT_DIR = SCRIPT_DIR.parent
 WALL_HOURS = 8
-STEPS_CEILING = 500_000
+STEPS_CEILING = 500_000  # wall clock kills first; this is just a ceiling
 BATCH_SIZE = 4
-SEQ_LEN = 2048
+SEQ_LEN = 2048  # 8192 tok/step with batch=4
 LR = 3e-4
-RESULTS_DIR = Path("llama3_results")
-SMOKE_STEPS = 3_000
+RESULTS_DIR = ROOT_DIR / "llama3_results"
+SMOKE_STEPS = 3_000  # warn if any run ends before this
 
 EXPERIMENTS = [
     {
-        "name": "nvfp4",
-        "gpu": 2,
-        "extra": ["--precision", "nvfp4"],
+        "name": "bf16",
+        "gpu": 1,
+        "extra": [],
     },
     {
-        "name": "mxfp8",
+        "name": "nvfp4_torch",
+        "gpu": 2,
+        "extra": ["--quantize", "nvfp4", "--kernel", "torch"],
+    },
+    {
+        "name": "nvfp4_te",
         "gpu": 3,
-        "extra": ["--precision", "mxfp8"],
+        "extra": ["--quantize", "nvfp4", "--kernel", "te"],
     },
 ]
 
+# ---------------------------------------------------------------------------
 # Step-line regex: "  1234   6.8234     9842    1.0M    24.31"
+# ---------------------------------------------------------------------------
 _STEP_RE = re.compile(r"^\s+(\d+)\s+([\d.]+)\s+([\d.]+)\s+\S+\s+([\d.]+)\s*$")
 
 
 def stream_to_file(proc, log_path: Path, prefix: str):
-    """Read proc.stdout line by line, write to log_path, and print with prefix."""
+    """Read proc.stdout line by line, write to log_path and print with prefix."""
     with open(log_path, "w") as f:
         for line in proc.stdout:
             f.write(line)
             f.flush()
+            # Only print step lines and header lines to keep stdout readable
             stripped = line.rstrip()
             if stripped:
                 print(f"[{prefix}] {stripped}", flush=True)
@@ -70,14 +80,22 @@ def launch_experiments(
     steps: int,
     only: str = None,
     gpu_override: int = None,
-    cuda_graphs: bool = False,
     compile_mode: str = None,
 ):
     RESULTS_DIR.mkdir(exist_ok=True)
     ts = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     wall_seconds = wall_hours * 3600
 
-    base_args = [
+    exps = [e for e in EXPERIMENTS if only is None or e["name"] == only]
+    if not exps:
+        raise SystemExit(
+            f"No experiment named {only!r}. Choices: {[e['name'] for e in EXPERIMENTS]}"
+        )
+
+    base_cmd = [
+        sys.executable,
+        "-u",
+        str(SCRIPT_DIR / "ao_llama3_train.py"),
         "--data",
         "wikitext",
         "--steps",
@@ -89,74 +107,61 @@ def launch_experiments(
         "--lr",
         str(LR),
     ]
-
-    exps = [e for e in EXPERIMENTS if only is None or e["name"] == only]
-    if not exps:
-        raise SystemExit(
-            f"No experiment named {only!r}. Choices: {[e['name'] for e in EXPERIMENTS]}"
-        )
-
-    graph_enabled = cuda_graphs or compile_mode in {"reduce-overhead", "max-autotune"}
-    suffix = ""
     if compile_mode:
-        suffix = f"_{compile_mode.replace('-', '_')}"
-    elif graph_enabled:
-        suffix = "_cuda_graphs"
+        base_cmd += ["--compile", compile_mode]
 
-    running = []
+    running = []  # list of (name, gpu, proc, log_path, start_time)
 
-    print()
-    print("=" * 60)
-    print(f"TE native NVFP4 + MXFP8 - {wall_hours:.4g}h wall clock")
-    print(f"Batch {BATCH_SIZE} x seq {SEQ_LEN} = {BATCH_SIZE * SEQ_LEN} tok/step")
+    print(f"\n{'='*60}")
+    print(f"BF16 vs NVFP4 Comparison — {wall_hours:.4g}h wall clock")
+    print(f"Batch {BATCH_SIZE} × seq {SEQ_LEN} = {BATCH_SIZE * SEQ_LEN} tok/step")
     print(f"Steps ceiling: {steps:,}")
-    print(f"CUDA Graphs: {'enabled' if graph_enabled else 'disabled'}")
-    print("=" * 60)
-    print()
+    print(f"{'='*60}\n")
 
     for exp in exps:
-        log_path = RESULTS_DIR / f"{ts}_te_native_{exp['name']}{suffix}.txt"
-        extra = list(exp["extra"])
-        if graph_enabled:
-            extra.append("--cuda-graphs")
-        cmd = [sys.executable, "-u", "te_llama3_train.py"] + base_args + extra
+        log_path = RESULTS_DIR / f"{ts}_ao_{exp['name']}.txt"
+        cmd = base_cmd + exp["extra"]
         gpu = gpu_override if gpu_override is not None else exp["gpu"]
         env = {**os.environ, "CUDA_VISIBLE_DEVICES": str(gpu)}
 
         proc = subprocess.Popen(
             cmd,
+            cwd=ROOT_DIR,
             env=env,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
             bufsize=1,
         )
-        thread = threading.Thread(
+        t = threading.Thread(
             target=stream_to_file,
             args=(proc, log_path, exp["name"]),
             daemon=True,
         )
-        thread.start()
+        t.start()
 
         start = time.monotonic()
-        running.append((exp["name"], gpu, proc, log_path, start, thread))
-        print(f"  [{exp['name']}] GPU {gpu} PID {proc.pid} -> {log_path}")
+        running.append((exp["name"], gpu, proc, log_path, start, t))
+        print(f"  [{exp['name']}]  GPU {gpu}  PID {proc.pid}" f"  → {log_path}")
 
     print()
 
+    # Wait up to wall_seconds, polling every 15s
     deadline = time.monotonic() + wall_seconds
     try:
         while time.monotonic() < deadline:
-            if all(proc.poll() is not None for _, _, proc, _, _, _ in running):
+            if all(p.poll() is not None for _, _, p, _, _, _ in running):
                 print("\nAll experiments finished before wall clock.")
                 break
             time.sleep(15)
         else:
-            print(f"\n{wall_hours:.4g}h wall clock reached - stopping experiments.")
+            elapsed_h = wall_hours
+            print(f"\n{wall_hours:.4g}h wall clock reached — stopping experiments.")
     except KeyboardInterrupt:
-        print("\nKeyboardInterrupt - stopping experiments.")
+        print("\nKeyboardInterrupt — stopping experiments.")
 
-    for name, gpu, proc, log_path, start, thread in running:
+    # Graceful termination
+    for name, gpu, proc, log_path, start, t in running:
         if proc.poll() is None:
             proc.terminate()
             try:
@@ -166,8 +171,9 @@ def launch_experiments(
                 proc.wait()
             print(f"  [{name}] terminated (GPU {gpu})")
 
-    for _, _, _, _, _, thread in running:
-        thread.join(timeout=5)
+    # Wait for streaming threads to flush
+    for _, _, _, _, _, t in running:
+        t.join(timeout=5)
 
     print()
     print_summary(running)
@@ -179,13 +185,13 @@ def parse_log(log_path: Path):
     try:
         with open(log_path) as f:
             for line in f:
-                match = _STEP_RE.match(line)
-                if match:
+                m = _STEP_RE.match(line)
+                if m:
                     last = (
-                        int(match.group(1)),
-                        float(match.group(2)),
-                        float(match.group(3)),
-                        float(match.group(4)),
+                        int(m.group(1)),
+                        float(m.group(2)),
+                        float(m.group(3)),
+                        float(m.group(4)),
                     )
     except FileNotFoundError:
         pass
@@ -195,13 +201,10 @@ def parse_log(log_path: Path):
 def print_summary(running):
     tok_per_step = BATCH_SIZE * SEQ_LEN
 
-    header = (
-        f"{'Experiment':<16} {'Steps':>8} {'Final Loss':>12} "
-        f"{'Tok/s':>8} {'Total Tokens':>14} {'Log'}"
-    )
-    sep = "-" * (len(header) + 10)
+    header = f"{'Experiment':<16} {'Steps':>8} {'Final Loss':>12} {'Tok/s':>8} {'Total Tokens':>14} {'Log'}"
+    sep = "─" * (len(header) + 10)
 
-    print("=" * (len(header) + 10))
+    print("═" * (len(header) + 10))
     print(" SUMMARY")
     print(sep)
     print(f" {header}")
@@ -209,31 +212,32 @@ def print_summary(running):
 
     for name, gpu, proc, log_path, start, _ in running:
         result = parse_log(log_path)
+        elapsed = time.monotonic() - start
 
         if result is None:
             print(f" {name:<16} {'NO DATA':>8}")
             continue
 
         step, loss, tok_s, mem = result
-        total_tokens = (step + 1) * tok_per_step
+        total_tokens = step * tok_per_step
         tok_str = f"{total_tokens / 1e6:.1f}M"
 
-        warn = " <smoke floor" if step < SMOKE_STEPS else ""
+        warn = " ⚠ <smoke floor" if step < SMOKE_STEPS else ""
         print(
             f" {name:<16} {step:>8,} {loss:>12.4f} {tok_s:>8.0f}"
             f" {tok_str:>14}  {log_path.name}{warn}"
         )
 
-    print("=" * (len(header) + 10))
+    print("═" * (len(header) + 10))
     print()
 
 
 def main():
-    parser = argparse.ArgumentParser(description="TE native NVFP4/MXFP8 launcher")
+    parser = argparse.ArgumentParser(description="BF16 vs NVFP4 comparison launcher")
     parser.add_argument(
         "--smoke",
         action="store_true",
-        help="Smoke test: 5-minute wall clock, 10 steps",
+        help="Smoke test: 7-second wall clock, 10 steps (verify launch + logging)",
     )
     parser.add_argument(
         "--only",
@@ -250,37 +254,20 @@ def main():
         help="Override GPU index for the selected experiment",
     )
     parser.add_argument(
-        "--cuda-graphs",
-        action="store_true",
-        help="Enable CUDA graph capture in te_llama3_train.py",
-    )
-    parser.add_argument(
         "--compile",
         type=str,
-        nargs="?",
-        const="reduce-overhead",
         default=None,
-        metavar="MODE",
         choices=[
             "reduce-overhead",
             "default",
             "max-autotune",
             "max-autotune-no-cudagraphs",
         ],
-        help=(
-            "Compatibility label from run_triton.py. For TE, reduce-overhead "
-            "and max-autotune enable CUDA graphs; default and "
-            "max-autotune-no-cudagraphs leave graphs disabled."
-        ),
+        help="torch.compile mode to pass through to ao_llama3_train.py",
     )
     args = parser.parse_args()
 
-    kwargs = dict(
-        only=args.only,
-        gpu_override=args.gpu,
-        cuda_graphs=args.cuda_graphs,
-        compile_mode=args.compile,
-    )
+    kwargs = dict(only=args.only, gpu_override=args.gpu, compile_mode=args.compile)
     if args.smoke:
         print("SMOKE TEST MODE: 5min wall clock, 10 steps")
         launch_experiments(wall_hours=5 / 60, steps=10, **kwargs)

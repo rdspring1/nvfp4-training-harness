@@ -37,8 +37,9 @@ import time
 from pathlib import Path
 
 PLUGIN_DIR = Path(__file__).resolve().parent  # hosts torchtitan_ao
-TORCHTITAN_DIR = PLUGIN_DIR / "third_party" / "torchtitan"
-RESULTS_DIR = Path("llama3_results")
+ROOT_DIR = PLUGIN_DIR.parent
+TORCHTITAN_DIR = ROOT_DIR / "third_party" / "torchtitan"
+RESULTS_DIR = ROOT_DIR / "llama3_results"
 NVFP4_OVERRIDE_MODULE = "torchtitan_ao.overrides"
 SEQ_LEN = 2048
 LR = 3e-4
@@ -161,9 +162,7 @@ def _hf_assets_path_for_config(base_config: str) -> str | None:
 def _nvfp4_flags(nvfp4: bool) -> list[str]:
     if not nvfp4:
         return []
-    # torchtitan registers a custom tyro rule that parses list[str] as
-    # comma-separated values, not JSON. Pass the bare module path.
-    return ["--override.modules", NVFP4_OVERRIDE_MODULE]
+    return ["--override.imports", NVFP4_OVERRIDE_MODULE]
 
 
 def _precision_tag(nvfp4: bool) -> str:
@@ -211,13 +210,13 @@ def _single_cmd(
         str(SEQ_LEN),
         "--training.steps",
         str(steps),
-        "--optimizer.lr",
-        str(LR),
         "--dataloader.dataset",
         dataset,
         "--metrics.log_freq",
         "10",
     ]
+    if LR != 8e-4:
+        cmd += ["--optimizer.param-groups.0.optimizer-kwargs.lr", str(LR)]
     if hf_assets_path is not None:
         cmd += ["--hf-assets-path", hf_assets_path]
     return cmd + _compile_flags(compile_enabled) + _nvfp4_flags(nvfp4)
@@ -384,13 +383,13 @@ def _multi_cmd(
         str(SEQ_LEN),
         "--training.steps",
         str(steps),
-        "--optimizer.lr",
-        str(LR),
         "--dataloader.dataset",
         data,
         "--metrics.log_freq",
         "10",
     ]
+    if LR != 8e-4:
+        cmd += ["--optimizer.param-groups.0.optimizer-kwargs.lr", str(LR)]
     if hf_assets_path is not None:
         cmd += ["--hf-assets-path", hf_assets_path]
     return cmd + _compile_flags(compile_enabled) + _nvfp4_flags(nvfp4)

@@ -19,7 +19,7 @@ from torchao.quantization.quantize_.common.kernel_preference import (
     KernelPreference,
 )
 from torchtitan.distributed.parallel_dims import ParallelDims
-from torchtitan.models.common.linear import Linear
+from torchtitan.models.common import Linear
 from torchtitan.protocols.module import Module
 
 

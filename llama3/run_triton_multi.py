@@ -1,16 +1,19 @@
 #!/usr/bin/env python3
 """
-TransformerEngine FSDP2 + TP training launcher.
+NVFP4 FSDP2 + TP training launcher.
 
-Runs distributed TE experiments sequentially because each experiment consumes
-its full TP x FSDP2 world size.
+Runs distributed TorchAO NVFP4 Triton experiments sequentially because each
+experiment consumes its full TP x FSDP2 world size.
 
 Usage:
     # 10-step eager WikiText smoke over 4xTP, 4xFSDP2, then 2xTP/2xFSDP2.
-    python run_te_multi.py --smoke
+    python run_multi.py --smoke
+
+    # 10-step torch.compile reduce-overhead smoke.
+    python run_multi.py --smoke --compile
 
     # Run one shape explicitly.
-    python run_te_multi.py --smoke --only tp2_fsdp2
+    python run_multi.py --smoke --only tp2_fsdp2
 """
 
 import argparse
@@ -22,33 +25,35 @@ import threading
 import time
 from pathlib import Path
 
+SCRIPT_DIR = Path(__file__).resolve().parent
+ROOT_DIR = SCRIPT_DIR.parent
 WALL_HOURS = 8
 SMOKE_WALL_HOURS = 10 / 60
 STEPS_CEILING = 500_000
 SEQ_LEN = 2048
 LR = 3e-4
-RESULTS_DIR = Path("llama3_results")
+RESULTS_DIR = ROOT_DIR / "llama3_results"
 SMOKE_STEPS = 10
 
-# Match run_triton_multi.py batch sizes per DP replica.
+# Conservative first-jump batch sizes from reduce-overhead 10-step memory smoke.
 EXPERIMENTS = [
     {
         "name": "tp4",
-        "tag": "te_multi",
+        "tag": "ao_multi",
         "tp": 4,
         "fsdp": 1,
         "batch_size": 32,
     },
     {
         "name": "fsdp4",
-        "tag": "te_multi",
+        "tag": "ao_multi",
         "tp": 1,
         "fsdp": 4,
         "batch_size": 4,
     },
     {
         "name": "tp2_fsdp2",
-        "tag": "te_multi",
+        "tag": "ao_multi",
         "tp": 2,
         "fsdp": 2,
         "batch_size": 8,
@@ -99,29 +104,24 @@ def parse_log(log_path: Path):
     return last
 
 
-def experiment_label(exp: dict, precision: str, compile_mode: str | None) -> str:
+def experiment_label(exp: dict, compile_mode: str | None) -> str:
     suffix = f"_{compile_mode.replace('-', '_')}" if compile_mode else ""
-    return f"{precision}_{exp['name']}{suffix}"
+    return f"{exp['name']}{suffix}"
 
 
-def build_cmd(
-    exp: dict,
-    steps: int,
-    precision: str,
-    compile_mode: str | None,
-    data: str,
-):
+def build_cmd(exp: dict, steps: int, compile_mode: str | None, data: str):
     world_size = exp["tp"] * exp["fsdp"]
+    batch_size = exp["batch_size"]
     cmd = [
         "torchrun",
         "--standalone",
         "--nproc_per_node",
         str(world_size),
-        "te_llama3_fsdp2_tp_train.py",
+        str(SCRIPT_DIR / "ao_llama3_fsdp2_tp_train.py"),
         "--steps",
         str(steps),
         "--batch-size",
-        str(exp["batch_size"]),
+        str(batch_size),
         "--seq-len",
         str(SEQ_LEN),
         "--lr",
@@ -130,8 +130,10 @@ def build_cmd(
         str(exp["tp"]),
         "--fsdp-size",
         str(exp["fsdp"]),
-        "--precision",
-        precision,
+        "--quantize",
+        "nvfp4",
+        "--kernel",
+        "triton",
     ]
     if data != "synthetic":
         cmd += ["--data", data]
@@ -155,7 +157,6 @@ def launch_experiments(
     wall_hours: float,
     steps: int,
     only: str | None = None,
-    precision: str = "nvfp4",
     compile_mode: str | None = None,
     data: str = "wikitext",
     allow_insufficient_gpus: bool = False,
@@ -173,9 +174,7 @@ def launch_experiments(
 
     print()
     print("=" * 72)
-    print(
-        f"TE {precision.upper()} FSDP2 + TP - {wall_hours:.4g}h wall clock per experiment"
-    )
+    print(f"NVFP4 FSDP2 + TP - {wall_hours:.4g}h wall clock per experiment")
     batch_sizes = ", ".join(f"{exp['name']}={exp['batch_size']}" for exp in exps)
     print(f"Batch sizes per DP replica: {batch_sizes}")
     print(f"Seq length: {SEQ_LEN}")
@@ -189,7 +188,7 @@ def launch_experiments(
     results = []
     for exp in exps:
         world_size = exp["tp"] * exp["fsdp"]
-        label = experiment_label(exp, precision, compile_mode)
+        label = experiment_label(exp, compile_mode)
         log_path = RESULTS_DIR / f"{ts}_{exp['tag']}_{label}.txt"
         if available_gpus < world_size and not allow_insufficient_gpus:
             print(
@@ -199,7 +198,7 @@ def launch_experiments(
             results.append((exp, label, "SKIPPED", None, log_path, None))
             continue
 
-        cmd = build_cmd(exp, steps, precision, compile_mode, data)
+        cmd = build_cmd(exp, steps, compile_mode, data)
         env = {**os.environ, "OMP_NUM_THREADS": os.environ.get("OMP_NUM_THREADS", "1")}
         print(
             f"  [{label}] world_size={world_size} batch={exp['batch_size']} "
@@ -209,6 +208,7 @@ def launch_experiments(
 
         proc = subprocess.Popen(
             cmd,
+            cwd=ROOT_DIR,
             env=env,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
@@ -284,7 +284,7 @@ def print_summary(results):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="TE FSDP2 + TP launcher")
+    parser = argparse.ArgumentParser(description="NVFP4 FSDP2 + TP launcher")
     parser.add_argument(
         "--smoke",
         action="store_true",
@@ -298,13 +298,6 @@ def main():
         help=f"Run only this experiment. Choices: {[e['name'] for e in EXPERIMENTS]}",
     )
     parser.add_argument(
-        "--precision",
-        type=str,
-        default="nvfp4",
-        choices=["nvfp4", "mxfp8"],
-        help="TransformerEngine low-precision recipe",
-    )
-    parser.add_argument(
         "--compile",
         type=str,
         nargs="?",
@@ -316,7 +309,7 @@ def main():
             "max-autotune",
             "max-autotune-no-cudagraphs",
         ],
-        help="torch.compile mode for te_llama3_fsdp2_tp_train.py",
+        help="torch.compile mode for ao_llama3_fsdp2_tp_train.py",
     )
     parser.add_argument(
         "--data",
@@ -326,19 +319,26 @@ def main():
         help="Dataset for smoke/full runs. Use synthetic for launch-only checks.",
     )
     parser.add_argument(
+        "--steps",
+        type=int,
+        default=None,
+        help="Override the number of training steps for each selected experiment.",
+    )
+    parser.add_argument(
         "--allow-insufficient-gpus",
         action="store_true",
         help="Launch torchrun even when visible GPU count is below world size.",
     )
     args = parser.parse_args()
+    if args.steps is not None and args.steps <= 0:
+        raise SystemExit("--steps must be positive")
 
     if args.smoke:
         print("SMOKE TEST MODE: 10min wall clock per experiment, 10 steps")
         launch_experiments(
             wall_hours=SMOKE_WALL_HOURS,
-            steps=10,
+            steps=args.steps or 10,
             only=args.only,
-            precision=args.precision,
             compile_mode=args.compile,
             data=args.data,
             allow_insufficient_gpus=args.allow_insufficient_gpus,
@@ -346,9 +346,8 @@ def main():
     else:
         launch_experiments(
             wall_hours=WALL_HOURS,
-            steps=STEPS_CEILING,
+            steps=args.steps or STEPS_CEILING,
             only=args.only,
-            precision=args.precision,
             compile_mode=args.compile,
             data=args.data,
             allow_insufficient_gpus=args.allow_insufficient_gpus,

@@ -1,5 +1,5 @@
 """torchao NVFP4 plugin for TorchTitan."""
 
-from .nvfp4 import TritonNVFP4Linear
+from .nvfp4 import NVFP4Linear
 
-__all__ = ["TritonNVFP4Linear"]
+__all__ = ["NVFP4Linear"]

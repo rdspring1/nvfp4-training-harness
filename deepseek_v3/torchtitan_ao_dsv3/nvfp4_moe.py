@@ -50,6 +50,17 @@ class NVFP4GroupedExperts(GroupedExperts):
             w2_EDF = self.w2_EDF
             w3_EFD = self.w3_EFD
 
+        # NVFP4 grouped MM requires non-empty groups, but routing may leave
+        # experts idle. This single-GPU debugmodel override filters them here;
+        # the broader MXFP8 integration instead installs a padded EP dispatcher.
+        # For an EP>1 override, replace both GroupedExperts.Config components:
+        # implementation -> NVFP4GroupedExperts.Config and token_dispatcher ->
+        # TorchAOTokenDispatcher.Config, which pads empty experts.
+        active_experts_E = num_tokens_per_expert_E > 0
+        num_tokens_per_expert_E = num_tokens_per_expert_E[active_experts_E]
+        w1_EFD = w1_EFD[active_experts_E]
+        w2_EDF = w2_EDF[active_experts_E]
+        w3_EFD = w3_EFD[active_experts_E]
         offsets_E = torch.cumsum(
             num_tokens_per_expert_E, dim=0, dtype=torch.int32
         )

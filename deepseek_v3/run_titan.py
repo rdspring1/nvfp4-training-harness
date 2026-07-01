@@ -10,10 +10,12 @@ import sys
 import threading
 from pathlib import Path
 
-ROOT_DIR = Path(__file__).resolve().parent.parent
+PLUGIN_DIR = Path(__file__).resolve().parent
+ROOT_DIR = PLUGIN_DIR.parent
 TORCHTITAN_DIR = ROOT_DIR / "third_party" / "torchtitan"
 DEEPSEEK_MODEL_DIR = TORCHTITAN_DIR / "torchtitan" / "models" / "deepseek_v3"
 RESULTS_DIR = ROOT_DIR / "deepseek_v3_results"
+NVFP4_OVERRIDE_MODULE = "torchtitan_ao_dsv3.overrides"
 
 MODULE = "deepseek_v3"
 FLAVOR_CONFIGS = {
@@ -134,6 +136,8 @@ def _cmd(args: argparse.Namespace) -> list[str]:
             "--parallelism.expert_parallel_degree",
             "2",
         ]
+    if args.nvfp4:
+        cmd += ["--override.imports", NVFP4_OVERRIDE_MODULE]
     return cmd
 
 
@@ -216,9 +220,14 @@ def run(args: argparse.Namespace) -> None:
 
     RESULTS_DIR.mkdir(exist_ok=True)
     ts = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    log_path = RESULTS_DIR / f"{ts}_titan_deepseek_v3_{args.flavor}.txt"
+    precision = "nvfp4" if args.nvfp4 else "bf16"
+    log_path = RESULTS_DIR / (
+        f"{ts}_titan_deepseek_v3_{args.flavor}_{precision}.txt"
+    )
     cmd = _cmd(args)
     env = {**os.environ, "CUDA_VISIBLE_DEVICES": ",".join(gpus)}
+    if args.nvfp4:
+        env["PYTHONPATH"] = f"{PLUGIN_DIR}:{os.environ.get('PYTHONPATH', '')}"
 
     print()
     print("=" * 72)
@@ -287,6 +296,11 @@ def main() -> None:
         help="Sequence length",
     )
     parser.add_argument("--log-freq", type=int, default=1, help="Metrics log frequency")
+    parser.add_argument(
+        "--nvfp4",
+        action="store_true",
+        help=f"Enable torchao NVFP4 grouped experts via {NVFP4_OVERRIDE_MODULE}",
+    )
     args = parser.parse_args()
     defaults = FLAVOR_DEFAULTS[args.flavor]
     if args.steps is None:

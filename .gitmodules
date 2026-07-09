@@ -6,4 +6,4 @@
 	url = https://github.com/meta-pytorch/MSLK.git
 [submodule "third_party/torchtitan"]
 	path = third_party/torchtitan
-	url = https://github.com/pytorch/torchtitan.git
+	url = https://github.com/rdspring1/torchtitan.git

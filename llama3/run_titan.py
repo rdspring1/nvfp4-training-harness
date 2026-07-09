@@ -36,11 +36,11 @@ import threading
 import time
 from pathlib import Path
 
-PLUGIN_DIR = Path(__file__).resolve().parent  # hosts torchtitan_ao
+PLUGIN_DIR = Path(__file__).resolve().parent
 ROOT_DIR = PLUGIN_DIR.parent
 TORCHTITAN_DIR = ROOT_DIR / "third_party" / "torchtitan"
 RESULTS_DIR = ROOT_DIR / "llama3_results"
-NVFP4_OVERRIDE_MODULE = "torchtitan_ao.overrides"
+NVFP4_OVERRIDE_MODULE = "torchtitan.overrides.nvfp4_linear"
 SEQ_LEN = 2048
 LR = 3e-4
 
@@ -169,13 +169,10 @@ def _precision_tag(nvfp4: bool) -> str:
     return "nvfp4" if nvfp4 else "bf16"
 
 
-def _plugin_env(extra: dict | None = None, *, tp_degree: int = 1) -> dict:
+def _plugin_env(extra: dict | None = None) -> dict:
     env = {**os.environ}
     if extra:
         env.update(extra)
-    env["PYTHONPATH"] = f"{PLUGIN_DIR}:{os.environ.get('PYTHONPATH', '')}"
-    # Override factory reads this to require local-after-TP dim % 128 == 0.
-    env["TORCHTITAN_AO_TP_DEGREE"] = str(tp_degree)
     return env
 
 
@@ -273,7 +270,7 @@ def run_single(args):
         args.nvfp4,
         _hf_assets_path_for_config(base_config),
     )
-    env = _plugin_env({"CUDA_VISIBLE_DEVICES": str(gpu)}, tp_degree=1)
+    env = _plugin_env({"CUDA_VISIBLE_DEVICES": str(gpu)})
     print(f"  cmd: {' '.join(cmd)}")
     print(f"  log: {log_path}\n")
 
@@ -411,11 +408,10 @@ def run_multi(args):
         raise SystemExit("--steps must be positive")
 
     smoke = args.smoke
-    # torchao NVFP4 quantization requires per-rank weight dims divisible by
-    # 128. llama3_debugmodel (dim=256) collapses below that under TP, so we
-    # use 8B for any --nvfp4 multi smoke run with a TP shape; the override
-    # also skips linears whose local-after-TP shape would fail the
-    # divisibility check (see TORCHTITAN_AO_TP_DEGREE below).
+    # torchao NVFP4 quantization requires per-rank GEMM dims divisible by 128.
+    # llama3_debugmodel (dim=256) collapses below that under TP, and the
+    # override raises on the invalid local dim, so use 8B for any --nvfp4
+    # smoke run with a TP shape.
     needs_8b = (
         smoke
         and args.nvfp4
@@ -509,8 +505,7 @@ def run_multi(args):
             hf_assets_path,
         )
         env = _plugin_env(
-            {"OMP_NUM_THREADS": os.environ.get("OMP_NUM_THREADS", "1")},
-            tp_degree=exp["tp"],
+            {"OMP_NUM_THREADS": os.environ.get("OMP_NUM_THREADS", "1")}
         )
         print(
             f"  [{label}] world_size={world_size} batch={exp['batch_size']} steps={steps:,} -> {log_path}"

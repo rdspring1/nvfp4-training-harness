@@ -98,7 +98,9 @@ def _ensure_assets(flavor: str) -> None:
 
 def _parse_gpus(args: argparse.Namespace) -> list[str]:
     if args.gpus is None:
-        return [str(args.gpu)] if args.flavor == "debugmodel" else ["0", "1", "2", "3"]
+        if args.flavor == "debugmodel":
+            return ["0", "1"] if args.nvfp4 else [str(args.gpu)]
+        return ["0", "1", "2", "3"]
 
     gpus = [gpu.strip() for gpu in args.gpus.split(",") if gpu.strip()]
     if not gpus:
@@ -133,6 +135,13 @@ def _cmd(args: argparse.Namespace) -> list[str]:
         cmd += [
             "--parallelism.data_parallel_shard_degree",
             "4",
+            "--parallelism.expert_parallel_degree",
+            "2",
+        ]
+    elif args.nvfp4:
+        cmd += [
+            "--parallelism.data_parallel_shard_degree",
+            str(args.nproc_per_node),
             "--parallelism.expert_parallel_degree",
             "2",
         ]
@@ -215,6 +224,8 @@ def run(args: argparse.Namespace) -> None:
     args.nproc_per_node = len(gpus)
     if args.flavor == "16b" and args.nproc_per_node != 4:
         raise SystemExit("--flavor 16b requires exactly 4 GPUs via --gpus")
+    if args.flavor == "debugmodel" and args.nvfp4 and args.nproc_per_node != 2:
+        raise SystemExit("--nvfp4 debugmodel requires exactly 2 GPUs via --gpus")
 
     _ensure_assets(args.flavor)
 

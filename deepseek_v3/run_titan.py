@@ -17,10 +17,19 @@ DEEPSEEK_MODEL_DIR = TORCHTITAN_DIR / "torchtitan" / "models" / "deepseek_v3"
 RESULTS_DIR = ROOT_DIR / "deepseek_v3_results"
 NVFP4_OVERRIDE_MODULE = "torchtitan_ao_dsv3.overrides"
 
-MODULE = "deepseek_v3"
+TRAINER_MODULES = {
+    "eager": "deepseek_v3",
+    "graph": "graph_trainer.deepseek_v3",
+}
 FLAVOR_CONFIGS = {
-    "debugmodel": "deepseek_v3_debugmodel",
-    "16b": "deepseek_v3_16b",
+    "eager": {
+        "debugmodel": "deepseek_v3_debugmodel",
+        "16b": "deepseek_v3_16b",
+    },
+    "graph": {
+        "debugmodel": "graph_trainer_deepseek_v3_debugmodel",
+        "16b": "graph_trainer_deepseek_v3_16b",
+    },
 }
 FLAVOR_DEFAULTS = {
     "debugmodel": {"batch_size": 8, "seq_len": 2048, "steps": 10},
@@ -117,9 +126,9 @@ def _cmd(args: argparse.Namespace) -> list[str]:
         "-m",
         "torchtitan.train",
         "--module",
-        MODULE,
+        TRAINER_MODULES[args.trainer],
         "--config",
-        FLAVOR_CONFIGS[args.flavor],
+        FLAVOR_CONFIGS[args.trainer][args.flavor],
         "--training.local_batch_size",
         str(args.batch_size),
         "--training.seq_len",
@@ -147,6 +156,10 @@ def _cmd(args: argparse.Namespace) -> list[str]:
         ]
     if args.nvfp4:
         cmd += ["--override.imports", NVFP4_OVERRIDE_MODULE]
+    if args.trainer == "graph":
+        cmd += ["--compile.mode", "aot_fx_trace"]
+    elif args.compile:
+        cmd += ["--compile.enable"]
     return cmd
 
 
@@ -180,9 +193,14 @@ def _parse_log(log_path: Path):
 
 
 def _print_summary(
-    log_path: Path, batch_size: int, seq_len: int, data_parallel_degree: int
+    log_path: Path,
+    batch_size: int,
+    seq_len: int,
+    data_parallel_degree: int,
+    trainer: str,
 ) -> None:
     global_batch_size = batch_size * data_parallel_degree
+    run_name = f"deepseek_v3/{trainer}"
     print()
     print("=" * 96)
     print(
@@ -193,12 +211,12 @@ def _print_summary(
 
     result = _parse_log(log_path)
     if result is None:
-        print(f"{'deepseek_v3':<16} {'NO DATA':>8}  {log_path.name}")
+        print(f"{run_name:<16} {'NO DATA':>8}  {log_path.name}")
     else:
         step, loss, mem, tps, tflops = result
         tokens = step * global_batch_size * seq_len
         print(
-            f"{'deepseek_v3':<16} {step:>8,} {loss:>12.4f} {tps:>10,} "
+            f"{run_name:<16} {step:>8,} {loss:>12.4f} {tps:>10,} "
             f"{tflops:>8.2f} {mem:>10.2f}  {log_path.name}"
         )
         print(
@@ -232,8 +250,10 @@ def run(args: argparse.Namespace) -> None:
     RESULTS_DIR.mkdir(exist_ok=True)
     ts = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     precision = "nvfp4" if args.nvfp4 else "bf16"
+    compile_suffix = "_compile" if args.trainer == "graph" or args.compile else ""
     log_path = RESULTS_DIR / (
-        f"{ts}_titan_deepseek_v3_{args.flavor}_{precision}.txt"
+        f"{ts}_titan_deepseek_v3_{args.flavor}_{args.trainer}_{precision}"
+        f"{compile_suffix}.txt"
     )
     cmd = _cmd(args)
     env = {**os.environ, "CUDA_VISIBLE_DEVICES": ",".join(gpus)}
@@ -243,6 +263,8 @@ def run(args: argparse.Namespace) -> None:
     print()
     print("=" * 72)
     print(f"TorchTitan DeepSeek V3 {args.flavor}")
+    print(f"Trainer: {args.trainer}")
+    print(f"Compile: {'yes' if args.trainer == 'graph' or args.compile else 'no'}")
     print(f"GPUs: {','.join(gpus)}")
     print(f"Processes: {args.nproc_per_node}")
     print(f"Batch {args.batch_size} x seq {args.seq_len}")
@@ -271,7 +293,13 @@ def run(args: argparse.Namespace) -> None:
     finally:
         thread.join(timeout=10)
 
-    _print_summary(log_path, args.batch_size, args.seq_len, args.nproc_per_node)
+    _print_summary(
+        log_path,
+        args.batch_size,
+        args.seq_len,
+        args.nproc_per_node,
+        args.trainer,
+    )
     if proc.returncode != 0:
         raise SystemExit(proc.returncode)
 
@@ -282,9 +310,15 @@ def main() -> None:
     )
     parser.add_argument(
         "--flavor",
-        choices=sorted(FLAVOR_CONFIGS),
+        choices=sorted(FLAVOR_DEFAULTS),
         default="debugmodel",
         help="DeepSeek V3 model flavor",
+    )
+    parser.add_argument(
+        "--trainer",
+        choices=sorted(TRAINER_MODULES),
+        default="eager",
+        help="Trainer implementation to launch",
     )
     parser.add_argument("--steps", type=int, default=None, help="Training steps")
     parser.add_argument("--gpu", type=int, default=0, help="GPU index")
@@ -311,6 +345,11 @@ def main() -> None:
         "--nvfp4",
         action="store_true",
         help=f"Enable torchao NVFP4 grouped experts via {NVFP4_OVERRIDE_MODULE}",
+    )
+    parser.add_argument(
+        "--compile",
+        action="store_true",
+        help="Enable TorchTitan compile for the eager trainer; graph trainer compiles by default",
     )
     args = parser.parse_args()
     defaults = FLAVOR_DEFAULTS[args.flavor]

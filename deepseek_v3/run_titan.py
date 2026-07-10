@@ -136,7 +136,7 @@ def _cmd(args: argparse.Namespace) -> list[str]:
         "--training.steps",
         str(args.steps),
         "--dataloader.dataset",
-        "c4_test",
+        args.dataset,
         "--metrics.log_freq",
         str(args.log_freq),
     ]
@@ -145,17 +145,19 @@ def _cmd(args: argparse.Namespace) -> list[str]:
             "--parallelism.data_parallel_shard_degree",
             "4",
             "--parallelism.expert_parallel_degree",
-            "2",
+            str(args.expert_parallel_degree or 2),
         ]
     elif args.nvfp4:
         cmd += [
             "--parallelism.data_parallel_shard_degree",
             str(args.nproc_per_node),
             "--parallelism.expert_parallel_degree",
-            "2",
+            str(args.expert_parallel_degree or 2),
         ]
     if args.nvfp4:
         cmd += ["--override.imports", NVFP4_OVERRIDE_MODULE]
+    if args.global_batch_size is not None:
+        cmd += ["--training.global_batch_size", str(args.global_batch_size)]
     if args.trainer == "graph":
         cmd += ["--compile.mode", "aot_fx_trace"]
     elif args.compile:
@@ -175,21 +177,29 @@ def _stream_to_file(proc: subprocess.Popen, log_path: Path) -> None:
 
 def _parse_log(log_path: Path):
     last = None
+    completed = False
     try:
         with open(log_path) as f:
             for line in f:
-                match = _STEP_RE.search(_ANSI_RE.sub("", line))
+                clean = _ANSI_RE.sub("", line)
+                if "Training completed" in clean:
+                    completed = True
+                match = _STEP_RE.search(clean)
                 if match:
-                    last = (
+                    metric = (
                         int(match.group(1)),
                         float(match.group(2)),
                         float(match.group(3)),
                         int(match.group(4).replace(",", "")),
                         float(match.group(5).replace(",", "")),
                     )
+                    if last is None or metric[0] > last[0]:
+                        last = metric
+                    elif metric[0] == last[0] and metric[2] > last[2]:
+                        last = metric
     except FileNotFoundError:
         pass
-    return last
+    return last, completed
 
 
 def _print_summary(
@@ -197,9 +207,11 @@ def _print_summary(
     batch_size: int,
     seq_len: int,
     data_parallel_degree: int,
+    global_batch_size: int | None,
     trainer: str,
+    requested_steps: int,
 ) -> None:
-    global_batch_size = batch_size * data_parallel_degree
+    global_batch_size = global_batch_size or batch_size * data_parallel_degree
     run_name = f"deepseek_v3/{trainer}"
     print()
     print("=" * 96)
@@ -209,18 +221,21 @@ def _print_summary(
     )
     print("-" * 96)
 
-    result = _parse_log(log_path)
+    result, completed = _parse_log(log_path)
     if result is None:
         print(f"{run_name:<16} {'NO DATA':>8}  {log_path.name}")
     else:
-        step, loss, mem, tps, tflops = result
-        tokens = step * global_batch_size * seq_len
+        metric_step, loss, mem, tps, tflops = result
+        steps = requested_steps if completed else metric_step
+        tokens = steps * global_batch_size * seq_len
         print(
-            f"{run_name:<16} {step:>8,} {loss:>12.4f} {tps:>10,} "
+            f"{run_name:<16} {steps:>8,} {loss:>12.4f} {tps:>10,} "
             f"{tflops:>8.2f} {mem:>10.2f}  {log_path.name}"
         )
+        if metric_step != steps:
+            print(f"Last metric: step {metric_step:,}")
         print(
-            f"Tokens: {step:,} (step) * {global_batch_size:,} "
+            f"Tokens: {steps:,} (step) * {global_batch_size:,} "
             f"(global batch) * {seq_len:,} (seq_len) = {tokens:,}"
         )
     print("=" * 96)
@@ -237,6 +252,10 @@ def run(args: argparse.Namespace) -> None:
         raise SystemExit("--seq-len must be positive")
     if args.log_freq <= 0:
         raise SystemExit("--log-freq must be positive")
+    if args.global_batch_size is not None and args.global_batch_size <= 0:
+        raise SystemExit("--global-batch-size must be positive")
+    if args.expert_parallel_degree is not None and args.expert_parallel_degree <= 0:
+        raise SystemExit("--expert-parallel-degree must be positive")
 
     gpus = _parse_gpus(args)
     args.nproc_per_node = len(gpus)
@@ -268,6 +287,8 @@ def run(args: argparse.Namespace) -> None:
     print(f"GPUs: {','.join(gpus)}")
     print(f"Processes: {args.nproc_per_node}")
     print(f"Batch {args.batch_size} x seq {args.seq_len}")
+    if args.global_batch_size is not None:
+        print(f"Global batch: {args.global_batch_size}")
     print(f"Steps: {args.steps}")
     print(f"Log: {log_path}")
     print("=" * 72)
@@ -298,7 +319,9 @@ def run(args: argparse.Namespace) -> None:
         args.batch_size,
         args.seq_len,
         args.nproc_per_node,
+        args.global_batch_size,
         args.trainer,
+        args.steps,
     )
     if proc.returncode != 0:
         raise SystemExit(proc.returncode)
@@ -339,6 +362,24 @@ def main() -> None:
         type=int,
         default=None,
         help="Sequence length",
+    )
+    parser.add_argument(
+        "--global-batch-size",
+        type=int,
+        default=None,
+        help="Global batch size; enables gradient accumulation when larger than local batch times data-parallel degree",
+    )
+    parser.add_argument(
+        "--expert-parallel-degree",
+        type=int,
+        default=None,
+        help="Expert parallelism degree override",
+    )
+    parser.add_argument(
+        "--dataset",
+        type=str,
+        default="c4_test",
+        help="TorchTitan dataloader dataset",
     )
     parser.add_argument("--log-freq", type=int, default=1, help="Metrics log frequency")
     parser.add_argument(

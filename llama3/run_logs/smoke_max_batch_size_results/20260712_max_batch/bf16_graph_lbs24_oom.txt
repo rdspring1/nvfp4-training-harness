@@ -1,0 +1,337 @@
+W0712 14:22:54.373000 243439 /opt/pytorch/pytorch/torch/distributed/run.py:874] 
+W0712 14:22:54.373000 243439 /opt/pytorch/pytorch/torch/distributed/run.py:874] *****************************************
+W0712 14:22:54.373000 243439 /opt/pytorch/pytorch/torch/distributed/run.py:874] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0712 14:22:54.373000 243439 /opt/pytorch/pytorch/torch/distributed/run.py:874] *****************************************
+W0712 14:23:03.207000 243509 /opt/pytorch/pytorch/torch/utils/_pytree.py:630] <enum 'KernelPreference'> is an Enum subclass and is now natively supported by torch.compile as an opaque value type. Calling register_constant() on Enum subclasses is deprecated and will be an error in a future release.
+W0712 14:23:03.717000 243509 /opt/pytorch/pytorch/torch/utils/_pytree.py:630] <enum 'ScaleCalculationMode'> is an Enum subclass and is now natively supported by torch.compile as an opaque value type. Calling register_constant() on Enum subclasses is deprecated and will be an error in a future release.
+[titan] 2026-07-12 14:23:04,702 - root - INFO - torchtitan version: 0.2.2 (0.0.0 means __version__ is not defined correctly).
+[titan] 2026-07-12 14:23:04,824 - root - WARNING - initial_load_model_only=True has no effect without an initial_load_path.
+[titan] 2026-07-12 14:23:05,098 - root - WARNING - initial_load_model_only=True has no effect without an initial_load_path.
+[titan] 2026-07-12 14:23:05,100 - torchtitan.observability.structured_logger.jsonl_handler - INFO - Structured logging -> JSONL: /home/me/nvfp4/third_party/torchtitan/outputs/structured_logs/training.global_rank_0.20260712-142305-GULNSI.jsonl
+[titan] 2026-07-12 14:23:05,662 - root - WARNING - ENV[TORCH_NCCL_ASYNC_ERROR_HANDLING] = 1 will be overridden to 3 based on job config
+[titan] 2026-07-12 14:23:05,674 - root - INFO - Building device mesh with parallelism: pp=1, dp_replicate=1, dp_shard=4, cp=1, tp=1, ep=1
+[titan] 2026-07-12 14:23:05,689 - root - INFO - Successfully created meshes with active dimensions: ['batch', 'loss', 'efsdp', 'fsdp']
+[titan] 2026-07-12 14:23:05,690 - root - INFO - [GC] Initial GC collection took 0.00 seconds
+[titan] 2026-07-12 14:23:09,052 - root - INFO - Building llama3 8B
+[titan] 2026-07-12 14:23:09,183 - root - INFO - TensorBoard logging enabled. Logs will be saved at ./outputs/tb/20260712-1423
+[titan] 2026-07-12 14:23:09,184 - root - INFO - CUDA capacity: NVIDIA GB200 with 184.30GiB memory
+[titan] 2026-07-12 14:23:09,245 - root - INFO - [34mModel llama3 8B [31msize: 8,030,261,248 total parameters[39m
+[titan] 2026-07-12 14:23:09,245 - root - INFO - Compiling the loss function with torch.compile
+[titan] 2026-07-12 14:23:09,301 - root - INFO - Applied Data Parallel (simple_fsdp) (dp mode=fully_shard) to the model
+[titan] 2026-07-12 14:23:09,301 - root - INFO - aot_fx_trace compile mode: graph capture will happen at training time
+[titan] 2026-07-12 14:23:09,774 - root - INFO - Peak FLOPS used for computing MFU: 2.500e+15
+[titan] 2026-07-12 14:23:09,774 - root - INFO - CUDA memory usage for model: 10.10GiB(5.48%)
+[titan] 2026-07-12 14:23:09,775 - root - INFO - Optimizer AdamW (model_part=0): 227 params [.*] {'fused': True, 'foreach': False, 'lr': 0.0003, 'betas': (0.9, 0.95), 'eps': 1e-08, 'weight_decay': 0.1}
+[titan] 2026-07-12 14:23:09,776 - root - WARNING - Warmup steps (200) exceed total steps (10). Adjusting warmup steps to 10.
+[titan] 2026-07-12 14:23:09,776 - root - INFO - Loading tokenizer from tokenizer.json
+[titan] 2026-07-12 14:23:09,780 - root - INFO - Preparing c4_test dataset from tests/assets/c4_test
+/usr/local/lib/python3.12/dist-packages/torchdata/stateful_dataloader/stateful_dataloader.py:379: UserWarning: 'set_vital' is deprecated, please do not call
+  torch.set_vital("Dataloader", "enabled", "True")  # type: ignore[attr-defined]
+[titan] 2026-07-12 14:23:09,909 - root - WARNING - model.safetensors.index.json not found at hf_assets_path: ./tests/assets/tokenizer/model.safetensors.index.json.                     Defaulting to saving a single safetensors file if checkpoint is saved in HF format
+[titan] 2026-07-12 14:23:09,910 - root - WARNING - initial_load_model_only=True has no effect without an initial_load_path.
+[titan] 2026-07-12 14:23:09,910 - root - INFO - Trainer is initialized with local batch size 24, global batch size 96, gradient accumulation steps 1, sequence length 2048, total steps 10 (warmup 200)
+[titan] 2026-07-12 14:23:09,911 - root - INFO - NUMA binding applied for GPU 0
+[titan] 2026-07-12 14:23:09,912 - root - INFO - Training starts at step 1
+[titan] 2026-07-12 14:23:09,912 - root - INFO - Profiling active. Traces will be saved at ./outputs/profiling/traces
+/opt/pytorch/pytorch/torch/nn/attention/flex_attention.py:2565: UserWarning: flex_attention called without torch.compile() - this will use an unfused implementation that materializes the full scores matrix instead of generating a fused kernel.
+
+SOLUTION: Use torch.compile(flex_attention)(...)
+
+If you want to debug your score_mod/mask_mod, you can set:
+torch.nn.attention.flex_attention._FLEX_ATTENTION_DISABLE_COMPILE_DEBUG = True
+
+This will allow you to use print statements or breakpoints. Note: This doesn't work with the backwards pass and may produce incorrect results.
+  _warn_once(
+[titan] 2026-07-12 14:23:24,937 - root - INFO - minimal_fx_tracer took 12.603s
+[titan] 2026-07-12 14:23:24,938 - root - INFO - Applying 11 graph passes:
+  1. eliminate_dead_code_pass
+  2. canonicalize_graph_pass
+  3. deduplicate_fsdp_unshard_chains_pass
+  4. tag_with_memory_policy_pass
+  5. apply_cpu_offload_pass
+  6. selective_activation_remat_pass
+  7. joint_transformer_block_bucketing_reordering_pass
+  8. annotate_flex_attention_for_regional_inductor_pass
+  9. regional_inductor_pass
+  10. insert_kernel_annotations_pass
+  11. cudagraph_pass
+[titan] 2026-07-12 14:23:25,235 - root - INFO - Eliminated dead code from the graph
+[titan] 2026-07-12 14:23:25,460 - root - INFO - Removed 301 aten.detach.default node(s) from the graph
+[titan] 2026-07-12 14:23:25,682 - root - INFO - Removed 468 identity view/reshape node(s) from the graph
+[titan] 2026-07-12 14:23:25,888 - root - INFO - Removed 504 back-to-back transpose node(s) from the graph
+[titan] 2026-07-12 14:23:25,892 - root - INFO - Removed 234 identity slice node(s)
+[titan] 2026-07-12 14:23:26,286 - root - INFO - Normalized 1304 view op(s) to reshape
+[titan] 2026-07-12 14:23:26,544 - root - INFO - Canonicalized 8 duplicate FSDP unshard chain(s)
+[titan] 2026-07-12 14:23:26,760 - root - INFO - Applied selective activation checkpointing (SAC) graph pass.
+[titan] 2026-07-12 14:23:26,760 - root - INFO -   Forced 32 nodes to MUST_SAVE at layer boundaries
+[titan] 2026-07-12 14:23:26,760 - root - INFO -   Layer non-layer: 1 MUST_SAVE, 9 RECOMPUTE
+[titan] 2026-07-12 14:23:26,760 - root - INFO -   Layer 0: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:23:26,760 - root - INFO -   Layer 1: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:23:26,761 - root - INFO -   Layer 2: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:23:26,761 - root - INFO -   Layer 3: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:23:26,761 - root - INFO -   Layer 4: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:23:26,761 - root - INFO -   Layer 5: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:23:26,761 - root - INFO -   Layer 6: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:23:26,761 - root - INFO -   Layer 7: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:23:26,761 - root - INFO -   Layer 8: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:23:26,761 - root - INFO -   Layer 9: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:23:26,761 - root - INFO -   Layer 10: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:23:26,761 - root - INFO -   Layer 11: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:23:26,761 - root - INFO -   Layer 12: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:23:26,761 - root - INFO -   Layer 13: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:23:26,761 - root - INFO -   Layer 14: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:23:26,761 - root - INFO -   Layer 15: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:23:26,761 - root - INFO -   Layer 16: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:23:26,761 - root - INFO -   Layer 17: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:23:26,761 - root - INFO -   Layer 18: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:23:26,761 - root - INFO -   Layer 19: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:23:26,761 - root - INFO -   Layer 20: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:23:26,761 - root - INFO -   Layer 21: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:23:26,761 - root - INFO -   Layer 22: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:23:26,761 - root - INFO -   Layer 23: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:23:26,761 - root - INFO -   Layer 24: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:23:26,761 - root - INFO -   Layer 25: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:23:26,761 - root - INFO -   Layer 26: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:23:26,761 - root - INFO -   Layer 27: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:23:26,761 - root - INFO -   Layer 28: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:23:26,761 - root - INFO -   Layer 29: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:23:26,761 - root - INFO -   Layer 30: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:23:26,761 - root - INFO -   Layer 31: 8 MUST_SAVE, 83 RECOMPUTE
+[titan] 2026-07-12 14:23:30,655 - root - INFO - FSDP reorder: 100 overlap deps across 100 target nodes
+[titan] 2026-07-12 14:24:03,042 - root - INFO - Applied cudagraph pass.
+[titan] 2026-07-12 14:24:03,043 - root - INFO - All 11 graph passes took 38.105s
+[rank0]:[W712 14:24:13.076415416 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 526385152 bytes (free: 274137088, total: 197890015232).
+[rank0]:[W712 14:24:13.076664378 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 526385152 bytes (free: 274137088, total: 197890015232).
+[rank0]: Traceback (most recent call last):
+[rank0]:   File "<frozen runpy>", line 198, in _run_module_as_main
+[rank0]:   File "<frozen runpy>", line 88, in _run_code
+[rank0]:   File "/home/me/nvfp4/third_party/torchtitan/torchtitan/train.py", line 79, in <module>
+[rank0]:     main()
+[rank0]:   File "/home/me/nvfp4/third_party/torchtitan/torchtitan/train.py", line 65, in main
+[rank0]:     trainer.train()
+[rank0]:   File "/opt/pytorch/pytorch/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 380, in wrapper
+[rank0]:     return f(*args, **kwargs)
+[rank0]:            ^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/home/me/nvfp4/third_party/torchtitan/torchtitan/trainer.py", line 905, in train
+[rank0]:     self.train_step(data_iterator)
+[rank0]:   File "/home/me/nvfp4/third_party/torchtitan/torchtitan/experiments/graph_trainer/trainer.py", line 310, in train_step
+[rank0]:     super().train_step(data_iterator)
+[rank0]:   File "/home/me/nvfp4/third_party/torchtitan/torchtitan/trainer.py", line 814, in train_step
+[rank0]:     self.optimizers.step()
+[rank0]:   File "/opt/pytorch/pytorch/torch/optim/optimizer.py", line 530, in wrapper
+[rank0]:     out = func(*args, **kwargs)
+[rank0]:           ^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/home/me/nvfp4/third_party/torchtitan/torchtitan/components/optimizer.py", line 283, in step
+[rank0]:     optimizer.step()
+[rank0]:   File "/opt/pytorch/pytorch/torch/optim/lr_scheduler.py", line 166, in wrapper
+[rank0]:     return func.__get__(opt, opt.__class__)(*args, **kwargs)
+[rank0]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/opt/pytorch/pytorch/torch/optim/optimizer.py", line 530, in wrapper
+[rank0]:     out = func(*args, **kwargs)
+[rank0]:           ^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/opt/pytorch/pytorch/torch/optim/optimizer.py", line 80, in _use_grad
+[rank0]:     ret = func(*args, **kwargs)
+[rank0]:           ^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/opt/pytorch/pytorch/torch/optim/adam.py", line 238, in step
+[rank0]:     has_complex = self._init_group(
+[rank0]:                   ^^^^^^^^^^^^^^^^^
+[rank0]:   File "/opt/pytorch/pytorch/torch/_dynamo/eval_frame.py", line 1449, in _fn
+[rank0]:     return fn(*args, **kwargs)
+[rank0]:            ^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/opt/pytorch/pytorch/torch/optim/adam.py", line 178, in _init_group
+[rank0]:     state["exp_avg"] = torch.zeros_like(
+[rank0]:                        ^^^^^^^^^^^^^^^^^
+[rank0]: torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 502.00 MiB. GPU 0 has a total capacity of 184.30 GiB of which 261.44 MiB is free. Including non-PyTorch memory, this process has 184.03 GiB memory in use. Of the allocated memory 182.25 GiB is allocated by PyTorch, with 153.25 GiB allocated in private pools (e.g., CUDA Graphs), and 5.81 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+W0712 14:24:17.106000 243439 /opt/pytorch/pytorch/torch/distributed/elastic/multiprocessing/api.py:1028] Sending process 243509 closing signal SIGTERM
+W0712 14:24:17.107000 243439 /opt/pytorch/pytorch/torch/distributed/elastic/multiprocessing/api.py:1028] Sending process 243510 closing signal SIGTERM
+W0712 14:24:17.107000 243439 /opt/pytorch/pytorch/torch/distributed/elastic/multiprocessing/api.py:1028] Sending process 243511 closing signal SIGTERM
+E0712 14:24:17.722000 243439 /opt/pytorch/pytorch/torch/distributed/elastic/multiprocessing/api.py:1002] failed (exitcode: 1) local_rank: 3 (pid: 243512) of binary: /usr/bin/python3
+E0712 14:24:17.726000 243439 /opt/pytorch/pytorch/torch/distributed/elastic/multiprocessing/errors/error_handler.py:157] no error file defined for parent, to copy child error file (/tmp/torchelastic_aq8oyv6x/7f84bc89-074d-45c0-9f65-a7c20873aa44_8x6ndbs1/attempt_0/3/error.json)
+Traceback (most recent call last):
+  File "/usr/local/bin/torchrun", line 8, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/opt/pytorch/pytorch/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 380, in wrapper
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "/opt/pytorch/pytorch/torch/distributed/run.py", line 1028, in main
+    run(args)
+  File "/opt/pytorch/pytorch/torch/distributed/run.py", line 1019, in run
+    elastic_launch(
+  File "/opt/pytorch/pytorch/torch/distributed/launcher/api.py", line 194, in __call__
+    return launch_agent(
+           ^^^^^^^^^^^^^
+  File "/opt/pytorch/pytorch/torch/distributed/launcher/api.py", line 383, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+torchtitan.train FAILED
+------------------------------------------------------------
+Failures:
+[1]:
+  time      : 2026-07-12_14:24:13
+  host      : 9c987f412aad
+  rank      : 0 (local_rank: 0)
+  exitcode  : -15 (pid: 243509)  (SIGTERM)
+  error_file: /tmp/torchelastic_aq8oyv6x/7f84bc89-074d-45c0-9f65-a7c20873aa44_8x6ndbs1/attempt_0/0/error.json
+  traceback : Traceback (most recent call last):
+    File "/opt/pytorch/pytorch/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 380, in wrapper
+      return f(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^
+    File "/home/me/nvfp4/third_party/torchtitan/torchtitan/trainer.py", line 905, in train
+      self.train_step(data_iterator)
+    File "/home/me/nvfp4/third_party/torchtitan/torchtitan/experiments/graph_trainer/trainer.py", line 310, in train_step
+      super().train_step(data_iterator)
+    File "/home/me/nvfp4/third_party/torchtitan/torchtitan/trainer.py", line 814, in train_step
+      self.optimizers.step()
+    File "/opt/pytorch/pytorch/torch/optim/optimizer.py", line 530, in wrapper
+      out = func(*args, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^
+    File "/home/me/nvfp4/third_party/torchtitan/torchtitan/components/optimizer.py", line 283, in step
+      optimizer.step()
+    File "/opt/pytorch/pytorch/torch/optim/lr_scheduler.py", line 166, in wrapper
+      return func.__get__(opt, opt.__class__)(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    File "/opt/pytorch/pytorch/torch/optim/optimizer.py", line 530, in wrapper
+      out = func(*args, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^
+    File "/opt/pytorch/pytorch/torch/optim/optimizer.py", line 80, in _use_grad
+      ret = func(*args, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^
+    File "/opt/pytorch/pytorch/torch/optim/adam.py", line 238, in step
+      has_complex = self._init_group(
+                    ^^^^^^^^^^^^^^^^^
+    File "/opt/pytorch/pytorch/torch/_dynamo/eval_frame.py", line 1449, in _fn
+      return fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+    File "/opt/pytorch/pytorch/torch/optim/adam.py", line 178, in _init_group
+      state["exp_avg"] = torch.zeros_like(
+                         ^^^^^^^^^^^^^^^^^
+  torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 502.00 MiB. GPU 0 has a total capacity of 184.30 GiB of which 261.44 MiB is free. Including non-PyTorch memory, this process has 184.03 GiB memory in use. Of the allocated memory 182.25 GiB is allocated by PyTorch, with 153.25 GiB allocated in private pools (e.g., CUDA Graphs), and 5.81 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+  
+[2]:
+  time      : 2026-07-12_14:24:13
+  host      : 9c987f412aad
+  rank      : 1 (local_rank: 1)
+  exitcode  : -15 (pid: 243510)  (SIGTERM)
+  error_file: /tmp/torchelastic_aq8oyv6x/7f84bc89-074d-45c0-9f65-a7c20873aa44_8x6ndbs1/attempt_0/1/error.json
+  traceback : Traceback (most recent call last):
+    File "/opt/pytorch/pytorch/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 380, in wrapper
+      return f(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^
+    File "/home/me/nvfp4/third_party/torchtitan/torchtitan/trainer.py", line 905, in train
+      self.train_step(data_iterator)
+    File "/home/me/nvfp4/third_party/torchtitan/torchtitan/experiments/graph_trainer/trainer.py", line 310, in train_step
+      super().train_step(data_iterator)
+    File "/home/me/nvfp4/third_party/torchtitan/torchtitan/trainer.py", line 814, in train_step
+      self.optimizers.step()
+    File "/opt/pytorch/pytorch/torch/optim/optimizer.py", line 530, in wrapper
+      out = func(*args, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^
+    File "/home/me/nvfp4/third_party/torchtitan/torchtitan/components/optimizer.py", line 283, in step
+      optimizer.step()
+    File "/opt/pytorch/pytorch/torch/optim/lr_scheduler.py", line 166, in wrapper
+      return func.__get__(opt, opt.__class__)(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    File "/opt/pytorch/pytorch/torch/optim/optimizer.py", line 530, in wrapper
+      out = func(*args, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^
+    File "/opt/pytorch/pytorch/torch/optim/optimizer.py", line 80, in _use_grad
+      ret = func(*args, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^
+    File "/opt/pytorch/pytorch/torch/optim/adam.py", line 238, in step
+      has_complex = self._init_group(
+                    ^^^^^^^^^^^^^^^^^
+    File "/opt/pytorch/pytorch/torch/_dynamo/eval_frame.py", line 1449, in _fn
+      return fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+    File "/opt/pytorch/pytorch/torch/optim/adam.py", line 178, in _init_group
+      state["exp_avg"] = torch.zeros_like(
+                         ^^^^^^^^^^^^^^^^^
+  torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 502.00 MiB. GPU 1 has a total capacity of 184.30 GiB of which 261.44 MiB is free. Including non-PyTorch memory, this process has 184.03 GiB memory in use. Of the allocated memory 182.25 GiB is allocated by PyTorch, with 153.25 GiB allocated in private pools (e.g., CUDA Graphs), and 5.81 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+  
+[3]:
+  time      : 2026-07-12_14:24:13
+  host      : 9c987f412aad
+  rank      : 2 (local_rank: 2)
+  exitcode  : 1 (pid: 243511) 
+  error_file: /tmp/torchelastic_aq8oyv6x/7f84bc89-074d-45c0-9f65-a7c20873aa44_8x6ndbs1/attempt_0/2/error.json
+  traceback : Traceback (most recent call last):
+    File "/opt/pytorch/pytorch/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 380, in wrapper
+      return f(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^
+    File "/home/me/nvfp4/third_party/torchtitan/torchtitan/trainer.py", line 905, in train
+      self.train_step(data_iterator)
+    File "/home/me/nvfp4/third_party/torchtitan/torchtitan/experiments/graph_trainer/trainer.py", line 310, in train_step
+      super().train_step(data_iterator)
+    File "/home/me/nvfp4/third_party/torchtitan/torchtitan/trainer.py", line 814, in train_step
+      self.optimizers.step()
+    File "/opt/pytorch/pytorch/torch/optim/optimizer.py", line 530, in wrapper
+      out = func(*args, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^
+    File "/home/me/nvfp4/third_party/torchtitan/torchtitan/components/optimizer.py", line 283, in step
+      optimizer.step()
+    File "/opt/pytorch/pytorch/torch/optim/lr_scheduler.py", line 166, in wrapper
+      return func.__get__(opt, opt.__class__)(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    File "/opt/pytorch/pytorch/torch/optim/optimizer.py", line 530, in wrapper
+      out = func(*args, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^
+    File "/opt/pytorch/pytorch/torch/optim/optimizer.py", line 80, in _use_grad
+      ret = func(*args, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^
+    File "/opt/pytorch/pytorch/torch/optim/adam.py", line 238, in step
+      has_complex = self._init_group(
+                    ^^^^^^^^^^^^^^^^^
+    File "/opt/pytorch/pytorch/torch/_dynamo/eval_frame.py", line 1449, in _fn
+      return fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+    File "/opt/pytorch/pytorch/torch/optim/adam.py", line 178, in _init_group
+      state["exp_avg"] = torch.zeros_like(
+                         ^^^^^^^^^^^^^^^^^
+  torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 502.00 MiB. GPU 2 has a total capacity of 184.30 GiB of which 261.38 MiB is free. Including non-PyTorch memory, this process has 184.03 GiB memory in use. Of the allocated memory 182.25 GiB is allocated by PyTorch, with 153.25 GiB allocated in private pools (e.g., CUDA Graphs), and 5.81 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+  
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2026-07-12_14:24:13
+  host      : 9c987f412aad
+  rank      : 3 (local_rank: 3)
+  exitcode  : 1 (pid: 243512) 
+  error_file: /tmp/torchelastic_aq8oyv6x/7f84bc89-074d-45c0-9f65-a7c20873aa44_8x6ndbs1/attempt_0/3/error.json
+  traceback : Traceback (most recent call last):
+    File "/opt/pytorch/pytorch/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 380, in wrapper
+      return f(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^
+    File "/home/me/nvfp4/third_party/torchtitan/torchtitan/trainer.py", line 905, in train
+      self.train_step(data_iterator)
+    File "/home/me/nvfp4/third_party/torchtitan/torchtitan/experiments/graph_trainer/trainer.py", line 310, in train_step
+      super().train_step(data_iterator)
+    File "/home/me/nvfp4/third_party/torchtitan/torchtitan/trainer.py", line 814, in train_step
+      self.optimizers.step()
+    File "/opt/pytorch/pytorch/torch/optim/optimizer.py", line 530, in wrapper
+      out = func(*args, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^
+    File "/home/me/nvfp4/third_party/torchtitan/torchtitan/components/optimizer.py", line 283, in step
+      optimizer.step()
+    File "/opt/pytorch/pytorch/torch/optim/lr_scheduler.py", line 166, in wrapper
+      return func.__get__(opt, opt.__class__)(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    File "/opt/pytorch/pytorch/torch/optim/optimizer.py", line 530, in wrapper
+      out = func(*args, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^
+    File "/opt/pytorch/pytorch/torch/optim/optimizer.py", line 80, in _use_grad
+      ret = func(*args, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^
+    File "/opt/pytorch/pytorch/torch/optim/adam.py", line 238, in step
+      has_complex = self._init_group(
+                    ^^^^^^^^^^^^^^^^^
+    File "/opt/pytorch/pytorch/torch/_dynamo/eval_frame.py", line 1449, in _fn
+      return fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+    File "/opt/pytorch/pytorch/torch/optim/adam.py", line 178, in _init_group
+      state["exp_avg"] = torch.zeros_like(
+                         ^^^^^^^^^^^^^^^^^
+  torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 502.00 MiB. GPU 3 has a total capacity of 184.30 GiB of which 261.38 MiB is free. Including non-PyTorch memory, this process has 184.03 GiB memory in use. Of the allocated memory 182.25 GiB is allocated by PyTorch, with 153.25 GiB allocated in private pools (e.g., CUDA Graphs), and 5.81 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+  
+============================================================

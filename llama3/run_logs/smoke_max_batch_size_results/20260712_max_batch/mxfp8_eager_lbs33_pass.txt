@@ -1,0 +1,224 @@
+W0712 11:25:55.737000 152813 /opt/pytorch/pytorch/torch/utils/_pytree.py:630] <enum 'KernelPreference'> is an Enum subclass and is now natively supported by torch.compile as an opaque value type. Calling register_constant() on Enum subclasses is deprecated and will be an error in a future release.
+W0712 11:25:56.255000 152813 /opt/pytorch/pytorch/torch/utils/_pytree.py:630] <enum 'ScaleCalculationMode'> is an Enum subclass and is now natively supported by torch.compile as an opaque value type. Calling register_constant() on Enum subclasses is deprecated and will be an error in a future release.
+[titan] 2026-07-12 11:25:57,229 - root - INFO - torchtitan version: 0.2.2 (0.0.0 means __version__ is not defined correctly).
+[titan] 2026-07-12 11:25:57,234 - root - WARNING - initial_load_model_only=True has no effect without an initial_load_path.
+[titan] 2026-07-12 11:25:57,300 - root - WARNING - initial_load_model_only=True has no effect without an initial_load_path.
+[titan] 2026-07-12 11:25:57,301 - torchtitan.observability.structured_logger.jsonl_handler - INFO - Structured logging -> JSONL: /home/me/nvfp4/third_party/torchtitan/outputs/structured_logs/training.global_rank_0.20260712-112557-DZPHHP.jsonl
+[titan] 2026-07-12 11:25:57,863 - root - WARNING - ENV[TORCH_NCCL_ASYNC_ERROR_HANDLING] = 1 will be overridden to 3 based on job config
+[titan] 2026-07-12 11:25:57,876 - root - INFO - Building device mesh with parallelism: pp=1, dp_replicate=1, dp_shard=4, cp=1, tp=1, ep=1
+[titan] 2026-07-12 11:25:57,889 - root - INFO - Successfully created meshes with active dimensions: ['batch', 'loss', 'efsdp', 'fsdp']
+[titan] 2026-07-12 11:25:57,889 - root - INFO - [GC] Initial GC collection took 0.00 seconds
+[titan] 2026-07-12 11:26:01,235 - root - INFO - [Override] mxfp8_linear: model_spec.model.lm_head Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,235 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.0.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,235 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.0.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,235 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.0.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,235 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.0.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,235 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.0.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,235 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.1.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,235 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.1.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,235 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.1.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,235 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.1.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,235 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.1.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,235 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.2.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,235 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.2.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,235 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.2.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,235 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.2.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,235 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.2.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,235 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.3.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,235 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.3.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,235 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.3.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,235 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.3.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,235 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.3.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.4.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.4.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.4.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.4.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.4.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.5.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.5.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.5.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.5.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.5.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.6.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.6.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.6.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.6.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.6.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.7.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.7.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.7.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.7.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.7.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.8.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.8.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.8.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.8.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.8.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.9.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.9.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.9.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.9.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.9.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.10.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.10.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.10.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.10.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.10.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.11.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.11.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.11.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.11.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.11.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.12.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.12.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.12.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.12.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.12.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.13.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.13.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.13.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.13.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.13.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.14.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.14.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.14.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.14.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.14.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.15.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.15.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.15.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.15.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.15.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.16.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.16.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.16.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.16.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.16.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.17.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.17.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.17.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.17.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.17.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.18.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.18.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.18.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.18.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.18.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.19.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.19.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.19.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.19.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.19.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.20.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.20.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.20.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.20.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.20.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.21.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.21.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.21.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.21.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.21.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.22.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.22.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.22.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.22.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.22.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.23.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.23.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.23.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.23.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.23.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.24.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.24.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.24.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.24.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.24.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.25.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.25.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.25.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.25.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.25.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.26.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.26.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.26.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.26.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.26.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.27.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.27.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.27.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.27.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.27.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.28.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.28.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.28.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.28.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.28.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.29.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,236 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.29.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,237 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.29.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,237 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.29.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,237 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.29.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,237 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.30.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,237 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.30.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,237 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.30.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,237 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.30.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,237 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.30.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,237 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.31.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,237 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.31.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,237 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.31.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,237 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.31.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,237 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.31.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 11:26:01,237 - root - INFO - Applied 161 override(s)
+[titan] 2026-07-12 11:26:01,237 - root - INFO - Building llama3 8B
+[titan] 2026-07-12 11:26:01,368 - root - INFO - TensorBoard logging enabled. Logs will be saved at ./outputs/tb/20260712-1126
+[titan] 2026-07-12 11:26:01,369 - root - INFO - CUDA capacity: NVIDIA GB200 with 184.30GiB memory
+[titan] 2026-07-12 11:26:01,434 - root - INFO - [34mModel llama3 8B [31msize: 8,030,261,248 total parameters[39m
+[titan] 2026-07-12 11:26:01,447 - root - INFO - Applied SelectiveAC activation checkpointing to the model
+[titan] 2026-07-12 11:26:01,461 - root - INFO - Compiling each TransformerBlock with torch.compile
+[titan] 2026-07-12 11:26:01,522 - root - INFO - Applied FSDP to the model
+[titan] 2026-07-12 11:26:02,002 - root - INFO - Peak FLOPS used for computing MFU: 2.500e+15
+[titan] 2026-07-12 11:26:02,002 - root - INFO - CUDA memory usage for model: 10.10GiB(5.48%)
+[titan] 2026-07-12 11:26:02,004 - root - INFO - Optimizer AdamW (model_part=0): 227 params [.*] {'fused': True, 'foreach': False, 'lr': 0.0003, 'betas': (0.9, 0.95), 'eps': 1e-08, 'weight_decay': 0.1}
+[titan] 2026-07-12 11:26:02,004 - root - WARNING - Warmup steps (200) exceed total steps (10). Adjusting warmup steps to 10.
+[titan] 2026-07-12 11:26:02,005 - root - INFO - Loading tokenizer from tokenizer.json
+[titan] 2026-07-12 11:26:02,009 - root - INFO - Preparing c4_test dataset from tests/assets/c4_test
+/usr/local/lib/python3.12/dist-packages/torchdata/stateful_dataloader/stateful_dataloader.py:379: UserWarning: 'set_vital' is deprecated, please do not call
+  torch.set_vital("Dataloader", "enabled", "True")  # type: ignore[attr-defined]
+[titan] 2026-07-12 11:26:02,187 - root - WARNING - model.safetensors.index.json not found at hf_assets_path: ./tests/assets/tokenizer/model.safetensors.index.json.                     Defaulting to saving a single safetensors file if checkpoint is saved in HF format
+[titan] 2026-07-12 11:26:02,187 - root - WARNING - initial_load_model_only=True has no effect without an initial_load_path.
+[titan] 2026-07-12 11:26:02,187 - root - INFO - Trainer is initialized with local batch size 33, global batch size 132, gradient accumulation steps 1, sequence length 2048, total steps 10 (warmup 200)
+[titan] 2026-07-12 11:26:02,187 - root - INFO - Training starts at step 1
+[titan] 2026-07-12 11:26:02,187 - root - INFO - Profiling active. Traces will be saved at ./outputs/profiling/traces
+[rank0]:W0712 11:26:08.643000 152813 /opt/pytorch/pytorch/torch/_logging/_internal.py:1350] [1/0] 
+[rank0]:W0712 11:26:08.643000 152813 /opt/pytorch/pytorch/torch/_logging/_internal.py:1350] [1/0] Detected that context_fn is passed to torch.utils.checkpoint under torch.compile.
+[rank0]:W0712 11:26:08.643000 152813 /opt/pytorch/pytorch/torch/_logging/_internal.py:1350] [1/0] Please make sure the checkpointed region does not contain in-place ops (e.g. torch.relu_).
+[rank0]:W0712 11:26:08.643000 152813 /opt/pytorch/pytorch/torch/_logging/_internal.py:1350] [1/0] 
+/opt/pytorch/pytorch/torch/_inductor/lowering.py:2712: UserWarning: Torchinductor does not support code generation for complex operators. Performance may be worse than eager.
+  warnings.warn(
+[titan] 2026-07-12 11:26:35,039 - root - INFO - [31mstep:  1  [32mloss: 12.25277  [38;2;180;60;0mgrad_norm: 27.2483  [38;2;54;234;195mmemory: 167.20GiB(90.72%)  [34mtps: 2,011  [36mtflops: 97.04  [35mmfu: N/A[39m
+[titan] 2026-07-12 11:26:35,040 - root - INFO - Synchronizing and adjusting timeout for all ProcessGroups to 0:01:40
+[rank0]:[W712 11:26:35.778510367 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4334813184 bytes (free: 865533952, total: 197890015232).
+[rank0]:[W712 11:26:35.283079691 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 220200960 bytes (free: 204931072, total: 197890015232).
+[rank0]:[W712 11:26:37.107884320 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4334813184 bytes (free: 1431764992, total: 197890015232).
+[rank0]:[W712 11:26:38.637653337 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 220200960 bytes (free: 22478848, total: 197890015232).
+[rank0]:[W712 11:26:39.458091974 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4334813184 bytes (free: 1180106752, total: 197890015232).
+[rank0]:[W712 11:26:41.554761533 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 220200960 bytes (free: 45547520, total: 197890015232).
+[rank0]:[W712 11:26:42.859896970 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4334813184 bytes (free: 1180106752, total: 197890015232).
+[rank0]:[W712 11:26:43.959718470 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 220200960 bytes (free: 45547520, total: 197890015232).
+[rank0]:[W712 11:26:44.261211565 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4334813184 bytes (free: 903282688, total: 197890015232).
+[rank0]:[W712 11:26:45.263160089 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 220200960 bytes (free: 209125376, total: 197890015232).
+[rank0]:[W712 11:26:47.621726279 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4334813184 bytes (free: 626458624, total: 197890015232).
+[rank0]:[W712 11:26:48.569362545 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 220200960 bytes (free: 152502272, total: 197890015232).
+[rank0]:[W712 11:26:49.017109631 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4334813184 bytes (free: 211222528, total: 197890015232).
+[rank0]:[W712 11:26:50.862285425 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 220200960 bytes (free: 177668096, total: 197890015232).
+[rank0]:[W712 11:26:51.328173888 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4334813184 bytes (free: 4269211648, total: 197890015232).
+[rank0]:[W712 11:26:52.918833543 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 220200960 bytes (free: 154599424, total: 197890015232).
+[rank0]:[W712 11:26:54.557922030 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4334813184 bytes (free: 2054619136, total: 197890015232).
+[rank0]:[W712 11:26:54.992332829 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4334813184 bytes (free: 3593928704, total: 197890015232).
+[rank0]:[W712 11:26:54.034293864 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 1052770304 bytes (free: 636944384, total: 197890015232).
+[titan] 2026-07-12 11:26:56,136 - root - WARNING - 19 CUDA memory allocation retries.
+[titan] 2026-07-12 11:26:56,136 - root - INFO - [31mstep: 10  [32mloss:  9.40290  [38;2;180;60;0mgrad_norm: 31.0122  [38;2;54;234;195mmemory: 180.10GiB(97.72%)  [34mtps: 28,833  [36mtflops: 1,391.21  [35mmfu: N/A[39m
+[titan] 2026-07-12 11:26:56,137 - root - INFO - Sleeping 2 seconds for other ranks to complete
+[titan] 2026-07-12 11:26:58,137 - root - INFO - Training completed
+[titan] 2026-07-12 11:26:58,292 - root - INFO - Process group destroyed

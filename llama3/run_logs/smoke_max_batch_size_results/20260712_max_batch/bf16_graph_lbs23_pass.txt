@@ -1,0 +1,108 @@
+W0712 14:26:25.409000 246693 /opt/pytorch/pytorch/torch/distributed/run.py:874] 
+W0712 14:26:25.409000 246693 /opt/pytorch/pytorch/torch/distributed/run.py:874] *****************************************
+W0712 14:26:25.409000 246693 /opt/pytorch/pytorch/torch/distributed/run.py:874] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0712 14:26:25.409000 246693 /opt/pytorch/pytorch/torch/distributed/run.py:874] *****************************************
+W0712 14:26:34.314000 246764 /opt/pytorch/pytorch/torch/utils/_pytree.py:630] <enum 'KernelPreference'> is an Enum subclass and is now natively supported by torch.compile as an opaque value type. Calling register_constant() on Enum subclasses is deprecated and will be an error in a future release.
+W0712 14:26:34.836000 246764 /opt/pytorch/pytorch/torch/utils/_pytree.py:630] <enum 'ScaleCalculationMode'> is an Enum subclass and is now natively supported by torch.compile as an opaque value type. Calling register_constant() on Enum subclasses is deprecated and will be an error in a future release.
+[titan] 2026-07-12 14:26:35,819 - root - INFO - torchtitan version: 0.2.2 (0.0.0 means __version__ is not defined correctly).
+[titan] 2026-07-12 14:26:35,939 - root - WARNING - initial_load_model_only=True has no effect without an initial_load_path.
+[titan] 2026-07-12 14:26:36,216 - root - WARNING - initial_load_model_only=True has no effect without an initial_load_path.
+[titan] 2026-07-12 14:26:36,217 - torchtitan.observability.structured_logger.jsonl_handler - INFO - Structured logging -> JSONL: /home/me/nvfp4/third_party/torchtitan/outputs/structured_logs/training.global_rank_0.20260712-142636-3IRD6B.jsonl
+[titan] 2026-07-12 14:26:36,797 - root - WARNING - ENV[TORCH_NCCL_ASYNC_ERROR_HANDLING] = 1 will be overridden to 3 based on job config
+[titan] 2026-07-12 14:26:36,809 - root - INFO - Building device mesh with parallelism: pp=1, dp_replicate=1, dp_shard=4, cp=1, tp=1, ep=1
+[titan] 2026-07-12 14:26:36,821 - root - INFO - Successfully created meshes with active dimensions: ['batch', 'loss', 'efsdp', 'fsdp']
+[titan] 2026-07-12 14:26:36,822 - root - INFO - [GC] Initial GC collection took 0.00 seconds
+[titan] 2026-07-12 14:26:40,137 - root - INFO - Building llama3 8B
+[titan] 2026-07-12 14:26:40,269 - root - INFO - TensorBoard logging enabled. Logs will be saved at ./outputs/tb/20260712-1426
+[titan] 2026-07-12 14:26:40,270 - root - INFO - CUDA capacity: NVIDIA GB200 with 184.30GiB memory
+[titan] 2026-07-12 14:26:40,334 - root - INFO - [34mModel llama3 8B [31msize: 8,030,261,248 total parameters[39m
+[titan] 2026-07-12 14:26:40,334 - root - INFO - Compiling the loss function with torch.compile
+[titan] 2026-07-12 14:26:40,390 - root - INFO - Applied Data Parallel (simple_fsdp) (dp mode=fully_shard) to the model
+[titan] 2026-07-12 14:26:40,390 - root - INFO - aot_fx_trace compile mode: graph capture will happen at training time
+[titan] 2026-07-12 14:26:40,865 - root - INFO - Peak FLOPS used for computing MFU: 2.500e+15
+[titan] 2026-07-12 14:26:40,865 - root - INFO - CUDA memory usage for model: 10.10GiB(5.48%)
+[titan] 2026-07-12 14:26:40,867 - root - INFO - Optimizer AdamW (model_part=0): 227 params [.*] {'fused': True, 'foreach': False, 'lr': 0.0003, 'betas': (0.9, 0.95), 'eps': 1e-08, 'weight_decay': 0.1}
+[titan] 2026-07-12 14:26:40,867 - root - WARNING - Warmup steps (200) exceed total steps (10). Adjusting warmup steps to 10.
+[titan] 2026-07-12 14:26:40,868 - root - INFO - Loading tokenizer from tokenizer.json
+[titan] 2026-07-12 14:26:40,871 - root - INFO - Preparing c4_test dataset from tests/assets/c4_test
+/usr/local/lib/python3.12/dist-packages/torchdata/stateful_dataloader/stateful_dataloader.py:379: UserWarning: 'set_vital' is deprecated, please do not call
+  torch.set_vital("Dataloader", "enabled", "True")  # type: ignore[attr-defined]
+[titan] 2026-07-12 14:26:40,956 - root - WARNING - model.safetensors.index.json not found at hf_assets_path: ./tests/assets/tokenizer/model.safetensors.index.json.                     Defaulting to saving a single safetensors file if checkpoint is saved in HF format
+[titan] 2026-07-12 14:26:40,956 - root - WARNING - initial_load_model_only=True has no effect without an initial_load_path.
+[titan] 2026-07-12 14:26:40,956 - root - INFO - Trainer is initialized with local batch size 23, global batch size 92, gradient accumulation steps 1, sequence length 2048, total steps 10 (warmup 200)
+[titan] 2026-07-12 14:26:40,957 - root - INFO - NUMA binding applied for GPU 0
+[titan] 2026-07-12 14:26:40,958 - root - INFO - Training starts at step 1
+[titan] 2026-07-12 14:26:40,959 - root - INFO - Profiling active. Traces will be saved at ./outputs/profiling/traces
+/opt/pytorch/pytorch/torch/nn/attention/flex_attention.py:2565: UserWarning: flex_attention called without torch.compile() - this will use an unfused implementation that materializes the full scores matrix instead of generating a fused kernel.
+
+SOLUTION: Use torch.compile(flex_attention)(...)
+
+If you want to debug your score_mod/mask_mod, you can set:
+torch.nn.attention.flex_attention._FLEX_ATTENTION_DISABLE_COMPILE_DEBUG = True
+
+This will allow you to use print statements or breakpoints. Note: This doesn't work with the backwards pass and may produce incorrect results.
+  _warn_once(
+[titan] 2026-07-12 14:26:56,016 - root - INFO - minimal_fx_tracer took 12.534s
+[titan] 2026-07-12 14:26:56,017 - root - INFO - Applying 11 graph passes:
+  1. eliminate_dead_code_pass
+  2. canonicalize_graph_pass
+  3. deduplicate_fsdp_unshard_chains_pass
+  4. tag_with_memory_policy_pass
+  5. apply_cpu_offload_pass
+  6. selective_activation_remat_pass
+  7. joint_transformer_block_bucketing_reordering_pass
+  8. annotate_flex_attention_for_regional_inductor_pass
+  9. regional_inductor_pass
+  10. insert_kernel_annotations_pass
+  11. cudagraph_pass
+[titan] 2026-07-12 14:26:56,318 - root - INFO - Eliminated dead code from the graph
+[titan] 2026-07-12 14:26:56,541 - root - INFO - Removed 301 aten.detach.default node(s) from the graph
+[titan] 2026-07-12 14:26:56,763 - root - INFO - Removed 468 identity view/reshape node(s) from the graph
+[titan] 2026-07-12 14:26:56,969 - root - INFO - Removed 504 back-to-back transpose node(s) from the graph
+[titan] 2026-07-12 14:26:56,972 - root - INFO - Removed 234 identity slice node(s)
+[titan] 2026-07-12 14:26:57,361 - root - INFO - Normalized 1304 view op(s) to reshape
+[titan] 2026-07-12 14:26:57,611 - root - INFO - Canonicalized 8 duplicate FSDP unshard chain(s)
+[titan] 2026-07-12 14:26:57,824 - root - INFO - Applied selective activation checkpointing (SAC) graph pass.
+[titan] 2026-07-12 14:26:57,824 - root - INFO -   Forced 32 nodes to MUST_SAVE at layer boundaries
+[titan] 2026-07-12 14:26:57,824 - root - INFO -   Layer non-layer: 1 MUST_SAVE, 9 RECOMPUTE
+[titan] 2026-07-12 14:26:57,825 - root - INFO -   Layer 0: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:26:57,825 - root - INFO -   Layer 1: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:26:57,825 - root - INFO -   Layer 2: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:26:57,825 - root - INFO -   Layer 3: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:26:57,825 - root - INFO -   Layer 4: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:26:57,825 - root - INFO -   Layer 5: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:26:57,825 - root - INFO -   Layer 6: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:26:57,825 - root - INFO -   Layer 7: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:26:57,825 - root - INFO -   Layer 8: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:26:57,825 - root - INFO -   Layer 9: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:26:57,825 - root - INFO -   Layer 10: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:26:57,825 - root - INFO -   Layer 11: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:26:57,825 - root - INFO -   Layer 12: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:26:57,825 - root - INFO -   Layer 13: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:26:57,825 - root - INFO -   Layer 14: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:26:57,825 - root - INFO -   Layer 15: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:26:57,825 - root - INFO -   Layer 16: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:26:57,825 - root - INFO -   Layer 17: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:26:57,825 - root - INFO -   Layer 18: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:26:57,825 - root - INFO -   Layer 19: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:26:57,825 - root - INFO -   Layer 20: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:26:57,825 - root - INFO -   Layer 21: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:26:57,825 - root - INFO -   Layer 22: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:26:57,825 - root - INFO -   Layer 23: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:26:57,825 - root - INFO -   Layer 24: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:26:57,825 - root - INFO -   Layer 25: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:26:57,825 - root - INFO -   Layer 26: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:26:57,825 - root - INFO -   Layer 27: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:26:57,825 - root - INFO -   Layer 28: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:26:57,825 - root - INFO -   Layer 29: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:26:57,825 - root - INFO -   Layer 30: 9 MUST_SAVE, 82 RECOMPUTE
+[titan] 2026-07-12 14:26:57,825 - root - INFO -   Layer 31: 8 MUST_SAVE, 83 RECOMPUTE
+[titan] 2026-07-12 14:27:01,510 - root - INFO - FSDP reorder: 100 overlap deps across 100 target nodes
+[titan] 2026-07-12 14:27:34,288 - root - INFO - Applied cudagraph pass.
+[titan] 2026-07-12 14:27:34,289 - root - INFO - All 11 graph passes took 38.272s
+[titan] 2026-07-12 14:27:45,832 - root - INFO - [31mstep:  1  [32mloss: 12.16310  [38;2;180;60;0mgrad_norm: 25.9435  [38;2;54;234;195mmemory: 173.79GiB(94.30%)  [34mtps: 719  [36mtflops: 34.70  [35mmfu: 1.39%[39m
+[titan] 2026-07-12 14:27:45,833 - root - INFO - Synchronizing and adjusting timeout for all ProcessGroups to 0:01:40
+[titan] 2026-07-12 14:28:07,168 - root - INFO - [31mstep: 10  [32mloss:  8.98496  [38;2;180;60;0mgrad_norm: 52.2861  [38;2;54;234;195mmemory: 173.79GiB(94.30%)  [34mtps: 19,871  [36mtflops: 958.77  [35mmfu: 38.35%[39m
+[titan] 2026-07-12 14:28:07,169 - root - INFO - Sleeping 2 seconds for other ranks to complete
+[titan] 2026-07-12 14:28:09,169 - root - INFO - Training completed
+[titan] 2026-07-12 14:28:09,255 - root - INFO - Process group destroyed

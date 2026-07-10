@@ -1,0 +1,156 @@
+W0713 10:46:34.454000 13485 /opt/pytorch/pytorch/torch/distributed/run.py:874] 
+W0713 10:46:34.454000 13485 /opt/pytorch/pytorch/torch/distributed/run.py:874] *****************************************
+W0713 10:46:34.454000 13485 /opt/pytorch/pytorch/torch/distributed/run.py:874] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0713 10:46:34.454000 13485 /opt/pytorch/pytorch/torch/distributed/run.py:874] *****************************************
+W0713 10:46:43.485000 13555 /opt/pytorch/pytorch/torch/utils/_pytree.py:630] <enum 'KernelPreference'> is an Enum subclass and is now natively supported by torch.compile as an opaque value type. Calling register_constant() on Enum subclasses is deprecated and will be an error in a future release.
+W0713 10:46:43.989000 13555 /opt/pytorch/pytorch/torch/utils/_pytree.py:630] <enum 'ScaleCalculationMode'> is an Enum subclass and is now natively supported by torch.compile as an opaque value type. Calling register_constant() on Enum subclasses is deprecated and will be an error in a future release.
+[titan] 2026-07-13 10:46:44,971 - root - INFO - torchtitan version: 0.0.0+unknown (0.0.0 means __version__ is not defined correctly).
+[titan] 2026-07-13 10:46:44,975 - root - WARNING - initial_load_model_only=True has no effect without an initial_load_path.
+[titan] 2026-07-13 10:46:44,976 - root - WARNING - torch.compile enablement is required for highest performance of MXFP8 dynamic quantization.
+[titan] 2026-07-13 10:46:44,977 - root - INFO - Converted Linear layers to MXFP8Linear
+[titan] 2026-07-13 10:46:45,238 - root - WARNING - initial_load_model_only=True has no effect without an initial_load_path.
+[titan] 2026-07-13 10:46:45,239 - torchtitan.observability.structured_logger.jsonl_handler - INFO - Structured logging -> JSONL: /home/me/torchtitan-mxfp8ao/outputs/structured_logs/training.global_rank_0.20260713-104645-WH0IMA.jsonl
+[titan] 2026-07-13 10:46:45,824 - root - WARNING - ENV[TORCH_NCCL_ASYNC_ERROR_HANDLING] = 1 will be overridden to 3 based on job config
+[titan] 2026-07-13 10:46:45,836 - root - INFO - Building device mesh with parallelism: pp=1, dp_replicate=1, dp_shard=4, cp=1, tp=1, ep=1
+[titan] 2026-07-13 10:46:45,848 - root - INFO - Successfully created meshes with active dimensions: ['batch', 'loss', 'efsdp', 'fsdp']
+[titan] 2026-07-13 10:46:45,849 - root - INFO - [GC] Initial GC collection took 0.00 seconds
+[titan] 2026-07-13 10:46:49,571 - root - INFO - Building llama3 8B
+[titan] 2026-07-13 10:46:49,704 - root - INFO - TensorBoard logging enabled. Logs will be saved at ./outputs/tb/20260713-1046
+[titan] 2026-07-13 10:46:49,704 - root - INFO - CUDA capacity: NVIDIA GB200 with 184.30GiB memory
+[titan] 2026-07-13 10:46:49,768 - root - INFO - [34mModel llama3 8B [31msize: 8,030,261,248 total parameters[39m
+[titan] 2026-07-13 10:46:49,781 - root - INFO - Applied SelectiveAC activation checkpointing to the model
+[titan] 2026-07-13 10:46:49,795 - root - INFO - Compiling each TransformerBlock with torch.compile
+[titan] 2026-07-13 10:46:49,855 - root - INFO - Applied FSDP to the model
+[titan] 2026-07-13 10:46:50,329 - root - INFO - Peak FLOPS used for computing MFU: 2.500e+15
+[titan] 2026-07-13 10:46:50,329 - root - INFO - CUDA memory usage for model: 10.10GiB(5.48%)
+[titan] 2026-07-13 10:46:50,330 - root - INFO - Optimizer AdamW (model_part=0): 227 params [.*] {'fused': True, 'foreach': False, 'lr': 0.0003, 'betas': (0.9, 0.95), 'eps': 1e-08, 'weight_decay': 0.1}
+[titan] 2026-07-13 10:46:50,331 - root - WARNING - Warmup steps (200) exceed total steps (50). Adjusting warmup steps to 50.
+[titan] 2026-07-13 10:46:50,331 - root - INFO - Loading tokenizer from tokenizer.json
+[titan] 2026-07-13 10:46:50,335 - root - INFO - Preparing c4_test dataset from tests/assets/c4_test
+/usr/local/lib/python3.12/dist-packages/torchdata/stateful_dataloader/stateful_dataloader.py:379: UserWarning: 'set_vital' is deprecated, please do not call
+  torch.set_vital("Dataloader", "enabled", "True")  # type: ignore[attr-defined]
+[titan] 2026-07-13 10:46:50,560 - root - WARNING - model.safetensors.index.json not found at hf_assets_path: ./tests/assets/tokenizer/model.safetensors.index.json.                     Defaulting to saving a single safetensors file if checkpoint is saved in HF format
+[titan] 2026-07-13 10:46:50,560 - root - WARNING - initial_load_model_only=True has no effect without an initial_load_path.
+[titan] 2026-07-13 10:46:50,560 - root - INFO - Trainer is initialized with local batch size 32, global batch size 128, gradient accumulation steps 1, sequence length 2048, total steps 50 (warmup 200)
+[titan] 2026-07-13 10:46:50,561 - root - INFO - Training starts at step 1
+[titan] 2026-07-13 10:46:50,561 - root - INFO - Profiling active. Traces will be saved at ./outputs/profiling/traces
+[rank0]:W0713 10:46:53.359000 13555 /opt/pytorch/pytorch/torch/_logging/_internal.py:1350] [1/0] 
+[rank0]:W0713 10:46:53.359000 13555 /opt/pytorch/pytorch/torch/_logging/_internal.py:1350] [1/0] Detected that context_fn is passed to torch.utils.checkpoint under torch.compile.
+[rank0]:W0713 10:46:53.359000 13555 /opt/pytorch/pytorch/torch/_logging/_internal.py:1350] [1/0] Please make sure the checkpointed region does not contain in-place ops (e.g. torch.relu_).
+[rank0]:W0713 10:46:53.359000 13555 /opt/pytorch/pytorch/torch/_logging/_internal.py:1350] [1/0] 
+[titan] 2026-07-13 10:47:06,357 - root - INFO - [31mstep:  1  [32mloss: 12.16214  [38;2;180;60;0mgrad_norm: 25.9450  [38;2;54;234;195mmemory: 162.89GiB(88.39%)  [34mtps: 3,950  [36mtflops: 190.61  [35mmfu: N/A[39m
+[titan] 2026-07-13 10:47:06,358 - root - INFO - Synchronizing and adjusting timeout for all ProcessGroups to 0:01:40
+[rank0]:[W713 10:47:06.307832839 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 1687617536, total: 197890015232).
+[rank0]:[W713 10:47:07.711446160 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 220200960 bytes (free: 209125376, total: 197890015232).
+[rank0]:[W713 10:47:08.701666105 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 3226927104, total: 197890015232).
+[rank0]:[W713 10:47:11.960042479 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 2851536896, total: 197890015232).
+[rank0]:[W713 10:47:11.669829424 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 220200960 bytes (free: 37158912, total: 197890015232).
+[rank0]:[W713 10:47:13.272136955 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 4004970496, total: 197890015232).
+[rank0]:[W713 10:47:14.798021265 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 220200960 bytes (free: 35061760, total: 197890015232).
+[rank0]:[W713 10:47:15.563838502 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 2797010944, total: 197890015232).
+[rank0]:[W713 10:47:16.061919727 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 1052770304 bytes (free: 542572544, total: 197890015232).
+[rank0]:[W713 10:47:18.847699140 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 2260140032, total: 197890015232).
+[rank0]:[W713 10:47:18.343819434 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 264241152 bytes (free: 200736768, total: 197890015232).
+[rank0]:[W713 10:47:20.148108701 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 2482438144, total: 197890015232).
+[rank0]:[W713 10:47:20.641880895 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 264241152 bytes (free: 200736768, total: 197890015232).
+[rank0]:[W713 10:47:22.429649526 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 2482438144, total: 197890015232).
+[rank0]:[W713 10:47:23.916715725 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 264241152 bytes (free: 200736768, total: 197890015232).
+[rank0]:[W713 10:47:24.677769945 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 2482438144, total: 197890015232).
+[rank0]:[W713 10:47:25.157750245 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 264241152 bytes (free: 200736768, total: 197890015232).
+[titan] 2026-07-13 10:47:27,028 - root - WARNING - 17 CUDA memory allocation retries.
+[titan] 2026-07-13 10:47:27,028 - root - INFO - [31mstep: 10  [32mloss:  5.88361  [38;2;180;60;0mgrad_norm: 46.3092  [38;2;54;234;195mmemory: 180.09GiB(97.72%)  [34mtps: 28,535  [36mtflops: 1,376.85  [35mmfu: N/A[39m
+[rank0]:[W713 10:47:27.961454870 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 2482438144, total: 197890015232).
+[rank0]:[W713 10:47:27.442942243 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 264241152 bytes (free: 200736768, total: 197890015232).
+[rank0]:[W713 10:47:29.215647650 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 2482438144, total: 197890015232).
+[rank0]:[W713 10:47:29.691550374 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 264241152 bytes (free: 200736768, total: 197890015232).
+[rank0]:[W713 10:47:31.447727242 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 2482438144, total: 197890015232).
+[rank0]:[W713 10:47:32.923771887 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 264241152 bytes (free: 200736768, total: 197890015232).
+[rank0]:[W713 10:47:33.666094363 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 2482438144, total: 197890015232).
+[rank0]:[W713 10:47:34.134401587 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 264241152 bytes (free: 200736768, total: 197890015232).
+[titan] 2026-07-13 10:47:35,638 - root - WARNING - Dataset c4_test is being re-looped (epoch 1)
+[rank0]:[W713 10:47:36.886532623 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 2482438144, total: 197890015232).
+[rank0]:[W713 10:47:36.355911945 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 264241152 bytes (free: 200736768, total: 197890015232).
+[rank0]:[W713 10:47:38.123397694 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 2482438144, total: 197890015232).
+[rank0]:[W713 10:47:38.686479600 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 264241152 bytes (free: 200736768, total: 197890015232).
+[rank0]:[W713 10:47:40.439329420 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 2482438144, total: 197890015232).
+[rank0]:[W713 10:47:41.912339948 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 264241152 bytes (free: 200736768, total: 197890015232).
+[rank0]:[W713 10:47:42.670103825 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 2482438144, total: 197890015232).
+[rank0]:[W713 10:47:43.152724640 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 264241152 bytes (free: 200736768, total: 197890015232).
+[rank0]:[W713 10:47:45.911300613 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 2482438144, total: 197890015232).
+[rank0]:[W713 10:47:45.383112739 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 264241152 bytes (free: 200736768, total: 197890015232).
+[rank0]:[W713 10:47:47.129804693 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 2482438144, total: 197890015232).
+[rank0]:[W713 10:47:47.604353815 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 264241152 bytes (free: 200736768, total: 197890015232).
+[titan] 2026-07-13 10:47:49,499 - root - WARNING - 37 CUDA memory allocation retries.
+[titan] 2026-07-13 10:47:49,500 - root - INFO - [31mstep: 20  [32mloss:  3.48604  [38;2;180;60;0mgrad_norm: 21.7282  [38;2;54;234;195mmemory: 179.94GiB(97.63%)  [34mtps: 29,165  [36mtflops: 1,407.22  [35mmfu: N/A[39m
+[rank0]:[W713 10:47:49.429076615 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 2482438144, total: 197890015232).
+[rank0]:[W713 10:47:50.901291365 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 264241152 bytes (free: 200736768, total: 197890015232).
+[rank0]:[W713 10:47:51.644708882 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 2482438144, total: 197890015232).
+[rank0]:[W713 10:47:52.110605030 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 264241152 bytes (free: 200736768, total: 197890015232).
+[rank0]:[W713 10:47:54.852500399 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 2482438144, total: 197890015232).
+[rank0]:[W713 10:47:54.331726168 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 264241152 bytes (free: 200736768, total: 197890015232).
+[rank0]:[W713 10:47:56.118246794 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 2482438144, total: 197890015232).
+[rank0]:[W713 10:47:56.592433355 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 264241152 bytes (free: 200736768, total: 197890015232).
+[rank0]:[W713 10:47:58.370153198 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 2482438144, total: 197890015232).
+[rank0]:[W713 10:47:59.843787982 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 264241152 bytes (free: 200736768, total: 197890015232).
+[rank0]:[W713 10:48:00.601849809 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 2482438144, total: 197890015232).
+[rank0]:[W713 10:48:01.084947936 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 264241152 bytes (free: 200736768, total: 197890015232).
+[rank0]:[W713 10:48:03.827544586 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 2482438144, total: 197890015232).
+[rank0]:[W713 10:48:03.304166351 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 264241152 bytes (free: 200736768, total: 197890015232).
+[rank0]:[W713 10:48:05.031391903 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 2482438144, total: 197890015232).
+[rank0]:[W713 10:48:05.512316587 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 264241152 bytes (free: 200736768, total: 197890015232).
+[titan] 2026-07-13 10:48:07,026 - root - WARNING - Dataset c4_test is being re-looped (epoch 2)
+[rank0]:[W713 10:48:07.270502029 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 2482438144, total: 197890015232).
+[rank0]:[W713 10:48:07.743832301 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 264241152 bytes (free: 200736768, total: 197890015232).
+[rank0]:[W713 10:48:09.547706969 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 2482438144, total: 197890015232).
+[rank0]:[W713 10:48:10.021975706 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 264241152 bytes (free: 200736768, total: 197890015232).
+[titan] 2026-07-13 10:48:11,910 - root - WARNING - 57 CUDA memory allocation retries.
+[titan] 2026-07-13 10:48:11,911 - root - INFO - [31mstep: 30  [32mloss:  3.02496  [38;2;180;60;0mgrad_norm:  8.0432  [38;2;54;234;195mmemory: 179.94GiB(97.63%)  [34mtps: 29,244  [36mtflops: 1,411.03  [35mmfu: N/A[39m
+[rank0]:[W713 10:48:12.859914877 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 2482438144, total: 197890015232).
+[rank0]:[W713 10:48:12.340730088 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 264241152 bytes (free: 200736768, total: 197890015232).
+[rank0]:[W713 10:48:14.096280390 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 2482438144, total: 197890015232).
+[rank0]:[W713 10:48:14.578979380 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 264241152 bytes (free: 200736768, total: 197890015232).
+[rank0]:[W713 10:48:16.347653894 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 2482438144, total: 197890015232).
+[rank0]:[W713 10:48:17.825329068 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 264241152 bytes (free: 200736768, total: 197890015232).
+[rank0]:[W713 10:48:18.586451858 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 2482438144, total: 197890015232).
+[rank0]:[W713 10:48:19.070798307 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 264241152 bytes (free: 200736768, total: 197890015232).
+[rank0]:[W713 10:48:21.829630725 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 2482438144, total: 197890015232).
+[rank0]:[W713 10:48:21.312789748 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 264241152 bytes (free: 200736768, total: 197890015232).
+[rank0]:[W713 10:48:23.106146253 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 2482438144, total: 197890015232).
+[rank0]:[W713 10:48:23.584364852 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 264241152 bytes (free: 200736768, total: 197890015232).
+[rank0]:[W713 10:48:25.328086685 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 2482438144, total: 197890015232).
+[rank0]:[W713 10:48:26.813308047 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 264241152 bytes (free: 200736768, total: 197890015232).
+[rank0]:[W713 10:48:27.562614945 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 2482438144, total: 197890015232).
+[rank0]:[W713 10:48:28.047007698 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 264241152 bytes (free: 200736768, total: 197890015232).
+[rank0]:[W713 10:48:30.789389944 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 2482438144, total: 197890015232).
+[rank0]:[W713 10:48:30.280548724 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 264241152 bytes (free: 200736768, total: 197890015232).
+[rank0]:[W713 10:48:32.030199589 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 2482438144, total: 197890015232).
+[rank0]:[W713 10:48:32.515072183 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 264241152 bytes (free: 200736768, total: 197890015232).
+[titan] 2026-07-13 10:48:34,399 - root - WARNING - 77 CUDA memory allocation retries.
+[titan] 2026-07-13 10:48:34,399 - root - INFO - [31mstep: 40  [32mloss:  2.87019  [38;2;180;60;0mgrad_norm:  4.3568  [38;2;54;234;195mmemory: 179.94GiB(97.63%)  [34mtps: 29,143  [36mtflops: 1,406.16  [35mmfu: N/A[39m
+[rank0]:[W713 10:48:34.334760858 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 2482438144, total: 197890015232).
+[rank0]:[W713 10:48:35.821386126 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 264241152 bytes (free: 200736768, total: 197890015232).
+[rank0]:[W713 10:48:36.585314614 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 2482438144, total: 197890015232).
+[rank0]:[W713 10:48:37.071940906 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 264241152 bytes (free: 200736768, total: 197890015232).
+[rank0]:[W713 10:48:39.880758811 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 2482438144, total: 197890015232).
+[rank0]:[W713 10:48:39.361374661 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 264241152 bytes (free: 200736768, total: 197890015232).
+[titan] 2026-07-13 10:48:40,863 - root - WARNING - Dataset c4_test is being re-looped (epoch 3)
+[rank0]:[W713 10:48:41.129868533 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 2482438144, total: 197890015232).
+[rank0]:[W713 10:48:41.617200874 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 264241152 bytes (free: 200736768, total: 197890015232).
+[rank0]:[W713 10:48:43.442512245 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 2482438144, total: 197890015232).
+[rank0]:[W713 10:48:44.923477151 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 264241152 bytes (free: 200736768, total: 197890015232).
+[rank0]:[W713 10:48:45.713795729 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 2482438144, total: 197890015232).
+[rank0]:[W713 10:48:46.197597249 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 264241152 bytes (free: 200736768, total: 197890015232).
+[rank0]:[W713 10:48:48.964189740 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 2482438144, total: 197890015232).
+[rank0]:[W713 10:48:48.447782747 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 264241152 bytes (free: 200736768, total: 197890015232).
+[rank0]:[W713 10:48:50.234356006 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 2482438144, total: 197890015232).
+[rank0]:[W713 10:48:50.716932403 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 264241152 bytes (free: 200736768, total: 197890015232).
+[rank0]:[W713 10:48:52.479851224 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 2482438144, total: 197890015232).
+[rank0]:[W713 10:48:53.967543213 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 264241152 bytes (free: 200736768, total: 197890015232).
+[titan] 2026-07-13 10:48:54,481 - root - INFO - [GC] Performing periodic GC collection took 0.01 seconds
+[rank0]:[W713 10:48:54.729925681 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 2482438144, total: 197890015232).
+[rank0]:[W713 10:48:55.214529569 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 264241152 bytes (free: 200736768, total: 197890015232).
+[titan] 2026-07-13 10:48:57,073 - root - WARNING - 97 CUDA memory allocation retries.
+[titan] 2026-07-13 10:48:57,073 - root - INFO - [31mstep: 50  [32mloss:  2.78774  [38;2;180;60;0mgrad_norm:  3.0972  [38;2;54;234;195mmemory: 179.94GiB(97.63%)  [34mtps: 28,905  [36mtflops: 1,394.67  [35mmfu: N/A[39m
+[titan] 2026-07-13 10:48:57,074 - root - INFO - Sleeping 2 seconds for other ranks to complete
+[titan] 2026-07-13 10:48:59,074 - root - INFO - Training completed
+[titan] 2026-07-13 10:48:59,201 - root - INFO - Process group destroyed

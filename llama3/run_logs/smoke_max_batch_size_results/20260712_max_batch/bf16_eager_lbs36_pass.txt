@@ -1,0 +1,65 @@
+W0712 14:17:29.250000 236542 /opt/pytorch/pytorch/torch/distributed/run.py:874] 
+W0712 14:17:29.250000 236542 /opt/pytorch/pytorch/torch/distributed/run.py:874] *****************************************
+W0712 14:17:29.250000 236542 /opt/pytorch/pytorch/torch/distributed/run.py:874] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0712 14:17:29.250000 236542 /opt/pytorch/pytorch/torch/distributed/run.py:874] *****************************************
+W0712 14:17:38.043000 236613 /opt/pytorch/pytorch/torch/utils/_pytree.py:630] <enum 'KernelPreference'> is an Enum subclass and is now natively supported by torch.compile as an opaque value type. Calling register_constant() on Enum subclasses is deprecated and will be an error in a future release.
+W0712 14:17:38.555000 236613 /opt/pytorch/pytorch/torch/utils/_pytree.py:630] <enum 'ScaleCalculationMode'> is an Enum subclass and is now natively supported by torch.compile as an opaque value type. Calling register_constant() on Enum subclasses is deprecated and will be an error in a future release.
+[titan] 2026-07-12 14:17:39,542 - root - INFO - torchtitan version: 0.2.2 (0.0.0 means __version__ is not defined correctly).
+[titan] 2026-07-12 14:17:39,547 - root - WARNING - initial_load_model_only=True has no effect without an initial_load_path.
+[titan] 2026-07-12 14:17:39,613 - root - WARNING - initial_load_model_only=True has no effect without an initial_load_path.
+[titan] 2026-07-12 14:17:39,614 - torchtitan.observability.structured_logger.jsonl_handler - INFO - Structured logging -> JSONL: /home/me/nvfp4/third_party/torchtitan/outputs/structured_logs/training.global_rank_0.20260712-141739-A04MSV.jsonl
+[titan] 2026-07-12 14:17:40,172 - root - WARNING - ENV[TORCH_NCCL_ASYNC_ERROR_HANDLING] = 1 will be overridden to 3 based on job config
+[titan] 2026-07-12 14:17:40,184 - root - INFO - Building device mesh with parallelism: pp=1, dp_replicate=1, dp_shard=4, cp=1, tp=1, ep=1
+[titan] 2026-07-12 14:17:40,200 - root - INFO - Successfully created meshes with active dimensions: ['batch', 'loss', 'efsdp', 'fsdp']
+[titan] 2026-07-12 14:17:40,200 - root - INFO - [GC] Initial GC collection took 0.00 seconds
+[titan] 2026-07-12 14:17:43,518 - root - INFO - Building llama3 8B
+[titan] 2026-07-12 14:17:43,649 - root - INFO - TensorBoard logging enabled. Logs will be saved at ./outputs/tb/20260712-1417
+[titan] 2026-07-12 14:17:43,650 - root - INFO - CUDA capacity: NVIDIA GB200 with 184.30GiB memory
+[titan] 2026-07-12 14:17:43,710 - root - INFO - [34mModel llama3 8B [31msize: 8,030,261,248 total parameters[39m
+[titan] 2026-07-12 14:17:43,723 - root - INFO - Applied SelectiveAC activation checkpointing to the model
+[titan] 2026-07-12 14:17:43,737 - root - INFO - Compiling each TransformerBlock with torch.compile
+[titan] 2026-07-12 14:17:43,798 - root - INFO - Applied FSDP to the model
+[titan] 2026-07-12 14:17:44,272 - root - INFO - Peak FLOPS used for computing MFU: 2.500e+15
+[titan] 2026-07-12 14:17:44,272 - root - INFO - CUDA memory usage for model: 10.10GiB(5.48%)
+[titan] 2026-07-12 14:17:44,273 - root - INFO - Optimizer AdamW (model_part=0): 227 params [.*] {'fused': True, 'foreach': False, 'lr': 0.0003, 'betas': (0.9, 0.95), 'eps': 1e-08, 'weight_decay': 0.1}
+[titan] 2026-07-12 14:17:44,274 - root - WARNING - Warmup steps (200) exceed total steps (10). Adjusting warmup steps to 10.
+[titan] 2026-07-12 14:17:44,274 - root - INFO - Loading tokenizer from tokenizer.json
+[titan] 2026-07-12 14:17:44,278 - root - INFO - Preparing c4_test dataset from tests/assets/c4_test
+/usr/local/lib/python3.12/dist-packages/torchdata/stateful_dataloader/stateful_dataloader.py:379: UserWarning: 'set_vital' is deprecated, please do not call
+  torch.set_vital("Dataloader", "enabled", "True")  # type: ignore[attr-defined]
+[titan] 2026-07-12 14:17:44,457 - root - WARNING - model.safetensors.index.json not found at hf_assets_path: ./tests/assets/tokenizer/model.safetensors.index.json.                     Defaulting to saving a single safetensors file if checkpoint is saved in HF format
+[titan] 2026-07-12 14:17:44,457 - root - WARNING - initial_load_model_only=True has no effect without an initial_load_path.
+[titan] 2026-07-12 14:17:44,457 - root - INFO - Trainer is initialized with local batch size 36, global batch size 144, gradient accumulation steps 1, sequence length 2048, total steps 10 (warmup 200)
+[titan] 2026-07-12 14:17:44,458 - root - INFO - Training starts at step 1
+[titan] 2026-07-12 14:17:44,458 - root - INFO - Profiling active. Traces will be saved at ./outputs/profiling/traces
+[rank0]:W0712 14:17:47.040000 236613 /opt/pytorch/pytorch/torch/_logging/_internal.py:1350] [1/0] 
+[rank0]:W0712 14:17:47.040000 236613 /opt/pytorch/pytorch/torch/_logging/_internal.py:1350] [1/0] Detected that context_fn is passed to torch.utils.checkpoint under torch.compile.
+[rank0]:W0712 14:17:47.040000 236613 /opt/pytorch/pytorch/torch/_logging/_internal.py:1350] [1/0] Please make sure the checkpointed region does not contain in-place ops (e.g. torch.relu_).
+[rank0]:W0712 14:17:47.040000 236613 /opt/pytorch/pytorch/torch/_logging/_internal.py:1350] [1/0] 
+/opt/pytorch/pytorch/torch/_inductor/lowering.py:2712: UserWarning: Torchinductor does not support code generation for complex operators. Performance may be worse than eager.
+  warnings.warn(
+[titan] 2026-07-12 14:18:01,330 - root - INFO - [31mstep:  1  [32mloss: 12.25653  [38;2;180;60;0mgrad_norm: 26.0230  [38;2;54;234;195mmemory: 174.94GiB(94.92%)  [34mtps: 4,184  [36mtflops: 201.89  [35mmfu: 8.08%[39m
+[titan] 2026-07-12 14:18:01,331 - root - INFO - Synchronizing and adjusting timeout for all ProcessGroups to 0:01:40
+[rank0]:[W712 14:18:01.997818668 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4729077760 bytes (free: 3415670784, total: 197890015232).
+[rank0]:[W712 14:18:02.918841192 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 220200960 bytes (free: 204931072, total: 197890015232).
+[rank0]:[W712 14:18:04.435183178 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4729077760 bytes (free: 3409379328, total: 197890015232).
+[rank0]:[W712 14:18:05.332760343 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 220200960 bytes (free: 110559232, total: 197890015232).
+[rank0]:[W712 14:18:08.868328762 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4729077760 bytes (free: 3057057792, total: 197890015232).
+[rank0]:[W712 14:18:09.752174157 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 220200960 bytes (free: 198639616, total: 197890015232).
+[rank0]:[W712 14:18:11.275085979 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4729077760 bytes (free: 3057057792, total: 197890015232).
+[rank0]:[W712 14:18:12.150382944 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 220200960 bytes (free: 198639616, total: 197890015232).
+[rank0]:[W712 14:18:15.645191154 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4729077760 bytes (free: 2755067904, total: 197890015232).
+[rank0]:[W712 14:18:15.503897540 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 220200960 bytes (free: 116850688, total: 197890015232).
+[rank0]:[W712 14:18:18.003536313 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4729077760 bytes (free: 2610364416, total: 197890015232).
+[rank0]:[W712 14:18:19.842124217 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 220200960 bytes (free: 192348160, total: 197890015232).
+[rank0]:[W712 14:18:21.343261046 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4729077760 bytes (free: 2610364416, total: 197890015232).
+[rank0]:[W712 14:18:22.179990083 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 220200960 bytes (free: 192348160, total: 197890015232).
+[rank0]:[W712 14:18:25.643664882 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4729077760 bytes (free: 2308374528, total: 197890015232).
+[rank0]:[W712 14:18:25.479060146 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 220200960 bytes (free: 110559232, total: 197890015232).
+[rank0]:[W712 14:18:28.951189284 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4729077760 bytes (free: 1100414976, total: 197890015232).
+[rank0]:[W712 14:18:29.759234419 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 220200960 bytes (free: 3604480, total: 197890015232).
+[titan] 2026-07-12 14:18:31,589 - root - WARNING - 18 CUDA memory allocation retries.
+[titan] 2026-07-12 14:18:31,589 - root - INFO - [31mstep: 10  [32mloss:  8.77061  [38;2;180;60;0mgrad_norm: 31.1982  [38;2;54;234;195mmemory: 182.52GiB(99.04%)  [34mtps: 21,930  [36mtflops: 1,058.12  [35mmfu: 42.32%[39m
+[titan] 2026-07-12 14:18:31,590 - root - INFO - Sleeping 2 seconds for other ranks to complete
+[titan] 2026-07-12 14:18:33,590 - root - INFO - Training completed
+[titan] 2026-07-12 14:18:34,070 - root - INFO - Process group destroyed

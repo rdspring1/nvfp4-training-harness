@@ -1,0 +1,119 @@
+W0712 21:21:47.981000 31048 /opt/pytorch/pytorch/torch/distributed/run.py:874] 
+W0712 21:21:47.981000 31048 /opt/pytorch/pytorch/torch/distributed/run.py:874] *****************************************
+W0712 21:21:47.981000 31048 /opt/pytorch/pytorch/torch/distributed/run.py:874] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0712 21:21:47.981000 31048 /opt/pytorch/pytorch/torch/distributed/run.py:874] *****************************************
+W0712 21:21:57.004000 31119 /opt/pytorch/pytorch/torch/utils/_pytree.py:630] <enum 'KernelPreference'> is an Enum subclass and is now natively supported by torch.compile as an opaque value type. Calling register_constant() on Enum subclasses is deprecated and will be an error in a future release.
+W0712 21:21:57.546000 31119 /opt/pytorch/pytorch/torch/utils/_pytree.py:630] <enum 'ScaleCalculationMode'> is an Enum subclass and is now natively supported by torch.compile as an opaque value type. Calling register_constant() on Enum subclasses is deprecated and will be an error in a future release.
+[titan] 2026-07-12 21:21:58,542 - root - INFO - torchtitan version: 0.2.2 (0.0.0 means __version__ is not defined correctly).
+[titan] 2026-07-12 21:21:58,546 - root - WARNING - initial_load_model_only=True has no effect without an initial_load_path.
+[titan] 2026-07-12 21:21:58,612 - root - WARNING - initial_load_model_only=True has no effect without an initial_load_path.
+[titan] 2026-07-12 21:21:58,613 - torchtitan.observability.structured_logger.jsonl_handler - INFO - Structured logging -> JSONL: /home/me/nvfp4/third_party/torchtitan/outputs/structured_logs/training.global_rank_0.20260712-212158-JTMTXH.jsonl
+[titan] 2026-07-12 21:21:59,179 - root - WARNING - ENV[TORCH_NCCL_ASYNC_ERROR_HANDLING] = 1 will be overridden to 3 based on job config
+[titan] 2026-07-12 21:21:59,191 - root - INFO - Building device mesh with parallelism: pp=1, dp_replicate=1, dp_shard=4, cp=1, tp=1, ep=1
+[titan] 2026-07-12 21:21:59,204 - root - INFO - Successfully created meshes with active dimensions: ['batch', 'loss', 'efsdp', 'fsdp']
+[titan] 2026-07-12 21:21:59,204 - root - INFO - [GC] Initial GC collection took 0.00 seconds
+[titan] 2026-07-12 21:22:03,370 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.0.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.1.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.2.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.3.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.4.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.5.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.6.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.7.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.8.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.9.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.10.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.11.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.12.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.13.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.14.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.15.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.16.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.17.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.18.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.19.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.20.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.21.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.22.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.23.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.24.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.25.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.26.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.27.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.28.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.29.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.30.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.31.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.0.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.1.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.2.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.3.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.4.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.5.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.6.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.7.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.8.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.9.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.10.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.11.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.12.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.13.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.14.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.15.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.16.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.17.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.18.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.19.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.20.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.21.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.22.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.23.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.24.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.25.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.26.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.27.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.28.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.29.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.30.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.31.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 21:22:03,371 - root - INFO - Applied 64 override(s)
+[titan] 2026-07-12 21:22:03,372 - root - INFO - Building llama3 8B
+[titan] 2026-07-12 21:22:03,519 - root - INFO - TensorBoard logging enabled. Logs will be saved at ./outputs/tb/20260712-2122
+[titan] 2026-07-12 21:22:03,520 - root - INFO - CUDA capacity: NVIDIA GB200 with 184.30GiB memory
+[titan] 2026-07-12 21:22:03,579 - root - INFO - [34mModel llama3 8B [31msize: 8,030,261,248 total parameters[39m
+[titan] 2026-07-12 21:22:03,592 - root - INFO - Applied SelectiveAC activation checkpointing to the model
+[titan] 2026-07-12 21:22:03,605 - root - INFO - Compiling each TransformerBlock with torch.compile
+[titan] 2026-07-12 21:22:03,665 - root - INFO - Applied FSDP to the model
+[titan] 2026-07-12 21:22:04,181 - root - INFO - Peak FLOPS used for computing MFU: 2.500e+15
+[titan] 2026-07-12 21:22:04,181 - root - INFO - CUDA memory usage for model: 10.10GiB(5.48%)
+[titan] 2026-07-12 21:22:04,183 - root - INFO - Optimizer AdamW (model_part=0): 227 params [.*] {'fused': True, 'foreach': False, 'lr': 0.0003, 'betas': (0.9, 0.95), 'eps': 1e-08, 'weight_decay': 0.1}
+[titan] 2026-07-12 21:22:04,183 - root - WARNING - Warmup steps (200) exceed total steps (50). Adjusting warmup steps to 50.
+[titan] 2026-07-12 21:22:04,184 - root - INFO - Loading tokenizer from tokenizer.json
+[titan] 2026-07-12 21:22:04,188 - root - INFO - Preparing c4_test dataset from tests/assets/c4_test
+/usr/local/lib/python3.12/dist-packages/torchdata/stateful_dataloader/stateful_dataloader.py:379: UserWarning: 'set_vital' is deprecated, please do not call
+  torch.set_vital("Dataloader", "enabled", "True")  # type: ignore[attr-defined]
+[titan] 2026-07-12 21:22:04,368 - root - WARNING - model.safetensors.index.json not found at hf_assets_path: ./tests/assets/tokenizer/model.safetensors.index.json.                     Defaulting to saving a single safetensors file if checkpoint is saved in HF format
+[titan] 2026-07-12 21:22:04,368 - root - WARNING - initial_load_model_only=True has no effect without an initial_load_path.
+[titan] 2026-07-12 21:22:04,368 - root - INFO - Trainer is initialized with local batch size 32, global batch size 128, gradient accumulation steps 1, sequence length 2048, total steps 50 (warmup 200)
+[titan] 2026-07-12 21:22:04,368 - root - INFO - Training starts at step 1
+[titan] 2026-07-12 21:22:04,368 - root - INFO - Profiling active. Traces will be saved at ./outputs/profiling/traces
+[rank0]:W0712 21:22:07.244000 31119 /opt/pytorch/pytorch/torch/_logging/_internal.py:1350] [1/0] 
+[rank0]:W0712 21:22:07.244000 31119 /opt/pytorch/pytorch/torch/_logging/_internal.py:1350] [1/0] Detected that context_fn is passed to torch.utils.checkpoint under torch.compile.
+[rank0]:W0712 21:22:07.244000 31119 /opt/pytorch/pytorch/torch/_logging/_internal.py:1350] [1/0] Please make sure the checkpointed region does not contain in-place ops (e.g. torch.relu_).
+[rank0]:W0712 21:22:07.244000 31119 /opt/pytorch/pytorch/torch/_logging/_internal.py:1350] [1/0] 
+/opt/pytorch/pytorch/torch/_inductor/lowering.py:2712: UserWarning: Torchinductor does not support code generation for complex operators. Performance may be worse than eager.
+  warnings.warn(
+[titan] 2026-07-12 21:26:28,580 - root - INFO - [31mstep:  1  [32mloss: 12.03007  [38;2;180;60;0mgrad_norm: 24.7835  [38;2;54;234;195mmemory: 81.11GiB(44.01%)  [34mtps: 247  [36mtflops: 11.93  [35mmfu: 0.48%[39m
+[titan] 2026-07-12 21:26:28,581 - root - INFO - Synchronizing and adjusting timeout for all ProcessGroups to 0:01:40
+[titan] 2026-07-12 21:26:47,223 - root - INFO - [31mstep: 10  [32mloss:  4.87905  [38;2;180;60;0mgrad_norm: 27.0115  [38;2;54;234;195mmemory: 103.00GiB(55.89%)  [34mtps: 31,639  [36mtflops: 1,526.61  [35mmfu: 61.06%[39m
+[titan] 2026-07-12 21:26:55,256 - root - WARNING - Dataset c4_test is being re-looped (epoch 1)
+[titan] 2026-07-12 21:27:07,744 - root - INFO - [31mstep: 20  [32mloss:  3.17162  [38;2;180;60;0mgrad_norm:  7.8401  [38;2;54;234;195mmemory: 103.00GiB(55.89%)  [34mtps: 31,937  [36mtflops: 1,540.99  [35mmfu: 61.64%[39m
+[titan] 2026-07-12 21:27:23,946 - root - WARNING - Dataset c4_test is being re-looped (epoch 2)
+[titan] 2026-07-12 21:27:28,248 - root - INFO - [31mstep: 30  [32mloss:  2.91039  [38;2;180;60;0mgrad_norm:  4.5704  [38;2;54;234;195mmemory: 103.00GiB(55.89%)  [34mtps: 31,963  [36mtflops: 1,542.24  [35mmfu: 61.69%[39m
+[titan] 2026-07-12 21:27:48,826 - root - INFO - [31mstep: 40  [32mloss:  2.84301  [38;2;180;60;0mgrad_norm:  4.5467  [38;2;54;234;195mmemory: 103.00GiB(55.89%)  [34mtps: 31,849  [36mtflops: 1,536.76  [35mmfu: 61.47%[39m
+[titan] 2026-07-12 21:27:54,794 - root - WARNING - Dataset c4_test is being re-looped (epoch 3)
+[titan] 2026-07-12 21:28:07,324 - root - INFO - [GC] Performing periodic GC collection took 0.24 seconds
+[titan] 2026-07-12 21:28:09,540 - root - INFO - [31mstep: 50  [32mloss:  2.78874  [38;2;180;60;0mgrad_norm:  4.1019  [38;2;54;234;195mmemory: 103.00GiB(55.89%)  [34mtps: 31,639  [36mtflops: 1,526.61  [35mmfu: 61.06%[39m
+[titan] 2026-07-12 21:28:09,541 - root - INFO - Sleeping 2 seconds for other ranks to complete
+[titan] 2026-07-12 21:28:11,541 - root - INFO - Training completed
+[titan] 2026-07-12 21:28:11,682 - root - INFO - Process group destroyed

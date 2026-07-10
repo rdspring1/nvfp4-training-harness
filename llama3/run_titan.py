@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-TorchTitan bf16 launcher — single-GPU and multi-GPU FSDP2 + TP runs.
+TorchTitan bf16/NVFP4/MXFP8 launcher — single-GPU and multi-GPU FSDP2 + TP runs.
 
 Subcommands:
     single   one TorchTitan run on a chosen GPU (8 h wall clock default)
@@ -19,6 +19,10 @@ Usage:
 
     # Multi-GPU GraphTrainer smoke over all three shapes:
     python run_titan.py multi --smoke --graph
+
+    # MXFP8 4xFSDP smoke with the eager Trainer or GraphTrainer:
+    python run_titan.py multi --smoke --only fsdp4 --compile --mxfp8
+    python run_titan.py multi --smoke --only fsdp4 --graph --mxfp8
 
     # Full single-GPU 8-hour run in background:
     nohup python run_titan.py single > run_titan_single.log 2>&1 &
@@ -41,6 +45,7 @@ ROOT_DIR = PLUGIN_DIR.parent
 TORCHTITAN_DIR = ROOT_DIR / "third_party" / "torchtitan"
 RESULTS_DIR = ROOT_DIR / "llama3_results"
 NVFP4_OVERRIDE_MODULE = "torchtitan.overrides.nvfp4_linear"
+MXFP8_OVERRIDE_MODULE = "torchtitan.overrides.mxfp8_linear"
 SEQ_LEN = 2048
 LR = 3e-4
 
@@ -159,14 +164,20 @@ def _hf_assets_path_for_config(base_config: str) -> str | None:
     return None
 
 
-def _nvfp4_flags(nvfp4: bool) -> list[str]:
-    if not nvfp4:
-        return []
-    return ["--override.imports", NVFP4_OVERRIDE_MODULE]
+def _precision_flags(nvfp4: bool, mxfp8: bool) -> list[str]:
+    if nvfp4:
+        return ["--override.imports", NVFP4_OVERRIDE_MODULE]
+    if mxfp8:
+        return ["--override.imports", MXFP8_OVERRIDE_MODULE]
+    return []
 
 
-def _precision_tag(nvfp4: bool) -> str:
-    return "nvfp4" if nvfp4 else "bf16"
+def _precision_tag(nvfp4: bool, mxfp8: bool) -> str:
+    if nvfp4:
+        return "nvfp4"
+    if mxfp8:
+        return "mxfp8"
+    return "bf16"
 
 
 def _plugin_env(extra: dict | None = None) -> dict:
@@ -188,6 +199,7 @@ def _single_cmd(
     dataset: str,
     compile_enabled: bool,
     nvfp4: bool,
+    mxfp8: bool,
     hf_assets_path: str | None = None,
 ) -> list[str]:
     cmd = [
@@ -216,7 +228,7 @@ def _single_cmd(
         cmd += ["--optimizer.param-groups.0.optimizer-kwargs.lr", str(LR)]
     if hf_assets_path is not None:
         cmd += ["--hf-assets-path", hf_assets_path]
-    return cmd + _compile_flags(compile_enabled) + _nvfp4_flags(nvfp4)
+    return cmd + _compile_flags(compile_enabled) + _precision_flags(nvfp4, mxfp8)
 
 
 def run_single(args):
@@ -229,7 +241,7 @@ def run_single(args):
     wall_hours = 5 / 60 if smoke else SINGLE_WALL_HOURS
     gpu = args.gpu
 
-    precision = _precision_tag(args.nvfp4)
+    precision = _precision_tag(args.nvfp4, args.mxfp8)
     label_parts = [precision]
     if args.graph:
         label_parts.append("graph")
@@ -268,6 +280,7 @@ def run_single(args):
         dataset,
         args.compile and not args.graph,
         args.nvfp4,
+        args.mxfp8,
         _hf_assets_path_for_config(base_config),
     )
     env = _plugin_env({"CUDA_VISIBLE_DEVICES": str(gpu)})
@@ -349,12 +362,14 @@ def _single_summary(log_path: Path, smoke: bool, precision: str):
 
 def _multi_cmd(
     exp: dict,
+    batch_size: int,
     steps: int,
     module: str,
     config: str,
     compile_enabled: bool,
     data: str,
     nvfp4: bool,
+    mxfp8: bool,
     hf_assets_path: str | None = None,
 ) -> list[str]:
     cmd = [
@@ -375,7 +390,7 @@ def _multi_cmd(
         "--parallelism.data_parallel_shard_degree",
         str(exp["fsdp"]),
         "--training.local_batch_size",
-        str(exp["batch_size"]),
+        str(batch_size),
         "--training.seq_len",
         str(SEQ_LEN),
         "--training.steps",
@@ -389,13 +404,17 @@ def _multi_cmd(
         cmd += ["--optimizer.param-groups.0.optimizer-kwargs.lr", str(LR)]
     if hf_assets_path is not None:
         cmd += ["--hf-assets-path", hf_assets_path]
-    return cmd + _compile_flags(compile_enabled) + _nvfp4_flags(nvfp4)
+    return cmd + _compile_flags(compile_enabled) + _precision_flags(nvfp4, mxfp8)
 
 
-def _multi_label(exp: dict, compile_enabled: bool, nvfp4: bool, graph: bool) -> str:
+def _multi_label(
+    exp: dict, compile_enabled: bool, nvfp4: bool, mxfp8: bool, graph: bool
+) -> str:
     parts = [exp["name"]]
     if nvfp4:
         parts.append("nvfp4")
+    elif mxfp8:
+        parts.append("mxfp8")
     if graph:
         parts.append("graph")
     elif compile_enabled:
@@ -406,6 +425,8 @@ def _multi_label(exp: dict, compile_enabled: bool, nvfp4: bool, graph: bool) -> 
 def run_multi(args):
     if args.steps is not None and args.steps <= 0:
         raise SystemExit("--steps must be positive")
+    if args.batch_size is not None and args.batch_size <= 0:
+        raise SystemExit("--batch-size must be positive")
 
     smoke = args.smoke
     # torchao NVFP4 quantization requires per-rank GEMM dims divisible by 128.
@@ -440,7 +461,7 @@ def run_multi(args):
             f"Choices: {[e['name'] for e in MULTI_EXPERIMENTS]}"
         )
 
-    precision = _precision_tag(args.nvfp4)
+    precision = _precision_tag(args.nvfp4, args.mxfp8)
     print()
     print("=" * 72)
     print(
@@ -449,7 +470,9 @@ def run_multi(args):
     )
     print(f"Module: {module}")
     print(f"Config: {config}")
-    batch_sizes = ", ".join(f"{e['name']}={e['batch_size']}" for e in exps)
+    batch_sizes = ", ".join(
+        f"{e['name']}={args.batch_size or e['batch_size']}" for e in exps
+    )
     print(f"Local batch per DP replica: {batch_sizes}")
     print(f"Seq length: {SEQ_LEN}")
     if args.steps is not None:
@@ -474,7 +497,10 @@ def run_multi(args):
     results = []
     for exp in exps:
         world_size = exp["tp"] * exp["fsdp"]
-        label = _multi_label(exp, args.compile, args.nvfp4, args.graph)
+        batch_size = args.batch_size or exp["batch_size"]
+        label = _multi_label(
+            exp, args.compile, args.nvfp4, args.mxfp8, args.graph
+        )
         log_path = RESULTS_DIR / f"{ts}_titan_multi_{label}.txt"
 
         if args.steps is not None:
@@ -483,7 +509,7 @@ def run_multi(args):
             steps = MULTI_SMOKE_STEPS
         else:
             steps = steps_for_total_tokens(
-                args.total_tokens, exp["batch_size"], SEQ_LEN, exp["fsdp"]
+                args.total_tokens, batch_size, SEQ_LEN, exp["fsdp"]
             )
 
         if available_gpus < world_size and not args.allow_insufficient_gpus:
@@ -496,19 +522,21 @@ def run_multi(args):
         hf_assets_path = _hf_assets_path_for_config(base_config)
         cmd = _multi_cmd(
             exp,
+            batch_size,
             steps,
             module,
             config,
             args.compile and not args.graph,
             args.data,
             args.nvfp4,
+            args.mxfp8,
             hf_assets_path,
         )
         env = _plugin_env(
             {"OMP_NUM_THREADS": os.environ.get("OMP_NUM_THREADS", "1")}
         )
         print(
-            f"  [{label}] world_size={world_size} batch={exp['batch_size']} steps={steps:,} -> {log_path}"
+            f"  [{label}] world_size={world_size} batch={batch_size} steps={steps:,} -> {log_path}"
         )
         print(f"  [{label}] {' '.join(cmd)}")
 
@@ -594,7 +622,7 @@ def _multi_summary(results, smoke: bool):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="TorchTitan bf16 launcher (single + multi-GPU)"
+        description="TorchTitan bf16/NVFP4/MXFP8 launcher (single + multi-GPU)"
     )
     sub = parser.add_subparsers(dest="mode", required=True)
 
@@ -624,10 +652,16 @@ def main():
         action="store_true",
         help="Use graph_trainer.llama3 with GraphTrainer defaults including CUDA graphs",
     )
-    p_single.add_argument(
+    single_precision = p_single.add_mutually_exclusive_group()
+    single_precision.add_argument(
         "--nvfp4",
         action="store_true",
         help=f"Enable torchao NVFP4 via override module {NVFP4_OVERRIDE_MODULE}",
+    )
+    single_precision.add_argument(
+        "--mxfp8",
+        action="store_true",
+        help=f"Enable torchao MXFP8 via override module {MXFP8_OVERRIDE_MODULE}",
     )
     p_single.set_defaults(func=run_single)
 
@@ -667,6 +701,12 @@ def main():
         "--steps", type=int, default=None, help="Override per-shape step count"
     )
     p_multi.add_argument(
+        "--batch-size",
+        type=int,
+        default=None,
+        help="Override local batch size per DP replica",
+    )
+    p_multi.add_argument(
         "--total-tokens",
         type=int,
         default=MULTI_TOTAL_TOKENS,
@@ -677,10 +717,16 @@ def main():
         action="store_true",
         help="Launch torchrun even when visible GPU count < world size",
     )
-    p_multi.add_argument(
+    multi_precision = p_multi.add_mutually_exclusive_group()
+    multi_precision.add_argument(
         "--nvfp4",
         action="store_true",
         help=f"Enable torchao NVFP4 via override module {NVFP4_OVERRIDE_MODULE}",
+    )
+    multi_precision.add_argument(
+        "--mxfp8",
+        action="store_true",
+        help=f"Enable torchao MXFP8 via override module {MXFP8_OVERRIDE_MODULE}",
     )
     p_multi.set_defaults(func=run_multi)
 

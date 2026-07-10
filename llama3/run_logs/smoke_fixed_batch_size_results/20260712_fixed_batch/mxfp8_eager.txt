@@ -1,0 +1,64 @@
+W0712 21:09:59.501000 24441 /opt/pytorch/pytorch/torch/distributed/run.py:874] 
+W0712 21:09:59.501000 24441 /opt/pytorch/pytorch/torch/distributed/run.py:874] *****************************************
+W0712 21:09:59.501000 24441 /opt/pytorch/pytorch/torch/distributed/run.py:874] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0712 21:09:59.501000 24441 /opt/pytorch/pytorch/torch/distributed/run.py:874] *****************************************
+W0712 21:10:08.821000 24636 /opt/pytorch/pytorch/torch/utils/_pytree.py:630] <enum 'KernelPreference'> is an Enum subclass and is now natively supported by torch.compile as an opaque value type. Calling register_constant() on Enum subclasses is deprecated and will be an error in a future release.
+W0712 21:10:09.399000 24636 /opt/pytorch/pytorch/torch/utils/_pytree.py:630] <enum 'ScaleCalculationMode'> is an Enum subclass and is now natively supported by torch.compile as an opaque value type. Calling register_constant() on Enum subclasses is deprecated and will be an error in a future release.
+[titan] 2026-07-12 21:10:10,404 - root - INFO - torchtitan version: 0.2.2 (0.0.0 means __version__ is not defined correctly).
+[titan] 2026-07-12 21:10:10,408 - root - WARNING - initial_load_model_only=True has no effect without an initial_load_path.
+[titan] 2026-07-12 21:10:10,410 - root - WARNING - torch.compile enablement is required for highest performance of MXFP8 dynamic quantization.
+[titan] 2026-07-12 21:10:10,411 - root - INFO - Converted Linear layers to MXFP8Linear
+[titan] 2026-07-12 21:10:10,475 - root - WARNING - initial_load_model_only=True has no effect without an initial_load_path.
+[titan] 2026-07-12 21:10:10,476 - torchtitan.observability.structured_logger.jsonl_handler - INFO - Structured logging -> JSONL: /home/me/nvfp4/third_party/torchtitan/outputs/structured_logs/training.global_rank_0.20260712-211010-0KCAFR.jsonl
+[titan] 2026-07-12 21:10:11,053 - root - WARNING - ENV[TORCH_NCCL_ASYNC_ERROR_HANDLING] = 1 will be overridden to 3 based on job config
+[titan] 2026-07-12 21:10:11,066 - root - INFO - Building device mesh with parallelism: pp=1, dp_replicate=1, dp_shard=4, cp=1, tp=1, ep=1
+[titan] 2026-07-12 21:10:11,081 - root - INFO - Successfully created meshes with active dimensions: ['batch', 'loss', 'efsdp', 'fsdp']
+[titan] 2026-07-12 21:10:11,081 - root - INFO - [GC] Initial GC collection took 0.00 seconds
+[titan] 2026-07-12 21:10:15,181 - root - INFO - Building llama3 8B
+[titan] 2026-07-12 21:10:15,310 - root - INFO - TensorBoard logging enabled. Logs will be saved at ./outputs/tb/20260712-2110
+[titan] 2026-07-12 21:10:15,311 - root - INFO - CUDA capacity: NVIDIA GB200 with 184.30GiB memory
+[titan] 2026-07-12 21:10:15,379 - root - INFO - [34mModel llama3 8B [31msize: 8,030,261,248 total parameters[39m
+[titan] 2026-07-12 21:10:15,392 - root - INFO - Applied SelectiveAC activation checkpointing to the model
+[titan] 2026-07-12 21:10:15,406 - root - INFO - Compiling each TransformerBlock with torch.compile
+[titan] 2026-07-12 21:10:15,468 - root - INFO - Applied FSDP to the model
+[titan] 2026-07-12 21:10:15,951 - root - INFO - Peak FLOPS used for computing MFU: 2.500e+15
+[titan] 2026-07-12 21:10:15,951 - root - INFO - CUDA memory usage for model: 10.10GiB(5.48%)
+[titan] 2026-07-12 21:10:15,953 - root - INFO - Optimizer AdamW (model_part=0): 227 params [.*] {'fused': True, 'foreach': False, 'lr': 0.0003, 'betas': (0.9, 0.95), 'eps': 1e-08, 'weight_decay': 0.1}
+[titan] 2026-07-12 21:10:15,953 - root - WARNING - Warmup steps (200) exceed total steps (50). Adjusting warmup steps to 50.
+[titan] 2026-07-12 21:10:15,954 - root - INFO - Loading tokenizer from tokenizer.json
+[titan] 2026-07-12 21:10:15,957 - root - INFO - Preparing c4_test dataset from tests/assets/c4_test
+/usr/local/lib/python3.12/dist-packages/torchdata/stateful_dataloader/stateful_dataloader.py:379: UserWarning: 'set_vital' is deprecated, please do not call
+  torch.set_vital("Dataloader", "enabled", "True")  # type: ignore[attr-defined]
+[titan] 2026-07-12 21:10:16,188 - root - WARNING - model.safetensors.index.json not found at hf_assets_path: ./tests/assets/tokenizer/model.safetensors.index.json.                     Defaulting to saving a single safetensors file if checkpoint is saved in HF format
+[titan] 2026-07-12 21:10:16,188 - root - WARNING - initial_load_model_only=True has no effect without an initial_load_path.
+[titan] 2026-07-12 21:10:16,189 - root - INFO - Trainer is initialized with local batch size 32, global batch size 128, gradient accumulation steps 1, sequence length 2048, total steps 50 (warmup 200)
+[titan] 2026-07-12 21:10:16,189 - root - INFO - Training starts at step 1
+[titan] 2026-07-12 21:10:16,189 - root - INFO - Profiling active. Traces will be saved at ./outputs/profiling/traces
+[rank0]:W0712 21:10:22.017000 24636 /opt/pytorch/pytorch/torch/_logging/_internal.py:1350] [1/0] 
+[rank0]:W0712 21:10:22.017000 24636 /opt/pytorch/pytorch/torch/_logging/_internal.py:1350] [1/0] Detected that context_fn is passed to torch.utils.checkpoint under torch.compile.
+[rank0]:W0712 21:10:22.017000 24636 /opt/pytorch/pytorch/torch/_logging/_internal.py:1350] [1/0] Please make sure the checkpointed region does not contain in-place ops (e.g. torch.relu_).
+[rank0]:W0712 21:10:22.017000 24636 /opt/pytorch/pytorch/torch/_logging/_internal.py:1350] [1/0] 
+/opt/pytorch/pytorch/torch/_inductor/lowering.py:2712: UserWarning: Torchinductor does not support code generation for complex operators. Performance may be worse than eager.
+  warnings.warn(
+[titan] 2026-07-12 21:11:01,473 - root - INFO - [31mstep:  1  [32mloss: 12.32434  [38;2;180;60;0mgrad_norm: 25.4213  [38;2;54;234;195mmemory: 162.77GiB(88.32%)  [34mtps: 1,422  [36mtflops: 68.60  [35mmfu: N/A[39m
+[titan] 2026-07-12 21:11:01,474 - root - INFO - Synchronizing and adjusting timeout for all ProcessGroups to 0:01:40
+[rank0]:[W712 21:11:01.743330358 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 609681408, total: 197890015232).
+[rank0]:[W712 21:11:02.814230486 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 220200960 bytes (free: 11993088, total: 197890015232).
+[rank0]:[W712 21:11:04.213362147 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 2404843520, total: 197890015232).
+[titan] 2026-07-12 21:11:22,447 - root - WARNING - 3 CUDA memory allocation retries.
+[titan] 2026-07-12 21:11:22,447 - root - INFO - [31mstep: 10  [32mloss:  4.52695  [38;2;180;60;0mgrad_norm: 17.7985  [38;2;54;234;195mmemory: 178.98GiB(97.12%)  [34mtps: 28,122  [36mtflops: 1,356.90  [35mmfu: N/A[39m
+[titan] 2026-07-12 21:11:31,015 - root - WARNING - Dataset c4_test is being re-looped (epoch 1)
+[titan] 2026-07-12 21:11:45,057 - root - WARNING - 3 CUDA memory allocation retries.
+[titan] 2026-07-12 21:11:45,058 - root - INFO - [31mstep: 20  [32mloss:  3.32124  [38;2;180;60;0mgrad_norm: 11.9890  [38;2;54;234;195mmemory: 177.49GiB(96.31%)  [34mtps: 28,986  [36mtflops: 1,398.59  [35mmfu: N/A[39m
+[titan] 2026-07-12 21:12:02,632 - root - WARNING - Dataset c4_test is being re-looped (epoch 2)
+[titan] 2026-07-12 21:12:07,733 - root - WARNING - 3 CUDA memory allocation retries.
+[titan] 2026-07-12 21:12:07,733 - root - INFO - [31mstep: 30  [32mloss:  2.92610  [38;2;180;60;0mgrad_norm:  5.2373  [38;2;54;234;195mmemory: 177.49GiB(96.31%)  [34mtps: 28,903  [36mtflops: 1,394.58  [35mmfu: N/A[39m
+[titan] 2026-07-12 21:12:30,519 - root - WARNING - 3 CUDA memory allocation retries.
+[titan] 2026-07-12 21:12:30,519 - root - INFO - [31mstep: 40  [32mloss:  2.84013  [38;2;180;60;0mgrad_norm:  4.1516  [38;2;54;234;195mmemory: 177.49GiB(96.31%)  [34mtps: 28,762  [36mtflops: 1,387.77  [35mmfu: N/A[39m
+[titan] 2026-07-12 21:12:36,829 - root - WARNING - Dataset c4_test is being re-looped (epoch 3)
+[titan] 2026-07-12 21:12:51,254 - root - INFO - [GC] Performing periodic GC collection took 0.71 seconds
+[titan] 2026-07-12 21:12:53,595 - root - WARNING - 3 CUDA memory allocation retries.
+[titan] 2026-07-12 21:12:53,595 - root - INFO - [31mstep: 50  [32mloss:  2.90156  [38;2;180;60;0mgrad_norm:  7.9181  [38;2;54;234;195mmemory: 177.49GiB(96.31%)  [34mtps: 28,401  [36mtflops: 1,370.36  [35mmfu: N/A[39m
+[titan] 2026-07-12 21:12:53,596 - root - INFO - Sleeping 2 seconds for other ranks to complete
+[titan] 2026-07-12 21:12:55,596 - root - INFO - Training completed
+[titan] 2026-07-12 21:12:55,844 - root - INFO - Process group destroyed

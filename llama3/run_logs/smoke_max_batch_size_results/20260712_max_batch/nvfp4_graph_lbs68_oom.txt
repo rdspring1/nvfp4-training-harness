@@ -1,0 +1,347 @@
+W0712 15:04:00.007000 272186 /opt/pytorch/pytorch/torch/distributed/run.py:874] 
+W0712 15:04:00.007000 272186 /opt/pytorch/pytorch/torch/distributed/run.py:874] *****************************************
+W0712 15:04:00.007000 272186 /opt/pytorch/pytorch/torch/distributed/run.py:874] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0712 15:04:00.007000 272186 /opt/pytorch/pytorch/torch/distributed/run.py:874] *****************************************
+W0712 15:04:09.068000 272256 /opt/pytorch/pytorch/torch/utils/_pytree.py:630] <enum 'KernelPreference'> is an Enum subclass and is now natively supported by torch.compile as an opaque value type. Calling register_constant() on Enum subclasses is deprecated and will be an error in a future release.
+W0712 15:04:09.542000 272256 /opt/pytorch/pytorch/torch/utils/_pytree.py:630] <enum 'ScaleCalculationMode'> is an Enum subclass and is now natively supported by torch.compile as an opaque value type. Calling register_constant() on Enum subclasses is deprecated and will be an error in a future release.
+[titan] 2026-07-12 15:04:10,527 - root - INFO - torchtitan version: 0.2.2 (0.0.0 means __version__ is not defined correctly).
+[titan] 2026-07-12 15:04:10,648 - root - WARNING - initial_load_model_only=True has no effect without an initial_load_path.
+[titan] 2026-07-12 15:04:10,922 - root - WARNING - initial_load_model_only=True has no effect without an initial_load_path.
+[titan] 2026-07-12 15:04:10,923 - torchtitan.observability.structured_logger.jsonl_handler - INFO - Structured logging -> JSONL: /home/me/nvfp4/third_party/torchtitan/outputs/structured_logs/training.global_rank_0.20260712-150410-CQ890A.jsonl
+[titan] 2026-07-12 15:04:11,485 - root - WARNING - ENV[TORCH_NCCL_ASYNC_ERROR_HANDLING] = 1 will be overridden to 3 based on job config
+[titan] 2026-07-12 15:04:11,497 - root - INFO - Building device mesh with parallelism: pp=1, dp_replicate=1, dp_shard=4, cp=1, tp=1, ep=1
+[titan] 2026-07-12 15:04:11,509 - root - INFO - Successfully created meshes with active dimensions: ['batch', 'loss', 'efsdp', 'fsdp']
+[titan] 2026-07-12 15:04:11,509 - root - INFO - [GC] Initial GC collection took 0.00 seconds
+[titan] 2026-07-12 15:04:14,864 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.0.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 15:04:14,864 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.1.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 15:04:14,864 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.2.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 15:04:14,864 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.3.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 15:04:14,864 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.4.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 15:04:14,864 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.5.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 15:04:14,864 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.6.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 15:04:14,864 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.7.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 15:04:14,864 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.8.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 15:04:14,864 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.9.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 15:04:14,864 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.10.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 15:04:14,864 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.11.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 15:04:14,864 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.12.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 15:04:14,864 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.13.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 15:04:14,864 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.14.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 15:04:14,864 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.15.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 15:04:14,864 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.16.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 15:04:14,864 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.17.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 15:04:14,864 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.18.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 15:04:14,864 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.19.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 15:04:14,864 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.20.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 15:04:14,864 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.21.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 15:04:14,864 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.22.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 15:04:14,864 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.23.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 15:04:14,864 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.24.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 15:04:14,864 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.25.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 15:04:14,864 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.26.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 15:04:14,864 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.27.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 15:04:14,864 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.28.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 15:04:14,864 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.29.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 15:04:14,864 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.30.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 15:04:14,864 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.31.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 15:04:14,864 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.0.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 15:04:14,864 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.1.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 15:04:14,864 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.2.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 15:04:14,865 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.3.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 15:04:14,865 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.4.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 15:04:14,865 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.5.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 15:04:14,865 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.6.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 15:04:14,865 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.7.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 15:04:14,865 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.8.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 15:04:14,865 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.9.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 15:04:14,865 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.10.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 15:04:14,865 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.11.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 15:04:14,865 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.12.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 15:04:14,865 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.13.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 15:04:14,865 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.14.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 15:04:14,865 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.15.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 15:04:14,865 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.16.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 15:04:14,865 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.17.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 15:04:14,865 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.18.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 15:04:14,865 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.19.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 15:04:14,865 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.20.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 15:04:14,865 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.21.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 15:04:14,865 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.22.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 15:04:14,865 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.23.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 15:04:14,865 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.24.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 15:04:14,865 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.25.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 15:04:14,865 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.26.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 15:04:14,865 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.27.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 15:04:14,865 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.28.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 15:04:14,865 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.29.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 15:04:14,865 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.30.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 15:04:14,865 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.31.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 15:04:14,865 - root - INFO - Applied 64 override(s)
+[titan] 2026-07-12 15:04:14,865 - root - INFO - Building llama3 8B
+[titan] 2026-07-12 15:04:15,015 - root - INFO - TensorBoard logging enabled. Logs will be saved at ./outputs/tb/20260712-1504
+[titan] 2026-07-12 15:04:15,016 - root - INFO - CUDA capacity: NVIDIA GB200 with 184.30GiB memory
+[titan] 2026-07-12 15:04:15,079 - root - INFO - [34mModel llama3 8B [31msize: 8,030,261,248 total parameters[39m
+[titan] 2026-07-12 15:04:15,079 - root - INFO - Compiling the loss function with torch.compile
+[titan] 2026-07-12 15:04:15,135 - root - INFO - Applied Data Parallel (simple_fsdp) (dp mode=fully_shard) to the model
+[titan] 2026-07-12 15:04:15,135 - root - INFO - aot_fx_trace compile mode: graph capture will happen at training time
+[titan] 2026-07-12 15:04:15,664 - root - INFO - Peak FLOPS used for computing MFU: 2.500e+15
+[titan] 2026-07-12 15:04:15,665 - root - INFO - CUDA memory usage for model: 10.10GiB(5.48%)
+[titan] 2026-07-12 15:04:15,666 - root - INFO - Optimizer AdamW (model_part=0): 227 params [.*] {'fused': True, 'foreach': False, 'lr': 0.0003, 'betas': (0.9, 0.95), 'eps': 1e-08, 'weight_decay': 0.1}
+[titan] 2026-07-12 15:04:15,667 - root - WARNING - Warmup steps (200) exceed total steps (10). Adjusting warmup steps to 10.
+[titan] 2026-07-12 15:04:15,667 - root - INFO - Loading tokenizer from tokenizer.json
+[titan] 2026-07-12 15:04:15,671 - root - INFO - Preparing c4_test dataset from tests/assets/c4_test
+/usr/local/lib/python3.12/dist-packages/torchdata/stateful_dataloader/stateful_dataloader.py:379: UserWarning: 'set_vital' is deprecated, please do not call
+  torch.set_vital("Dataloader", "enabled", "True")  # type: ignore[attr-defined]
+[titan] 2026-07-12 15:04:15,754 - root - WARNING - model.safetensors.index.json not found at hf_assets_path: ./tests/assets/tokenizer/model.safetensors.index.json.                     Defaulting to saving a single safetensors file if checkpoint is saved in HF format
+[titan] 2026-07-12 15:04:15,755 - root - WARNING - initial_load_model_only=True has no effect without an initial_load_path.
+[titan] 2026-07-12 15:04:15,755 - root - INFO - Trainer is initialized with local batch size 68, global batch size 272, gradient accumulation steps 1, sequence length 2048, total steps 10 (warmup 200)
+[titan] 2026-07-12 15:04:15,756 - root - INFO - NUMA binding applied for GPU 0
+[titan] 2026-07-12 15:04:15,757 - root - INFO - Training starts at step 1
+[titan] 2026-07-12 15:04:15,757 - root - INFO - Profiling active. Traces will be saved at ./outputs/profiling/traces
+/opt/pytorch/pytorch/torch/nn/attention/flex_attention.py:2565: UserWarning: flex_attention called without torch.compile() - this will use an unfused implementation that materializes the full scores matrix instead of generating a fused kernel.
+
+SOLUTION: Use torch.compile(flex_attention)(...)
+
+If you want to debug your score_mod/mask_mod, you can set:
+torch.nn.attention.flex_attention._FLEX_ATTENTION_DISABLE_COMPILE_DEBUG = True
+
+This will allow you to use print statements or breakpoints. Note: This doesn't work with the backwards pass and may produce incorrect results.
+  _warn_once(
+[titan] 2026-07-12 15:04:39,237 - root - INFO - minimal_fx_tracer took 18.983s
+[titan] 2026-07-12 15:04:39,238 - root - INFO - Applying 11 graph passes:
+  1. eliminate_dead_code_pass
+  2. canonicalize_graph_pass
+  3. deduplicate_fsdp_unshard_chains_pass
+  4. tag_with_memory_policy_pass
+  5. apply_cpu_offload_pass
+  6. selective_activation_remat_pass
+  7. joint_transformer_block_bucketing_reordering_pass
+  8. annotate_flex_attention_for_regional_inductor_pass
+  9. regional_inductor_pass
+  10. insert_kernel_annotations_pass
+  11. cudagraph_pass
+[titan] 2026-07-12 15:04:39,806 - root - INFO - Eliminated dead code from the graph
+[titan] 2026-07-12 15:04:40,256 - root - INFO - Removed 1261 aten.detach.default node(s) from the graph
+[titan] 2026-07-12 15:04:40,697 - root - INFO - Removed 468 identity view/reshape node(s) from the graph
+[titan] 2026-07-12 15:04:41,118 - root - INFO - Removed 24 back-to-back transpose node(s) from the graph
+[titan] 2026-07-12 15:04:41,124 - root - INFO - Removed 234 identity slice node(s)
+[titan] 2026-07-12 15:04:41,946 - root - INFO - Normalized 2264 view op(s) to reshape
+[titan] 2026-07-12 15:04:42,433 - root - INFO - Canonicalized 168 duplicate FSDP unshard chain(s)
+[titan] 2026-07-12 15:04:42,861 - root - INFO - Applied selective activation checkpointing (SAC) graph pass.
+[titan] 2026-07-12 15:04:42,861 - root - INFO -   Forced 32 nodes to MUST_SAVE at layer boundaries
+[titan] 2026-07-12 15:04:42,861 - root - INFO -   Layer non-layer: 1 MUST_SAVE, 9 RECOMPUTE
+[titan] 2026-07-12 15:04:42,861 - root - INFO -   Layer 0: 9 MUST_SAVE, 197 RECOMPUTE
+[titan] 2026-07-12 15:04:42,861 - root - INFO -   Layer 1: 9 MUST_SAVE, 197 RECOMPUTE
+[titan] 2026-07-12 15:04:42,861 - root - INFO -   Layer 2: 9 MUST_SAVE, 197 RECOMPUTE
+[titan] 2026-07-12 15:04:42,861 - root - INFO -   Layer 3: 9 MUST_SAVE, 197 RECOMPUTE
+[titan] 2026-07-12 15:04:42,861 - root - INFO -   Layer 4: 9 MUST_SAVE, 197 RECOMPUTE
+[titan] 2026-07-12 15:04:42,861 - root - INFO -   Layer 5: 9 MUST_SAVE, 197 RECOMPUTE
+[titan] 2026-07-12 15:04:42,861 - root - INFO -   Layer 6: 9 MUST_SAVE, 197 RECOMPUTE
+[titan] 2026-07-12 15:04:42,861 - root - INFO -   Layer 7: 9 MUST_SAVE, 197 RECOMPUTE
+[titan] 2026-07-12 15:04:42,861 - root - INFO -   Layer 8: 9 MUST_SAVE, 197 RECOMPUTE
+[titan] 2026-07-12 15:04:42,861 - root - INFO -   Layer 9: 9 MUST_SAVE, 197 RECOMPUTE
+[titan] 2026-07-12 15:04:42,861 - root - INFO -   Layer 10: 9 MUST_SAVE, 197 RECOMPUTE
+[titan] 2026-07-12 15:04:42,861 - root - INFO -   Layer 11: 9 MUST_SAVE, 197 RECOMPUTE
+[titan] 2026-07-12 15:04:42,861 - root - INFO -   Layer 12: 9 MUST_SAVE, 197 RECOMPUTE
+[titan] 2026-07-12 15:04:42,861 - root - INFO -   Layer 13: 9 MUST_SAVE, 197 RECOMPUTE
+[titan] 2026-07-12 15:04:42,861 - root - INFO -   Layer 14: 9 MUST_SAVE, 197 RECOMPUTE
+[titan] 2026-07-12 15:04:42,861 - root - INFO -   Layer 15: 9 MUST_SAVE, 197 RECOMPUTE
+[titan] 2026-07-12 15:04:42,861 - root - INFO -   Layer 16: 9 MUST_SAVE, 197 RECOMPUTE
+[titan] 2026-07-12 15:04:42,861 - root - INFO -   Layer 17: 9 MUST_SAVE, 197 RECOMPUTE
+[titan] 2026-07-12 15:04:42,861 - root - INFO -   Layer 18: 9 MUST_SAVE, 197 RECOMPUTE
+[titan] 2026-07-12 15:04:42,861 - root - INFO -   Layer 19: 9 MUST_SAVE, 197 RECOMPUTE
+[titan] 2026-07-12 15:04:42,861 - root - INFO -   Layer 20: 9 MUST_SAVE, 197 RECOMPUTE
+[titan] 2026-07-12 15:04:42,861 - root - INFO -   Layer 21: 9 MUST_SAVE, 197 RECOMPUTE
+[titan] 2026-07-12 15:04:42,861 - root - INFO -   Layer 22: 9 MUST_SAVE, 197 RECOMPUTE
+[titan] 2026-07-12 15:04:42,861 - root - INFO -   Layer 23: 9 MUST_SAVE, 197 RECOMPUTE
+[titan] 2026-07-12 15:04:42,861 - root - INFO -   Layer 24: 9 MUST_SAVE, 197 RECOMPUTE
+[titan] 2026-07-12 15:04:42,861 - root - INFO -   Layer 25: 9 MUST_SAVE, 197 RECOMPUTE
+[titan] 2026-07-12 15:04:42,861 - root - INFO -   Layer 26: 9 MUST_SAVE, 197 RECOMPUTE
+[titan] 2026-07-12 15:04:42,861 - root - INFO -   Layer 27: 9 MUST_SAVE, 197 RECOMPUTE
+[titan] 2026-07-12 15:04:42,861 - root - INFO -   Layer 28: 9 MUST_SAVE, 197 RECOMPUTE
+[titan] 2026-07-12 15:04:42,861 - root - INFO -   Layer 29: 9 MUST_SAVE, 197 RECOMPUTE
+[titan] 2026-07-12 15:04:42,861 - root - INFO -   Layer 30: 9 MUST_SAVE, 197 RECOMPUTE
+[titan] 2026-07-12 15:04:42,861 - root - INFO -   Layer 31: 8 MUST_SAVE, 198 RECOMPUTE
+[titan] 2026-07-12 15:04:47,538 - root - INFO - FSDP reorder: 100 overlap deps across 100 target nodes
+/opt/pytorch/pytorch/torch/_inductor/select_algorithm.py:4950: UserWarning: TypedStorage is deprecated. It will be removed in the future and UntypedStorage will be the only storage class. This should only matter to you if you are using storages directly.  To access UntypedStorage directly, use tensor.untyped_storage() instead of tensor.storage()
+  current_out_size = out_base.storage().size()
+Autotune Choices Stats:
+{"num_choices": 7, "num_triton_choices": 7, "best_kernel": "triton_flex_attention_2", "best_kernel_desc": "BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M=128, BLOCK_N=128, FLOAT32_PRECISION=\"'tf32'\", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=2, num_warps=8", "best_time": 20.04889678955078, "best_triton_pos": 0}
+AUTOTUNE flex_attention(68x32x2048x128, 68x8x2048x128, 68x8x2048x128, 68x32x2048, 68x32x2048, 68x1x16, 68x1x16x16, 68x1x16, 68x1x16x16, 68x2048)
+strides: [8388608, 128, 4096, 1], [2097152, 128, 1024, 1], [2097152, 128, 1024, 1], [65536, 2048, 1], [65536, 2048, 1], [16, 16, 1], [256, 256, 16, 1], [16, 16, 1], [256, 256, 16, 1], [2048, 1]
+dtypes: torch.bfloat16, torch.bfloat16, torch.bfloat16, torch.float32, torch.float32, torch.int32, torch.int32, torch.int32, torch.int32, torch.int32
+  triton_flex_attention_2 20.0489 ms 100.0% BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M=128, BLOCK_N=128, FLOAT32_PRECISION="'tf32'", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=2, num_warps=8
+  triton_flex_attention_6 28.0924 ms 71.4% BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M=128, BLOCK_N=64, FLOAT32_PRECISION="'tf32'", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=3, num_warps=8
+  triton_flex_attention_3 28.3382 ms 70.7% BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M=128, BLOCK_N=128, FLOAT32_PRECISION="'tf32'", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=1, num_warps=8
+  triton_flex_attention_0 28.4621 ms 70.4% BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M=128, BLOCK_N=64, FLOAT32_PRECISION="'tf32'", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=3, num_warps=4
+  triton_flex_attention_4 32.8622 ms 61.0% BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M=64, BLOCK_N=128, FLOAT32_PRECISION="'tf32'", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=3, num_warps=4
+  triton_flex_attention_1 41.8468 ms 47.9% BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M=128, BLOCK_N=128, FLOAT32_PRECISION="'tf32'", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=3, num_warps=4
+  triton_flex_attention_5 46.4794 ms 43.1% BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M=64, BLOCK_N=64, FLOAT32_PRECISION="'tf32'", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=3, num_warps=4
+SingleProcess AUTOTUNE benchmarking takes 1.6665 seconds and 2.4861 seconds precompiling for 7 choices
+Autotune Choices Stats:
+{"num_choices": 7, "num_triton_choices": 7, "best_kernel": "triton_flex_attention_9", "best_kernel_desc": "BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M=128, BLOCK_N=128, FLOAT32_PRECISION=\"'tf32'\", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=2, num_warps=8", "best_time": 20.05708885192871, "best_triton_pos": 0}
+AUTOTUNE flex_attention(68x32x2048x128, 68x8x2048x128, 68x8x2048x128, 68x32x2048, 68x32x2048, 68x1x16, 68x1x16x16, 68x1x16, 68x1x16x16, 68x2048)
+strides: [8388608, 128, 4096, 1], [2097152, 128, 1024, 1], [2097152, 128, 1024, 1], [65536, 2048, 1], [65536, 2048, 1], [16, 16, 1], [256, 256, 16, 1], [16, 16, 1], [256, 256, 16, 1], [2048, 1]
+dtypes: torch.bfloat16, torch.bfloat16, torch.bfloat16, torch.float32, torch.float32, torch.int32, torch.int32, torch.int32, torch.int32, torch.int32
+  triton_flex_attention_9 20.0571 ms 100.0% BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M=128, BLOCK_N=128, FLOAT32_PRECISION="'tf32'", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=2, num_warps=8
+  triton_flex_attention_13 28.0955 ms 71.4% BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M=128, BLOCK_N=64, FLOAT32_PRECISION="'tf32'", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=3, num_warps=8
+  triton_flex_attention_10 28.3322 ms 70.8% BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M=128, BLOCK_N=128, FLOAT32_PRECISION="'tf32'", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=1, num_warps=8
+  triton_flex_attention_7 28.4611 ms 70.5% BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M=128, BLOCK_N=64, FLOAT32_PRECISION="'tf32'", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=3, num_warps=4
+  triton_flex_attention_11 32.8777 ms 61.0% BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M=64, BLOCK_N=128, FLOAT32_PRECISION="'tf32'", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=3, num_warps=4
+  triton_flex_attention_8 41.8509 ms 47.9% BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M=128, BLOCK_N=128, FLOAT32_PRECISION="'tf32'", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=3, num_warps=4
+  triton_flex_attention_12 46.4794 ms 43.2% BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M=64, BLOCK_N=64, FLOAT32_PRECISION="'tf32'", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=3, num_warps=4
+SingleProcess AUTOTUNE benchmarking takes 1.6757 seconds and 0.0676 seconds precompiling for 7 choices
+Autotune Choices Stats:
+{"num_choices": 7, "num_triton_choices": 7, "best_kernel": "triton_flex_attention_23", "best_kernel_desc": "BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M=128, BLOCK_N=128, FLOAT32_PRECISION=\"'tf32'\", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=2, num_warps=8", "best_time": 20.05401611328125, "best_triton_pos": 0}
+AUTOTUNE flex_attention(68x32x2048x128, 68x8x2048x128, 68x8x2048x128, 68x32x2048, 68x32x2048, 68x1x16, 68x1x16x16, 68x1x16, 68x1x16x16, 68x2048)
+strides: [8388608, 128, 4096, 1], [2097152, 128, 1024, 1], [2097152, 128, 1024, 1], [65536, 2048, 1], [65536, 2048, 1], [16, 16, 1], [256, 256, 16, 1], [16, 16, 1], [256, 256, 16, 1], [2048, 1]
+dtypes: torch.bfloat16, torch.bfloat16, torch.bfloat16, torch.float32, torch.float32, torch.int32, torch.int32, torch.int32, torch.int32, torch.int32
+  triton_flex_attention_23 20.0540 ms 100.0% BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M=128, BLOCK_N=128, FLOAT32_PRECISION="'tf32'", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=2, num_warps=8
+  triton_flex_attention_27 28.1170 ms 71.3% BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M=128, BLOCK_N=64, FLOAT32_PRECISION="'tf32'", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=3, num_warps=8
+  triton_flex_attention_24 28.3300 ms 70.8% BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M=128, BLOCK_N=128, FLOAT32_PRECISION="'tf32'", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=1, num_warps=8
+  triton_flex_attention_21 28.4396 ms 70.5% BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M=128, BLOCK_N=64, FLOAT32_PRECISION="'tf32'", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=3, num_warps=4
+  triton_flex_attention_25 32.8602 ms 61.0% BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M=64, BLOCK_N=128, FLOAT32_PRECISION="'tf32'", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=3, num_warps=4
+  triton_flex_attention_22 41.8263 ms 47.9% BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M=128, BLOCK_N=128, FLOAT32_PRECISION="'tf32'", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=3, num_warps=4
+  triton_flex_attention_26 46.4650 ms 43.2% BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M=64, BLOCK_N=64, FLOAT32_PRECISION="'tf32'", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=3, num_warps=4
+SingleProcess AUTOTUNE benchmarking takes 1.6797 seconds and 0.0684 seconds precompiling for 7 choices
+Autotune Choices Stats:
+{"num_choices": 13, "num_triton_choices": 13, "best_kernel": "triton_flex_attention_backward_229", "best_kernel_desc": "BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M1=32, BLOCK_M2=64, BLOCK_N1=64, BLOCK_N2=32, FLOAT32_PRECISION=\"'tf32'\", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=3, num_warps=4", "best_time": 57.72492980957031, "best_triton_pos": 0}
+AUTOTUNE flex_attention_backward(68x32x2048x128, 68x8x2048x128, 68x8x2048x128, 68x32x2048, 68x32x2048, 68x32x2048x128, 68x32x2048x128, 68x8x2048x128, 68x1x16, 68x1x16x16, 68x1x16, 68x1x16x16, 68x1x16, 68x1x16x16, 68x1x16, 68x1x16x16, 68x2048)
+strides: [8388608, 128, 4096, 1], [2097152, 128, 1024, 1], [2097152, 128, 1024, 1], [65536, 2048, 1], [65536, 2048, 1], [8388608, 128, 4096, 1], [8388608, 128, 4096, 1], [2097152, 128, 1024, 1], [16, 16, 1], [256, 256, 16, 1], [16, 16, 1], [256, 256, 16, 1], [16, 16, 1], [256, 256, 16, 1], [16, 16, 1], [256, 256, 16, 1], [2048, 1]
+dtypes: torch.bfloat16, torch.bfloat16, torch.bfloat16, torch.float32, torch.float32, torch.bfloat16, torch.bfloat16, torch.bfloat16, torch.int32, torch.int32, torch.int32, torch.int32, torch.int32, torch.int32, torch.int32, torch.int32, torch.int32
+  triton_flex_attention_backward_229 57.7249 ms 100.0% BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M1=32, BLOCK_M2=64, BLOCK_N1=64, BLOCK_N2=32, FLOAT32_PRECISION="'tf32'", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=3, num_warps=4
+  triton_flex_attention_backward_233 70.4277 ms 82.0% BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M1=64, BLOCK_M2=64, BLOCK_N1=64, BLOCK_N2=64, FLOAT32_PRECISION="'tf32'", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=3, num_warps=4
+  triton_flex_attention_backward_232 71.6554 ms 80.6% BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M1=64, BLOCK_M2=64, BLOCK_N1=64, BLOCK_N2=64, FLOAT32_PRECISION="'tf32'", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=1, num_warps=4
+  triton_flex_attention_backward_235 71.6636 ms 80.5% BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M1=64, BLOCK_M2=64, BLOCK_N1=64, BLOCK_N2=64, FLOAT32_PRECISION="'tf32'", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=5, num_warps=4
+  triton_flex_attention_backward_234 72.6777 ms 79.4% BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M1=64, BLOCK_M2=64, BLOCK_N1=64, BLOCK_N2=64, FLOAT32_PRECISION="'tf32'", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=4, num_warps=4
+  triton_flex_attention_backward_236 72.8994 ms 79.2% BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M1=64, BLOCK_M2=128, BLOCK_N1=128, BLOCK_N2=64, FLOAT32_PRECISION="'tf32'", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=3, num_warps=4
+  triton_flex_attention_backward_230 87.6351 ms 65.9% BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M1=32, BLOCK_M2=64, BLOCK_N1=64, BLOCK_N2=32, FLOAT32_PRECISION="'tf32'", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=4, num_warps=4
+  triton_flex_attention_backward_231 88.8259 ms 65.0% BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M1=32, BLOCK_M2=64, BLOCK_N1=64, BLOCK_N2=32, FLOAT32_PRECISION="'tf32'", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=5, num_warps=4
+  triton_flex_attention_backward_228 99.8587 ms 57.8% BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M1=32, BLOCK_M2=64, BLOCK_N1=64, BLOCK_N2=32, FLOAT32_PRECISION="'tf32'", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=1, num_warps=4
+  triton_flex_attention_backward_225 172.4778 ms 33.5% BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M1=32, BLOCK_M2=32, BLOCK_N1=32, BLOCK_N2=32, FLOAT32_PRECISION="'tf32'", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=3, num_warps=4
+SingleProcess AUTOTUNE benchmarking takes 10.0432 seconds and 4.8881 seconds precompiling for 13 choices
+Autotune Choices Stats:
+{"num_choices": 13, "num_triton_choices": 13, "best_kernel": "triton_flex_attention_backward_242", "best_kernel_desc": "BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M1=32, BLOCK_M2=64, BLOCK_N1=64, BLOCK_N2=32, FLOAT32_PRECISION=\"'tf32'\", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=3, num_warps=4", "best_time": 57.73209762573242, "best_triton_pos": 0}
+AUTOTUNE flex_attention_backward(68x32x2048x128, 68x8x2048x128, 68x8x2048x128, 68x32x2048, 68x32x2048, 68x32x2048x128, 68x32x2048x128, 68x8x2048x128, 68x1x16, 68x1x16x16, 68x1x16, 68x1x16x16, 68x1x16, 68x1x16x16, 68x1x16, 68x1x16x16, 68x2048)
+strides: [8388608, 128, 4096, 1], [2097152, 128, 1024, 1], [2097152, 128, 1024, 1], [65536, 2048, 1], [65536, 2048, 1], [8388608, 128, 4096, 1], [8388608, 128, 4096, 1], [2097152, 128, 1024, 1], [16, 16, 1], [256, 256, 16, 1], [16, 16, 1], [256, 256, 16, 1], [16, 16, 1], [256, 256, 16, 1], [16, 16, 1], [256, 256, 16, 1], [2048, 1]
+dtypes: torch.bfloat16, torch.bfloat16, torch.bfloat16, torch.float32, torch.float32, torch.bfloat16, torch.bfloat16, torch.bfloat16, torch.int32, torch.int32, torch.int32, torch.int32, torch.int32, torch.int32, torch.int32, torch.int32, torch.int32
+  triton_flex_attention_backward_242 57.7321 ms 100.0% BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M1=32, BLOCK_M2=64, BLOCK_N1=64, BLOCK_N2=32, FLOAT32_PRECISION="'tf32'", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=3, num_warps=4
+  triton_flex_attention_backward_246 70.4430 ms 82.0% BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M1=64, BLOCK_M2=64, BLOCK_N1=64, BLOCK_N2=64, FLOAT32_PRECISION="'tf32'", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=3, num_warps=4
+  triton_flex_attention_backward_245 71.6227 ms 80.6% BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M1=64, BLOCK_M2=64, BLOCK_N1=64, BLOCK_N2=64, FLOAT32_PRECISION="'tf32'", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=1, num_warps=4
+  triton_flex_attention_backward_248 71.6288 ms 80.6% BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M1=64, BLOCK_M2=64, BLOCK_N1=64, BLOCK_N2=64, FLOAT32_PRECISION="'tf32'", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=5, num_warps=4
+  triton_flex_attention_backward_247 72.7142 ms 79.4% BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M1=64, BLOCK_M2=64, BLOCK_N1=64, BLOCK_N2=64, FLOAT32_PRECISION="'tf32'", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=4, num_warps=4
+  triton_flex_attention_backward_249 72.8484 ms 79.2% BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M1=64, BLOCK_M2=128, BLOCK_N1=128, BLOCK_N2=64, FLOAT32_PRECISION="'tf32'", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=3, num_warps=4
+  triton_flex_attention_backward_243 87.6309 ms 65.9% BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M1=32, BLOCK_M2=64, BLOCK_N1=64, BLOCK_N2=32, FLOAT32_PRECISION="'tf32'", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=4, num_warps=4
+  triton_flex_attention_backward_244 88.8187 ms 65.0% BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M1=32, BLOCK_M2=64, BLOCK_N1=64, BLOCK_N2=32, FLOAT32_PRECISION="'tf32'", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=5, num_warps=4
+  triton_flex_attention_backward_241 99.9445 ms 57.8% BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M1=32, BLOCK_M2=64, BLOCK_N1=64, BLOCK_N2=32, FLOAT32_PRECISION="'tf32'", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=1, num_warps=4
+  triton_flex_attention_backward_238 172.5153 ms 33.5% BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M1=32, BLOCK_M2=32, BLOCK_N1=32, BLOCK_N2=32, FLOAT32_PRECISION="'tf32'", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=3, num_warps=4
+SingleProcess AUTOTUNE benchmarking takes 10.0652 seconds and 0.0223 seconds precompiling for 13 choices
+Autotune Choices Stats:
+{"num_choices": 13, "num_triton_choices": 13, "best_kernel": "triton_flex_attention_backward_255", "best_kernel_desc": "BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M1=32, BLOCK_M2=64, BLOCK_N1=64, BLOCK_N2=32, FLOAT32_PRECISION=\"'tf32'\", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=3, num_warps=4", "best_time": 57.746238708496094, "best_triton_pos": 0}
+AUTOTUNE flex_attention_backward(68x32x2048x128, 68x8x2048x128, 68x8x2048x128, 68x32x2048, 68x32x2048, 68x32x2048x128, 68x32x2048x128, 68x8x2048x128, 68x1x16, 68x1x16x16, 68x1x16, 68x1x16x16, 68x1x16, 68x1x16x16, 68x1x16, 68x1x16x16, 68x2048)
+strides: [8388608, 128, 4096, 1], [2097152, 128, 1024, 1], [2097152, 128, 1024, 1], [65536, 2048, 1], [65536, 2048, 1], [8388608, 128, 4096, 1], [8388608, 128, 4096, 1], [2097152, 128, 1024, 1], [16, 16, 1], [256, 256, 16, 1], [16, 16, 1], [256, 256, 16, 1], [16, 16, 1], [256, 256, 16, 1], [16, 16, 1], [256, 256, 16, 1], [2048, 1]
+dtypes: torch.bfloat16, torch.bfloat16, torch.bfloat16, torch.float32, torch.float32, torch.bfloat16, torch.bfloat16, torch.bfloat16, torch.int32, torch.int32, torch.int32, torch.int32, torch.int32, torch.int32, torch.int32, torch.int32, torch.int32
+  triton_flex_attention_backward_255 57.7462 ms 100.0% BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M1=32, BLOCK_M2=64, BLOCK_N1=64, BLOCK_N2=32, FLOAT32_PRECISION="'tf32'", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=3, num_warps=4
+  triton_flex_attention_backward_259 70.4256 ms 82.0% BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M1=64, BLOCK_M2=64, BLOCK_N1=64, BLOCK_N2=64, FLOAT32_PRECISION="'tf32'", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=3, num_warps=4
+  triton_flex_attention_backward_258 71.6882 ms 80.6% BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M1=64, BLOCK_M2=64, BLOCK_N1=64, BLOCK_N2=64, FLOAT32_PRECISION="'tf32'", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=1, num_warps=4
+  triton_flex_attention_backward_261 71.7459 ms 80.5% BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M1=64, BLOCK_M2=64, BLOCK_N1=64, BLOCK_N2=64, FLOAT32_PRECISION="'tf32'", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=5, num_warps=4
+  triton_flex_attention_backward_260 72.7081 ms 79.4% BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M1=64, BLOCK_M2=64, BLOCK_N1=64, BLOCK_N2=64, FLOAT32_PRECISION="'tf32'", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=4, num_warps=4
+  triton_flex_attention_backward_262 72.8709 ms 79.2% BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M1=64, BLOCK_M2=128, BLOCK_N1=128, BLOCK_N2=64, FLOAT32_PRECISION="'tf32'", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=3, num_warps=4
+  triton_flex_attention_backward_256 87.6329 ms 65.9% BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M1=32, BLOCK_M2=64, BLOCK_N1=64, BLOCK_N2=32, FLOAT32_PRECISION="'tf32'", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=4, num_warps=4
+  triton_flex_attention_backward_257 88.8187 ms 65.0% BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M1=32, BLOCK_M2=64, BLOCK_N1=64, BLOCK_N2=32, FLOAT32_PRECISION="'tf32'", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=5, num_warps=4
+  triton_flex_attention_backward_254 99.9567 ms 57.8% BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M1=32, BLOCK_M2=64, BLOCK_N1=64, BLOCK_N2=32, FLOAT32_PRECISION="'tf32'", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=1, num_warps=4
+  triton_flex_attention_backward_251 172.6758 ms 33.4% BLOCKS_ARE_CONTIGUOUS=False, BLOCK_M1=32, BLOCK_M2=32, BLOCK_N1=32, BLOCK_N2=32, FLOAT32_PRECISION="'tf32'", GQA_SHARED_HEADS=4, HAS_FULL_BLOCKS=True, IS_DIVISIBLE=True, OUTPUT_LOGSUMEXP=True, OUTPUT_MAX=False, PRESCALE_QK=False, QK_HEAD_DIM=128, QK_HEAD_DIM_ROUNDED=128, ROWS_GUARANTEED_SAFE=False, SAFE_HEAD_DIM=True, SM_SCALE=0.08838834764831843, SPARSE_KV_BLOCK_SIZE=128, SPARSE_Q_BLOCK_SIZE=128, USE_TMA=False, V_HEAD_DIM=128, V_HEAD_DIM_ROUNDED=128, WRITE_DQ=True, num_stages=3, num_warps=4
+SingleProcess AUTOTUNE benchmarking takes 10.0532 seconds and 0.0260 seconds precompiling for 13 choices
+[titan] 2026-07-12 15:06:18,965 - root - INFO - Applied cudagraph pass.
+[titan] 2026-07-12 15:06:18,966 - root - INFO - All 11 graph passes took 99.727s
+W0712 15:07:15.313000 272186 /opt/pytorch/pytorch/torch/distributed/elastic/multiprocessing/api.py:1028] Sending process 272256 closing signal SIGTERM
+W0712 15:07:15.314000 272186 /opt/pytorch/pytorch/torch/distributed/elastic/multiprocessing/api.py:1028] Sending process 272257 closing signal SIGTERM
+W0712 15:07:15.314000 272186 /opt/pytorch/pytorch/torch/distributed/elastic/multiprocessing/api.py:1028] Sending process 272258 closing signal SIGTERM
+E0712 15:07:16.029000 272186 /opt/pytorch/pytorch/torch/distributed/elastic/multiprocessing/api.py:1002] failed (exitcode: 1) local_rank: 3 (pid: 272259) of binary: /usr/bin/python3
+E0712 15:07:16.033000 272186 /opt/pytorch/pytorch/torch/distributed/elastic/multiprocessing/errors/error_handler.py:157] no error file defined for parent, to copy child error file (/tmp/torchelastic_9mw8d0q8/787e9eaa-f587-42e9-b43e-29c4d77a44cd_d4teo31y/attempt_0/3/error.json)
+Traceback (most recent call last):
+  File "/usr/local/bin/torchrun", line 8, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/opt/pytorch/pytorch/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 380, in wrapper
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "/opt/pytorch/pytorch/torch/distributed/run.py", line 1028, in main
+    run(args)
+  File "/opt/pytorch/pytorch/torch/distributed/run.py", line 1019, in run
+    elastic_launch(
+  File "/opt/pytorch/pytorch/torch/distributed/launcher/api.py", line 194, in __call__
+    return launch_agent(
+           ^^^^^^^^^^^^^
+  File "/opt/pytorch/pytorch/torch/distributed/launcher/api.py", line 383, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+torchtitan.train FAILED
+------------------------------------------------------------
+Failures:
+[1]:
+  time      : 2026-07-12_15:07:16
+  host      : 9c987f412aad
+  rank      : 0 (local_rank: 0)
+  exitcode  : -15 (pid: 272256)  (SIGTERM)
+  error_file: <N/A>
+  traceback : Signal 15 (SIGTERM) received by PID 272256
+[2]:
+  time      : 2026-07-12_15:07:16
+  host      : 9c987f412aad
+  rank      : 1 (local_rank: 1)
+  exitcode  : -15 (pid: 272257)  (SIGTERM)
+  error_file: <N/A>
+  traceback : Signal 15 (SIGTERM) received by PID 272257
+[3]:
+  time      : 2026-07-12_15:07:16
+  host      : 9c987f412aad
+  rank      : 2 (local_rank: 2)
+  exitcode  : -15 (pid: 272258)  (SIGTERM)
+  error_file: <N/A>
+  traceback : Signal 15 (SIGTERM) received by PID 272258
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2026-07-12_15:07:11
+  host      : 9c987f412aad
+  rank      : 3 (local_rank: 3)
+  exitcode  : 1 (pid: 272259) 
+  error_file: /tmp/torchelastic_9mw8d0q8/787e9eaa-f587-42e9-b43e-29c4d77a44cd_d4teo31y/attempt_0/3/error.json
+  traceback : Traceback (most recent call last):
+    File "/opt/pytorch/pytorch/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 380, in wrapper
+      return f(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^
+    File "/home/me/nvfp4/third_party/torchtitan/torchtitan/trainer.py", line 905, in train
+      self.train_step(data_iterator)
+    File "/home/me/nvfp4/third_party/torchtitan/torchtitan/experiments/graph_trainer/trainer.py", line 310, in train_step
+      super().train_step(data_iterator)
+    File "/home/me/nvfp4/third_party/torchtitan/torchtitan/trainer.py", line 814, in train_step
+      self.optimizers.step()
+    File "/opt/pytorch/pytorch/torch/optim/optimizer.py", line 530, in wrapper
+      out = func(*args, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^
+    File "/home/me/nvfp4/third_party/torchtitan/torchtitan/components/optimizer.py", line 283, in step
+      optimizer.step()
+    File "/opt/pytorch/pytorch/torch/optim/lr_scheduler.py", line 166, in wrapper
+      return func.__get__(opt, opt.__class__)(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    File "/opt/pytorch/pytorch/torch/optim/optimizer.py", line 530, in wrapper
+      out = func(*args, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^
+    File "/opt/pytorch/pytorch/torch/optim/optimizer.py", line 80, in _use_grad
+      ret = func(*args, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^
+    File "/opt/pytorch/pytorch/torch/optim/adam.py", line 238, in step
+      has_complex = self._init_group(
+                    ^^^^^^^^^^^^^^^^^
+    File "/opt/pytorch/pytorch/torch/_dynamo/eval_frame.py", line 1449, in _fn
+      return fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+    File "/opt/pytorch/pytorch/torch/optim/adam.py", line 182, in _init_group
+      state["exp_avg_sq"] = torch.zeros_like(
+                            ^^^^^^^^^^^^^^^^^
+  torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 502.00 MiB. GPU 3 has a total capacity of 184.30 GiB of which 55.38 MiB is free. Including non-PyTorch memory, this process has 184.23 GiB memory in use. Of the allocated memory 172.68 GiB is allocated by PyTorch, with 108.15 GiB allocated in private pools (e.g., CUDA Graphs), and 69.71 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+  
+============================================================

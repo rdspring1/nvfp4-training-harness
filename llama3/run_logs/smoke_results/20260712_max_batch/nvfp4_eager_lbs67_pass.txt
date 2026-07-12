@@ -1,0 +1,130 @@
+W0712 14:39:01.509000 256980 /opt/pytorch/pytorch/torch/distributed/run.py:874] 
+W0712 14:39:01.509000 256980 /opt/pytorch/pytorch/torch/distributed/run.py:874] *****************************************
+W0712 14:39:01.509000 256980 /opt/pytorch/pytorch/torch/distributed/run.py:874] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0712 14:39:01.509000 256980 /opt/pytorch/pytorch/torch/distributed/run.py:874] *****************************************
+W0712 14:39:10.302000 257050 /opt/pytorch/pytorch/torch/utils/_pytree.py:630] <enum 'KernelPreference'> is an Enum subclass and is now natively supported by torch.compile as an opaque value type. Calling register_constant() on Enum subclasses is deprecated and will be an error in a future release.
+W0712 14:39:10.821000 257050 /opt/pytorch/pytorch/torch/utils/_pytree.py:630] <enum 'ScaleCalculationMode'> is an Enum subclass and is now natively supported by torch.compile as an opaque value type. Calling register_constant() on Enum subclasses is deprecated and will be an error in a future release.
+[titan] 2026-07-12 14:39:11,808 - root - INFO - torchtitan version: 0.2.2 (0.0.0 means __version__ is not defined correctly).
+[titan] 2026-07-12 14:39:11,813 - root - WARNING - initial_load_model_only=True has no effect without an initial_load_path.
+[titan] 2026-07-12 14:39:11,878 - root - WARNING - initial_load_model_only=True has no effect without an initial_load_path.
+[titan] 2026-07-12 14:39:11,878 - torchtitan.observability.structured_logger.jsonl_handler - INFO - Structured logging -> JSONL: /home/me/nvfp4/third_party/torchtitan/outputs/structured_logs/training.global_rank_0.20260712-143911-1TQBFR.jsonl
+[titan] 2026-07-12 14:39:12,443 - root - WARNING - ENV[TORCH_NCCL_ASYNC_ERROR_HANDLING] = 1 will be overridden to 3 based on job config
+[titan] 2026-07-12 14:39:12,456 - root - INFO - Building device mesh with parallelism: pp=1, dp_replicate=1, dp_shard=4, cp=1, tp=1, ep=1
+[titan] 2026-07-12 14:39:12,469 - root - INFO - Successfully created meshes with active dimensions: ['batch', 'loss', 'efsdp', 'fsdp']
+[titan] 2026-07-12 14:39:12,470 - root - INFO - [GC] Initial GC collection took 0.00 seconds
+[titan] 2026-07-12 14:39:15,846 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.0.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 14:39:15,846 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.1.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 14:39:15,846 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.2.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 14:39:15,846 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.3.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 14:39:15,846 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.4.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 14:39:15,846 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.5.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 14:39:15,846 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.6.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 14:39:15,846 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.7.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 14:39:15,846 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.8.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 14:39:15,846 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.9.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 14:39:15,846 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.10.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 14:39:15,846 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.11.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 14:39:15,846 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.12.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 14:39:15,846 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.13.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 14:39:15,846 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.14.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 14:39:15,846 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.15.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 14:39:15,846 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.16.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 14:39:15,846 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.17.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 14:39:15,846 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.18.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 14:39:15,846 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.19.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 14:39:15,846 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.20.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 14:39:15,846 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.21.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 14:39:15,846 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.22.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 14:39:15,846 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.23.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 14:39:15,846 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.24.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 14:39:15,846 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.25.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 14:39:15,846 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.26.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 14:39:15,846 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.27.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 14:39:15,846 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.28.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 14:39:15,846 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.29.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 14:39:15,846 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.30.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 14:39:15,846 - root - INFO - [Override] nvfp4_feed_forward: model_spec.model.layers.31.feed_forward FeedForward.Config -> FeedForward.Config
+[titan] 2026-07-12 14:39:15,846 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.0.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 14:39:15,846 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.1.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 14:39:15,846 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.2.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 14:39:15,846 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.3.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 14:39:15,846 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.4.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 14:39:15,846 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.5.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 14:39:15,846 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.6.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 14:39:15,846 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.7.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 14:39:15,846 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.8.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 14:39:15,846 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.9.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 14:39:15,847 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.10.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 14:39:15,847 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.11.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 14:39:15,847 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.12.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 14:39:15,847 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.13.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 14:39:15,847 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.14.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 14:39:15,847 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.15.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 14:39:15,847 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.16.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 14:39:15,847 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.17.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 14:39:15,847 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.18.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 14:39:15,847 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.19.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 14:39:15,847 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.20.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 14:39:15,847 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.21.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 14:39:15,847 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.22.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 14:39:15,847 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.23.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 14:39:15,847 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.24.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 14:39:15,847 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.25.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 14:39:15,847 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.26.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 14:39:15,847 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.27.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 14:39:15,847 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.28.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 14:39:15,847 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.29.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 14:39:15,847 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.30.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 14:39:15,847 - root - INFO - [Override] nvfp4_attention: model_spec.model.layers.31.attention GQAttention.Config -> GQAttention.Config
+[titan] 2026-07-12 14:39:15,847 - root - INFO - Applied 64 override(s)
+[titan] 2026-07-12 14:39:15,847 - root - INFO - Building llama3 8B
+[titan] 2026-07-12 14:39:15,995 - root - INFO - TensorBoard logging enabled. Logs will be saved at ./outputs/tb/20260712-1439
+[titan] 2026-07-12 14:39:15,995 - root - INFO - CUDA capacity: NVIDIA GB200 with 184.30GiB memory
+[titan] 2026-07-12 14:39:16,052 - root - INFO - [34mModel llama3 8B [31msize: 8,030,261,248 total parameters[39m
+[titan] 2026-07-12 14:39:16,065 - root - INFO - Applied SelectiveAC activation checkpointing to the model
+[titan] 2026-07-12 14:39:16,078 - root - INFO - Compiling each TransformerBlock with torch.compile
+[titan] 2026-07-12 14:39:16,139 - root - INFO - Applied FSDP to the model
+[titan] 2026-07-12 14:39:16,662 - root - INFO - Peak FLOPS used for computing MFU: 2.500e+15
+[titan] 2026-07-12 14:39:16,662 - root - INFO - CUDA memory usage for model: 10.10GiB(5.48%)
+[titan] 2026-07-12 14:39:16,663 - root - INFO - Optimizer AdamW (model_part=0): 227 params [.*] {'fused': True, 'foreach': False, 'lr': 0.0003, 'betas': (0.9, 0.95), 'eps': 1e-08, 'weight_decay': 0.1}
+[titan] 2026-07-12 14:39:16,664 - root - WARNING - Warmup steps (200) exceed total steps (10). Adjusting warmup steps to 10.
+[titan] 2026-07-12 14:39:16,664 - root - INFO - Loading tokenizer from tokenizer.json
+[titan] 2026-07-12 14:39:16,668 - root - INFO - Preparing c4_test dataset from tests/assets/c4_test
+/usr/local/lib/python3.12/dist-packages/torchdata/stateful_dataloader/stateful_dataloader.py:379: UserWarning: 'set_vital' is deprecated, please do not call
+  torch.set_vital("Dataloader", "enabled", "True")  # type: ignore[attr-defined]
+[titan] 2026-07-12 14:39:16,751 - root - WARNING - model.safetensors.index.json not found at hf_assets_path: ./tests/assets/tokenizer/model.safetensors.index.json.                     Defaulting to saving a single safetensors file if checkpoint is saved in HF format
+[titan] 2026-07-12 14:39:16,751 - root - WARNING - initial_load_model_only=True has no effect without an initial_load_path.
+[titan] 2026-07-12 14:39:16,751 - root - INFO - Trainer is initialized with local batch size 67, global batch size 268, gradient accumulation steps 1, sequence length 2048, total steps 10 (warmup 200)
+[titan] 2026-07-12 14:39:16,751 - root - INFO - Training starts at step 1
+[titan] 2026-07-12 14:39:16,751 - root - INFO - Profiling active. Traces will be saved at ./outputs/profiling/traces
+[rank0]:W0712 14:39:23.037000 257050 /opt/pytorch/pytorch/torch/_logging/_internal.py:1350] [1/0] 
+[rank0]:W0712 14:39:23.037000 257050 /opt/pytorch/pytorch/torch/_logging/_internal.py:1350] [1/0] Detected that context_fn is passed to torch.utils.checkpoint under torch.compile.
+[rank0]:W0712 14:39:23.037000 257050 /opt/pytorch/pytorch/torch/_logging/_internal.py:1350] [1/0] Please make sure the checkpointed region does not contain in-place ops (e.g. torch.relu_).
+[rank0]:W0712 14:39:23.037000 257050 /opt/pytorch/pytorch/torch/_logging/_internal.py:1350] [1/0] 
+/opt/pytorch/pytorch/torch/_inductor/lowering.py:2712: UserWarning: Torchinductor does not support code generation for complex operators. Performance may be worse than eager.
+  warnings.warn(
+[titan] 2026-07-12 14:40:43,095 - root - INFO - [31mstep:  1  [32mloss: 12.29552  [38;2;180;60;0mgrad_norm: 25.6095  [38;2;54;234;195mmemory: 147.63GiB(80.10%)  [34mtps: 1,576  [36mtflops: 76.06  [35mmfu: 3.04%[39m
+[titan] 2026-07-12 14:40:43,096 - root - INFO - Synchronizing and adjusting timeout for all ProcessGroups to 0:01:40
+[rank0]:[W712 14:40:43.474511092 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 1052770304 bytes (free: 636944384, total: 197890015232).
+[rank0]:[W712 14:40:47.534605406 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 8799649792 bytes (free: 6869680128, total: 197890015232).
+[rank0]:[W712 14:40:50.003539908 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 220200960 bytes (free: 139919360, total: 197890015232).
+[rank0]:[W712 14:40:52.779872484 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 8799649792 bytes (free: 3080126464, total: 197890015232).
+[rank0]:[W712 14:40:55.771477683 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 220200960 bytes (free: 215416832, total: 197890015232).
+[rank0]:[W712 14:40:56.167249179 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 8799649792 bytes (free: 831979520, total: 197890015232).
+[rank0]:[W712 14:40:58.310643968 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 220200960 bytes (free: 169279488, total: 197890015232).
+[rank0]:[W712 14:41:00.413298896 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 8799649792 bytes (free: 831979520, total: 197890015232).
+[rank0]:[W712 14:41:03.555796678 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 220200960 bytes (free: 169279488, total: 197890015232).
+[titan] 2026-07-12 14:41:04,071 - root - WARNING - Dataset c4_test is being re-looped (epoch 1)
+[rank0]:[W712 14:41:05.649895643 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 8799649792 bytes (free: 831979520, total: 197890015232).
+[rank0]:[W712 14:41:07.785404231 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 220200960 bytes (free: 169279488, total: 197890015232).
+[rank0]:[W712 14:41:09.874073184 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 8799649792 bytes (free: 831979520, total: 197890015232).
+[rank0]:[W712 14:41:11.997478702 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 220200960 bytes (free: 169279488, total: 197890015232).
+[rank0]:[W712 14:41:13.076726789 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 8799649792 bytes (free: 831979520, total: 197890015232).
+[rank0]:[W712 14:41:15.194207410 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 220200960 bytes (free: 169279488, total: 197890015232).
+[rank0]:[W712 14:41:17.270217891 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 8799649792 bytes (free: 831979520, total: 197890015232).
+[rank0]:[W712 14:41:19.373941122 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 220200960 bytes (free: 169279488, total: 197890015232).
+[titan] 2026-07-12 14:41:21,295 - root - WARNING - 17 CUDA memory allocation retries.
+[titan] 2026-07-12 14:41:21,295 - root - INFO - [31mstep: 10  [32mloss:  7.37868  [38;2;180;60;0mgrad_norm: 17.3353  [38;2;54;234;195mmemory: 172.68GiB(93.70%)  [34mtps: 32,329  [36mtflops: 1,559.90  [35mmfu: 62.40%[39m
+[titan] 2026-07-12 14:41:21,296 - root - INFO - Sleeping 2 seconds for other ranks to complete
+[titan] 2026-07-12 14:41:23,296 - root - INFO - Training completed
+[titan] 2026-07-12 14:41:23,424 - root - INFO - Process group destroyed

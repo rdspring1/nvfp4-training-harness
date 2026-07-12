@@ -1,0 +1,431 @@
+W0712 13:39:23.561000 224084 /opt/pytorch/pytorch/torch/distributed/run.py:874] 
+W0712 13:39:23.561000 224084 /opt/pytorch/pytorch/torch/distributed/run.py:874] *****************************************
+W0712 13:39:23.561000 224084 /opt/pytorch/pytorch/torch/distributed/run.py:874] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0712 13:39:23.561000 224084 /opt/pytorch/pytorch/torch/distributed/run.py:874] *****************************************
+W0712 13:39:32.444000 224154 /opt/pytorch/pytorch/torch/utils/_pytree.py:630] <enum 'KernelPreference'> is an Enum subclass and is now natively supported by torch.compile as an opaque value type. Calling register_constant() on Enum subclasses is deprecated and will be an error in a future release.
+W0712 13:39:32.969000 224154 /opt/pytorch/pytorch/torch/utils/_pytree.py:630] <enum 'ScaleCalculationMode'> is an Enum subclass and is now natively supported by torch.compile as an opaque value type. Calling register_constant() on Enum subclasses is deprecated and will be an error in a future release.
+[titan] 2026-07-12 13:39:33,949 - root - INFO - torchtitan version: 0.2.2 (0.0.0 means __version__ is not defined correctly).
+[titan] 2026-07-12 13:39:34,067 - root - WARNING - initial_load_model_only=True has no effect without an initial_load_path.
+[titan] 2026-07-12 13:39:34,342 - root - WARNING - initial_load_model_only=True has no effect without an initial_load_path.
+[titan] 2026-07-12 13:39:34,343 - torchtitan.observability.structured_logger.jsonl_handler - INFO - Structured logging -> JSONL: /home/me/nvfp4/third_party/torchtitan/outputs/structured_logs/training.global_rank_0.20260712-133934-8EWEHZ.jsonl
+[titan] 2026-07-12 13:39:34,893 - root - WARNING - ENV[TORCH_NCCL_ASYNC_ERROR_HANDLING] = 1 will be overridden to 3 based on job config
+[titan] 2026-07-12 13:39:34,906 - root - INFO - Building device mesh with parallelism: pp=1, dp_replicate=1, dp_shard=4, cp=1, tp=1, ep=1
+[titan] 2026-07-12 13:39:34,919 - root - INFO - Successfully created meshes with active dimensions: ['batch', 'loss', 'efsdp', 'fsdp']
+[titan] 2026-07-12 13:39:34,919 - root - INFO - [GC] Initial GC collection took 0.00 seconds
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.lm_head Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.0.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.0.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.0.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.0.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.0.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.1.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.1.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.1.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.1.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.1.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.2.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.2.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.2.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.2.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.2.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.3.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.3.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.3.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.3.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.3.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.4.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.4.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.4.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.4.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.4.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.5.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.5.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.5.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.5.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.5.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.6.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.6.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.6.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.6.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.6.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.7.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.7.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.7.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.7.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.7.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.8.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.8.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.8.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.8.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.8.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.9.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.9.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.9.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.9.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.9.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.10.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.10.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.10.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.10.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.10.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.11.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.11.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.11.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.11.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.11.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.12.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.12.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.12.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.12.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.12.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.13.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.13.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.13.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.13.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.13.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.14.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.14.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.14.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.14.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,257 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.14.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.15.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.15.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.15.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.15.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.15.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.16.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.16.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.16.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.16.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.16.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.17.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.17.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.17.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.17.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.17.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.18.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.18.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.18.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.18.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.18.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.19.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.19.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.19.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.19.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.19.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.20.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.20.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.20.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.20.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.20.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.21.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.21.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.21.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.21.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.21.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.22.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.22.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.22.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.22.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.22.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.23.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.23.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.23.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.23.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.23.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.24.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.24.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.24.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.24.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.24.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.25.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.25.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.25.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.25.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.25.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.26.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.26.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.26.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.26.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.26.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.27.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.27.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.27.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.27.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.27.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.28.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.28.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.28.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.28.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.28.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.29.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.29.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.29.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.29.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.29.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.30.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.30.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.30.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.30.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.30.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.31.attention.qkv_linear.wqkv Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.31.attention.wo Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.31.feed_forward.w1 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.31.feed_forward.w2 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - [Override] mxfp8_linear: model_spec.model.layers.31.feed_forward.w3 Linear.Config -> MXFP8Linear.Config
+[titan] 2026-07-12 13:39:38,258 - root - INFO - Applied 161 override(s)
+[titan] 2026-07-12 13:39:38,258 - root - INFO - Building llama3 8B
+[titan] 2026-07-12 13:39:38,393 - root - INFO - TensorBoard logging enabled. Logs will be saved at ./outputs/tb/20260712-1339
+[titan] 2026-07-12 13:39:38,393 - root - INFO - CUDA capacity: NVIDIA GB200 with 184.30GiB memory
+[titan] 2026-07-12 13:39:38,453 - root - INFO - [34mModel llama3 8B [31msize: 8,030,261,248 total parameters[39m
+[titan] 2026-07-12 13:39:38,453 - root - INFO - Compiling the loss function with torch.compile
+[titan] 2026-07-12 13:39:38,510 - root - INFO - Applied Data Parallel (simple_fsdp) (dp mode=fully_shard) to the model
+[titan] 2026-07-12 13:39:38,510 - root - INFO - aot_fx_trace compile mode: graph capture will happen at training time
+[titan] 2026-07-12 13:39:38,982 - root - INFO - Peak FLOPS used for computing MFU: 2.500e+15
+[titan] 2026-07-12 13:39:38,982 - root - INFO - CUDA memory usage for model: 10.10GiB(5.48%)
+[titan] 2026-07-12 13:39:38,984 - root - INFO - Optimizer AdamW (model_part=0): 227 params [.*] {'fused': True, 'foreach': False, 'lr': 0.0003, 'betas': (0.9, 0.95), 'eps': 1e-08, 'weight_decay': 0.1}
+[titan] 2026-07-12 13:39:38,984 - root - INFO - Loading tokenizer from tokenizer.json
+[titan] 2026-07-12 13:39:38,989 - root - INFO - Preparing c4 dataset from allenai/c4
+[titan] 2026-07-12 13:39:39,162 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/datasets/allenai/c4/resolve/main/README.md "HTTP/1.1 307 Temporary Redirect"
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[titan] 2026-07-12 13:39:39,162 - huggingface_hub.utils._http - WARNING - Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[titan] 2026-07-12 13:39:39,182 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/datasets/allenai/c4/1588ec454efa1a09f29cd18ddd04fe05fc8653a2/README.md "HTTP/1.1 200 OK"
+[titan] 2026-07-12 13:39:39,276 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/datasets/allenai/c4/resolve/1588ec454efa1a09f29cd18ddd04fe05fc8653a2/c4.py "HTTP/1.1 404 Not Found"
+[titan] 2026-07-12 13:39:39,516 - httpx - INFO - HTTP Request: HEAD https://s3.amazonaws.com/datasets.huggingface.co/datasets/datasets/allenai/c4/allenai/c4.py "HTTP/1.1 404 Not Found"
+[titan] 2026-07-12 13:39:39,697 - httpx - INFO - HTTP Request: GET https://huggingface.co/api/datasets/allenai/c4/revision/1588ec454efa1a09f29cd18ddd04fe05fc8653a2 "HTTP/1.1 200 OK"
+[titan] 2026-07-12 13:39:39,947 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/datasets/allenai/c4/resolve/1588ec454efa1a09f29cd18ddd04fe05fc8653a2/.huggingface.yaml "HTTP/1.1 404 Not Found"
+[titan] 2026-07-12 13:39:40,112 - httpx - INFO - HTTP Request: GET https://datasets-server.huggingface.co/info?dataset=allenai/c4 "HTTP/1.1 200 OK"
+[titan] 2026-07-12 13:39:40,242 - httpx - INFO - HTTP Request: GET https://huggingface.co/api/datasets/allenai/c4/tree/1588ec454efa1a09f29cd18ddd04fe05fc8653a2/en?recursive=true&expand=false "HTTP/1.1 200 OK"
+[titan] 2026-07-12 13:39:40,424 - httpx - INFO - HTTP Request: GET https://huggingface.co/api/datasets/allenai/c4/tree/1588ec454efa1a09f29cd18ddd04fe05fc8653a2/en?expand=false&recursive=true&limit=1000&cursor=ZXlKbWFXeGxYMjVoYldVaU9pSmxiaTlqTkMxMGNtRnBiaTR3TURrNU9TMXZaaTB3TVRBeU5DNXFjMjl1TG1kNklpd2lkSEpsWlY5dmFXUWlPaUprWXprME0yTTBZelF3WmpVelpEQXlZak14WTJWa01XUmxabUUzWlRWbU5ETTRaRFU0TmpKbEluMD06MTAwMA%3D%3D "HTTP/1.1 200 OK"
+[titan] 2026-07-12 13:39:40,527 - httpx - INFO - HTTP Request: GET https://huggingface.co/api/datasets/allenai/c4/tree/1588ec454efa1a09f29cd18ddd04fe05fc8653a2?recursive=false&expand=false "HTTP/1.1 200 OK"
+[titan] 2026-07-12 13:39:40,688 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/datasets/allenai/c4/resolve/1588ec454efa1a09f29cd18ddd04fe05fc8653a2/dataset_infos.json "HTTP/1.1 404 Not Found"
+/usr/local/lib/python3.12/dist-packages/torchdata/stateful_dataloader/stateful_dataloader.py:379: UserWarning: 'set_vital' is deprecated, please do not call
+  torch.set_vital("Dataloader", "enabled", "True")  # type: ignore[attr-defined]
+[titan] 2026-07-12 13:39:40,809 - root - WARNING - model.safetensors.index.json not found at hf_assets_path: ./tests/assets/tokenizer/model.safetensors.index.json.                     Defaulting to saving a single safetensors file if checkpoint is saved in HF format
+[titan] 2026-07-12 13:39:40,810 - root - WARNING - initial_load_model_only=True has no effect without an initial_load_path.
+[titan] 2026-07-12 13:39:40,810 - root - INFO - Trainer is initialized with local batch size 16, global batch size 128, gradient accumulation steps 2, sequence length 2048, total steps 763 (warmup 200)
+[titan] 2026-07-12 13:39:40,810 - root - INFO - NUMA binding applied for GPU 0
+[titan] 2026-07-12 13:39:40,812 - root - INFO - Training starts at step 1
+[titan] 2026-07-12 13:39:40,812 - root - INFO - Profiling active. Traces will be saved at ./outputs/profiling/traces
+[titan] 2026-07-12 13:39:40,974 - httpx - INFO - HTTP Request: GET https://huggingface.co/api/datasets/allenai/c4/revision/1588ec454efa1a09f29cd18ddd04fe05fc8653a2 "HTTP/1.1 200 OK"
+[titan] 2026-07-12 13:39:41,172 - httpx - INFO - HTTP Request: GET https://huggingface.co/api/datasets/allenai/c4/tree/1588ec454efa1a09f29cd18ddd04fe05fc8653a2/en?recursive=false&expand=false "HTTP/1.1 200 OK"
+[titan] 2026-07-12 13:39:41,319 - httpx - INFO - HTTP Request: GET https://huggingface.co/api/datasets/allenai/c4/tree/1588ec454efa1a09f29cd18ddd04fe05fc8653a2/en?expand=false&recursive=false&limit=1000&cursor=ZXlKbWFXeGxYMjVoYldVaU9pSmxiaTlqTkMxMGNtRnBiaTR3TURrNU9TMXZaaTB3TVRBeU5DNXFjMjl1TG1kNklpd2lkSEpsWlY5dmFXUWlPaUprWXprME0yTTBZelF3WmpVelpEQXlZak14WTJWa01XUmxabUUzWlRWbU5ETTRaRFU0TmpKbEluMD06MTAwMA%3D%3D "HTTP/1.1 200 OK"
+[titan] 2026-07-12 13:39:41,416 - httpx - INFO - HTTP Request: GET https://huggingface.co/datasets/allenai/c4/resolve/1588ec454efa1a09f29cd18ddd04fe05fc8653a2/en/c4-train.00000-of-01024.json.gz "HTTP/1.1 302 Found"
+[titan] 2026-07-12 13:39:41,659 - httpx - INFO - HTTP Request: GET https://us.aws.cdn.hf.co/xet-bridge-us/621ffdd236468d709f182a80/6656aac078668b0d5feb1cfb7b04def05bff73e7e375d0a66e252827336ac1a8?X-Xet-Cas-Uid=public&response-content-disposition=inline%3B+filename*%3DUTF-8%27%27c4-train.00000-of-01024.json.gz%3B+filename%3D%22c4-train.00000-of-01024.json.gz%22%3B&response-content-type=application%2Fgzip&user_id=public&Expires=1783892381&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly91cy5hd3MuY2RuLmhmLmNvL3hldC1icmlkZ2UtdXMvNjIxZmZkZDIzNjQ2OGQ3MDlmMTgyYTgwLzY2NTZhYWMwNzg2NjhiMGQ1ZmViMWNmYjdiMDRkZWYwNWJmZjczZTdlMzc1ZDBhNjZlMjUyODI3MzM2YWMxYThcXD9YLVhldC1DYXMtVWlkPXB1YmxpYyZyZXNwb25zZS1jb250ZW50LWRpc3Bvc2l0aW9uPWlubGluZSUzQitmaWxlbmFtZSUyQSUzRFVURi04JTI3JTI3YzQtdHJhaW4uMDAwMDAtb2YtMDEwMjQuanNvbi5neiUzQitmaWxlbmFtZSUzRCUyMmM0LXRyYWluLjAwMDAwLW9mLTAxMDI0Lmpzb24uZ3olMjIlM0ImcmVzcG9uc2UtY29udGVudC10eXBlPWFwcGxpY2F0aW9uJTJGZ3ppcCZ1c2VyX2lkPXB1YmxpYyIsIkNvbmRpdGlvbiI6eyJEYXRlTGVzc1RoYW4iOnsiRXBvY2hUaW1lIjoxNzgzODkyMzgxfSwiQnl0ZVJhbmdlIjp7IkV4cGVjdGVkSGVhZGVyIjoiYnl0ZXM9MC01MjQyODgxIn19fV19&Signature=MEQCIElnlNLpuUG%7EL1H1hBTEHQxU22Gdmcn-sVXV4sMhC0WKAiAyIgekeNMd4%7ELkty8qfu4R6sxxHXv0j8FlW9%7EZsypEnA__&Key-Pair-Id=01KAYHXK2CBJSW0YZTMNXK9W1M "HTTP/1.1 206 Partial Content"
+/opt/pytorch/pytorch/torch/nn/attention/flex_attention.py:2565: UserWarning: flex_attention called without torch.compile() - this will use an unfused implementation that materializes the full scores matrix instead of generating a fused kernel.
+
+SOLUTION: Use torch.compile(flex_attention)(...)
+
+If you want to debug your score_mod/mask_mod, you can set:
+torch.nn.attention.flex_attention._FLEX_ATTENTION_DISABLE_COMPILE_DEBUG = True
+
+This will allow you to use print statements or breakpoints. Note: This doesn't work with the backwards pass and may produce incorrect results.
+  _warn_once(
+[titan] 2026-07-12 13:40:09,353 - root - INFO - minimal_fx_tracer took 25.217s
+[titan] 2026-07-12 13:40:09,354 - root - INFO - Applying 11 graph passes:
+  1. eliminate_dead_code_pass
+  2. canonicalize_graph_pass
+  3. deduplicate_fsdp_unshard_chains_pass
+  4. tag_with_memory_policy_pass
+  5. apply_cpu_offload_pass
+  6. selective_activation_remat_pass
+  7. joint_transformer_block_bucketing_reordering_pass
+  8. annotate_flex_attention_for_regional_inductor_pass
+  9. regional_inductor_pass
+  10. insert_kernel_annotations_pass
+  11. cudagraph_pass
+[titan] 2026-07-12 13:40:10,097 - root - INFO - Eliminated dead code from the graph
+[titan] 2026-07-12 13:40:10,699 - root - INFO - Removed 301 aten.detach.default node(s) from the graph
+[titan] 2026-07-12 13:40:11,294 - root - INFO - Removed 1476 identity view/reshape node(s) from the graph
+[titan] 2026-07-12 13:40:11,832 - root - INFO - Removed 1680 back-to-back transpose node(s) from the graph
+[titan] 2026-07-12 13:40:11,838 - root - INFO - Removed 234 identity slice node(s)
+[titan] 2026-07-12 13:40:12,872 - root - INFO - Normalized 5504 view op(s) to reshape
+[titan] 2026-07-12 13:40:13,492 - root - INFO - Canonicalized 8 duplicate FSDP unshard chain(s)
+[titan] 2026-07-12 13:40:14,040 - root - INFO - Applied selective activation checkpointing (SAC) graph pass.
+[titan] 2026-07-12 13:40:14,041 - root - INFO -   Forced 32 nodes to MUST_SAVE at layer boundaries
+[titan] 2026-07-12 13:40:14,041 - root - INFO -   Layer non-layer: 1 MUST_SAVE, 9 RECOMPUTE
+[titan] 2026-07-12 13:40:14,041 - root - INFO -   Layer 0: 9 MUST_SAVE, 202 RECOMPUTE
+[titan] 2026-07-12 13:40:14,041 - root - INFO -   Layer 1: 9 MUST_SAVE, 202 RECOMPUTE
+[titan] 2026-07-12 13:40:14,041 - root - INFO -   Layer 2: 9 MUST_SAVE, 202 RECOMPUTE
+[titan] 2026-07-12 13:40:14,041 - root - INFO -   Layer 3: 9 MUST_SAVE, 202 RECOMPUTE
+[titan] 2026-07-12 13:40:14,041 - root - INFO -   Layer 4: 9 MUST_SAVE, 202 RECOMPUTE
+[titan] 2026-07-12 13:40:14,041 - root - INFO -   Layer 5: 9 MUST_SAVE, 202 RECOMPUTE
+[titan] 2026-07-12 13:40:14,041 - root - INFO -   Layer 6: 9 MUST_SAVE, 202 RECOMPUTE
+[titan] 2026-07-12 13:40:14,041 - root - INFO -   Layer 7: 9 MUST_SAVE, 202 RECOMPUTE
+[titan] 2026-07-12 13:40:14,041 - root - INFO -   Layer 8: 9 MUST_SAVE, 202 RECOMPUTE
+[titan] 2026-07-12 13:40:14,041 - root - INFO -   Layer 9: 9 MUST_SAVE, 202 RECOMPUTE
+[titan] 2026-07-12 13:40:14,041 - root - INFO -   Layer 10: 9 MUST_SAVE, 202 RECOMPUTE
+[titan] 2026-07-12 13:40:14,041 - root - INFO -   Layer 11: 9 MUST_SAVE, 202 RECOMPUTE
+[titan] 2026-07-12 13:40:14,041 - root - INFO -   Layer 12: 9 MUST_SAVE, 202 RECOMPUTE
+[titan] 2026-07-12 13:40:14,041 - root - INFO -   Layer 13: 9 MUST_SAVE, 202 RECOMPUTE
+[titan] 2026-07-12 13:40:14,041 - root - INFO -   Layer 14: 9 MUST_SAVE, 202 RECOMPUTE
+[titan] 2026-07-12 13:40:14,041 - root - INFO -   Layer 15: 9 MUST_SAVE, 202 RECOMPUTE
+[titan] 2026-07-12 13:40:14,041 - root - INFO -   Layer 16: 9 MUST_SAVE, 202 RECOMPUTE
+[titan] 2026-07-12 13:40:14,041 - root - INFO -   Layer 17: 9 MUST_SAVE, 202 RECOMPUTE
+[titan] 2026-07-12 13:40:14,041 - root - INFO -   Layer 18: 9 MUST_SAVE, 202 RECOMPUTE
+[titan] 2026-07-12 13:40:14,041 - root - INFO -   Layer 19: 9 MUST_SAVE, 202 RECOMPUTE
+[titan] 2026-07-12 13:40:14,041 - root - INFO -   Layer 20: 9 MUST_SAVE, 202 RECOMPUTE
+[titan] 2026-07-12 13:40:14,041 - root - INFO -   Layer 21: 9 MUST_SAVE, 202 RECOMPUTE
+[titan] 2026-07-12 13:40:14,041 - root - INFO -   Layer 22: 9 MUST_SAVE, 202 RECOMPUTE
+[titan] 2026-07-12 13:40:14,041 - root - INFO -   Layer 23: 9 MUST_SAVE, 202 RECOMPUTE
+[titan] 2026-07-12 13:40:14,041 - root - INFO -   Layer 24: 9 MUST_SAVE, 202 RECOMPUTE
+[titan] 2026-07-12 13:40:14,041 - root - INFO -   Layer 25: 9 MUST_SAVE, 202 RECOMPUTE
+[titan] 2026-07-12 13:40:14,041 - root - INFO -   Layer 26: 9 MUST_SAVE, 202 RECOMPUTE
+[titan] 2026-07-12 13:40:14,041 - root - INFO -   Layer 27: 9 MUST_SAVE, 202 RECOMPUTE
+[titan] 2026-07-12 13:40:14,041 - root - INFO -   Layer 28: 9 MUST_SAVE, 202 RECOMPUTE
+[titan] 2026-07-12 13:40:14,041 - root - INFO -   Layer 29: 9 MUST_SAVE, 202 RECOMPUTE
+[titan] 2026-07-12 13:40:14,041 - root - INFO -   Layer 30: 9 MUST_SAVE, 202 RECOMPUTE
+[titan] 2026-07-12 13:40:14,041 - root - INFO -   Layer 31: 8 MUST_SAVE, 203 RECOMPUTE
+[titan] 2026-07-12 13:40:19,434 - root - INFO - FSDP reorder: 100 overlap deps across 100 target nodes
+[titan] 2026-07-12 13:40:44,071 - root - INFO - Applied cudagraph pass.
+[titan] 2026-07-12 13:40:44,071 - root - INFO - All 11 graph passes took 34.717s
+[titan] 2026-07-12 13:41:24,638 - root - INFO - [31mstep:  1  [32mloss: 12.24517  [38;2;180;60;0mgrad_norm: 25.3177  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 617  [36mtflops: 29.78  [35mmfu: N/A[39m
+[titan] 2026-07-12 13:41:24,639 - root - INFO - Synchronizing and adjusting timeout for all ProcessGroups to 0:01:40
+[titan] 2026-07-12 13:41:46,321 - root - INFO - [31mstep: 10  [32mloss:  4.21310  [38;2;180;60;0mgrad_norm: 18.6946  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,202  [36mtflops: 1,312.53  [35mmfu: N/A[39m
+[titan] 2026-07-12 13:42:10,055 - root - INFO - [31mstep: 20  [32mloss:  3.37761  [38;2;180;60;0mgrad_norm:  9.2891  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,614  [36mtflops: 1,332.41  [35mmfu: N/A[39m
+[titan] 2026-07-12 13:42:33,749 - root - INFO - [31mstep: 30  [32mloss:  2.94346  [38;2;180;60;0mgrad_norm:  6.9578  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,660  [36mtflops: 1,334.60  [35mmfu: N/A[39m
+[titan] 2026-07-12 13:42:57,453 - root - INFO - [31mstep: 40  [32mloss:  2.90273  [38;2;180;60;0mgrad_norm:  5.6183  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,649  [36mtflops: 1,334.09  [35mmfu: N/A[39m
+[titan] 2026-07-12 13:43:17,610 - root - INFO - [GC] Performing periodic GC collection took 0.01 seconds
+[titan] 2026-07-12 13:43:21,133 - root - INFO - [31mstep: 50  [32mloss:  2.78791  [38;2;180;60;0mgrad_norm:  4.2206  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,676  [36mtflops: 1,335.37  [35mmfu: N/A[39m
+[titan] 2026-07-12 13:43:44,894 - root - INFO - [31mstep: 60  [32mloss:  2.85196  [38;2;180;60;0mgrad_norm:  6.5414  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,583  [36mtflops: 1,330.88  [35mmfu: N/A[39m
+[titan] 2026-07-12 13:44:08,581 - root - INFO - [31mstep: 70  [32mloss:  2.77799  [38;2;180;60;0mgrad_norm:  5.2898  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,668  [36mtflops: 1,335.00  [35mmfu: N/A[39m
+[titan] 2026-07-12 13:44:32,329 - root - INFO - [31mstep: 80  [32mloss:  2.75141  [38;2;180;60;0mgrad_norm:  5.6310  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,597  [36mtflops: 1,331.58  [35mmfu: N/A[39m
+[titan] 2026-07-12 13:44:56,132 - root - INFO - [31mstep: 90  [32mloss:  2.66911  [38;2;180;60;0mgrad_norm:  6.5875  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,534  [36mtflops: 1,328.52  [35mmfu: N/A[39m
+USDT:2026-07-12 13:45:16 224154:224154 SyncActivityProfilerHandler.cpp:39] profiler_start
+[titan] 2026-07-12 13:45:16,564 - root - INFO - [GC] Performing periodic GC collection took 0.00 seconds
+[titan] 2026-07-12 13:45:20,136 - root - INFO - [31mstep: 100  [32mloss:  2.67080  [38;2;180;60;0mgrad_norm:  4.7893  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,303  [36mtflops: 1,317.38  [35mmfu: N/A[39m
+USDT:2026-07-12 13:45:20 224154:224154 SyncActivityProfilerHandler.cpp:46] profiler_stop
+[titan] 2026-07-12 13:45:20,433 - root - INFO - Dumping profiler traces at step 100
+Removed 374 noise events from empty streams
+[titan] 2026-07-12 13:45:22,944 - root - INFO - Annotated 19133 CUDAGraph kernel event(s) in profiler trace
+[titan] 2026-07-12 13:45:22,960 - root - INFO - Finished dumping profiler traces in 2.53 seconds
+[titan] 2026-07-12 13:45:46,898 - root - INFO - [31mstep: 110  [32mloss:  2.66094  [38;2;180;60;0mgrad_norm:  4.4100  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 24,489  [36mtflops: 1,181.62  [35mmfu: N/A[39m
+[titan] 2026-07-12 13:46:10,875 - root - INFO - [31mstep: 120  [32mloss:  2.53788  [38;2;180;60;0mgrad_norm:  4.9092  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,334  [36mtflops: 1,318.89  [35mmfu: N/A[39m
+[titan] 2026-07-12 13:46:19,499 - httpx - INFO - HTTP Request: GET https://huggingface.co/datasets/allenai/c4/resolve/1588ec454efa1a09f29cd18ddd04fe05fc8653a2/en/c4-train.00000-of-01024.json.gz "HTTP/1.1 302 Found"
+[titan] 2026-07-12 13:46:19,753 - httpx - INFO - HTTP Request: GET https://us.aws.cdn.hf.co/xet-bridge-us/621ffdd236468d709f182a80/6656aac078668b0d5feb1cfb7b04def05bff73e7e375d0a66e252827336ac1a8?response-content-type=application%2Fgzip&response-content-disposition=inline%3B+filename*%3DUTF-8%27%27c4-train.00000-of-01024.json.gz%3B+filename%3D%22c4-train.00000-of-01024.json.gz%22%3B&X-Xet-Cas-Uid=public&user_id=public&Expires=1783892779&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly91cy5hd3MuY2RuLmhmLmNvL3hldC1icmlkZ2UtdXMvNjIxZmZkZDIzNjQ2OGQ3MDlmMTgyYTgwLzY2NTZhYWMwNzg2NjhiMGQ1ZmViMWNmYjdiMDRkZWYwNWJmZjczZTdlMzc1ZDBhNjZlMjUyODI3MzM2YWMxYThcXD9yZXNwb25zZS1jb250ZW50LXR5cGU9YXBwbGljYXRpb24lMkZnemlwJnJlc3BvbnNlLWNvbnRlbnQtZGlzcG9zaXRpb249aW5saW5lJTNCK2ZpbGVuYW1lJTJBJTNEVVRGLTglMjclMjdjNC10cmFpbi4wMDAwMC1vZi0wMTAyNC5qc29uLmd6JTNCK2ZpbGVuYW1lJTNEJTIyYzQtdHJhaW4uMDAwMDAtb2YtMDEwMjQuanNvbi5neiUyMiUzQiZYLVhldC1DYXMtVWlkPXB1YmxpYyZ1c2VyX2lkPXB1YmxpYyIsIkNvbmRpdGlvbiI6eyJEYXRlTGVzc1RoYW4iOnsiRXBvY2hUaW1lIjoxNzgzODkyNzc5fSwiQnl0ZVJhbmdlIjp7IkV4cGVjdGVkSGVhZGVyIjoiYnl0ZXM9NTI0Mjg4Mi0xMDQ4NTc2OSJ9fX1dfQ__&Signature=MEUCIAJLJSaxSEPVpKztv9jf3s3KirH2O0Bzq2d1RGe62ZOXAiEAx1qFie183iMpQcXWoMS6EifaeU8unMSvtlAGHcJp3%7Eo_&Key-Pair-Id=01KAYHXK2CBJSW0YZTMNXK9W1M "HTTP/1.1 206 Partial Content"
+[titan] 2026-07-12 13:46:34,889 - root - INFO - [31mstep: 130  [32mloss:  2.51186  [38;2;180;60;0mgrad_norm:  6.6757  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,292  [36mtflops: 1,316.84  [35mmfu: N/A[39m
+[titan] 2026-07-12 13:46:58,938 - root - INFO - [31mstep: 140  [32mloss:  2.42858  [38;2;180;60;0mgrad_norm:  6.8968  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,252  [36mtflops: 1,314.92  [35mmfu: N/A[39m
+[titan] 2026-07-12 13:47:19,393 - root - INFO - [GC] Performing periodic GC collection took 0.00 seconds
+[titan] 2026-07-12 13:47:22,940 - root - INFO - [31mstep: 150  [32mloss:  2.31387  [38;2;180;60;0mgrad_norm:  5.0878  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,305  [36mtflops: 1,317.50  [35mmfu: N/A[39m
+[titan] 2026-07-12 13:47:46,935 - root - INFO - [31mstep: 160  [32mloss:  2.33187  [38;2;180;60;0mgrad_norm:  8.6167  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,313  [36mtflops: 1,317.87  [35mmfu: N/A[39m
+[titan] 2026-07-12 13:48:10,945 - root - INFO - [31mstep: 170  [32mloss:  2.22407  [38;2;180;60;0mgrad_norm:  4.4124  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,296  [36mtflops: 1,317.06  [35mmfu: N/A[39m
+[titan] 2026-07-12 13:48:35,095 - root - INFO - [31mstep: 180  [32mloss:  2.09599  [38;2;180;60;0mgrad_norm:  3.6702  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,138  [36mtflops: 1,309.44  [35mmfu: N/A[39m
+[titan] 2026-07-12 13:48:59,083 - root - INFO - [31mstep: 190  [32mloss:  2.12734  [38;2;180;60;0mgrad_norm:  3.7296  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,321  [36mtflops: 1,318.26  [35mmfu: N/A[39m
+/opt/pytorch/pytorch/torch/profiler/profiler.py:314: UserWarning: Warning: Profiler clears events at the end of each cycle. Only events from the current cycle will be reported. To keep events across cycles, set acc_events=True.
+  _warn_once(
+USDT:2026-07-12 13:49:19 224154:224154 SyncActivityProfilerHandler.cpp:39] profiler_start
+[titan] 2026-07-12 13:49:19,585 - root - INFO - [GC] Performing periodic GC collection took 0.00 seconds
+[titan] 2026-07-12 13:49:23,173 - root - INFO - [31mstep: 200  [32mloss:  2.04377  [38;2;180;60;0mgrad_norm:  3.7973  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,205  [36mtflops: 1,312.68  [35mmfu: N/A[39m
+USDT:2026-07-12 13:49:23 224154:224154 SyncActivityProfilerHandler.cpp:46] profiler_stop
+[titan] 2026-07-12 13:49:23,474 - root - INFO - Dumping profiler traces at step 200
+Removed 373 noise events from empty streams
+[titan] 2026-07-12 13:49:26,013 - root - INFO - Annotated 19150 CUDAGraph kernel event(s) in profiler trace
+[titan] 2026-07-12 13:49:26,030 - root - INFO - Finished dumping profiler traces in 2.56 seconds
+[titan] 2026-07-12 13:49:50,124 - root - INFO - [31mstep: 210  [32mloss:  1.94457  [38;2;180;60;0mgrad_norm:  3.0305  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 24,317  [36mtflops: 1,173.32  [35mmfu: N/A[39m
+[titan] 2026-07-12 13:50:14,222 - root - INFO - [31mstep: 220  [32mloss:  1.88634  [38;2;180;60;0mgrad_norm:  3.7133  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,197  [36mtflops: 1,312.29  [35mmfu: N/A[39m
+[titan] 2026-07-12 13:50:38,296 - root - INFO - [31mstep: 230  [32mloss:  1.91171  [38;2;180;60;0mgrad_norm:  3.3733  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,223  [36mtflops: 1,313.55  [35mmfu: N/A[39m
+[titan] 2026-07-12 13:51:02,363 - root - INFO - [31mstep: 240  [32mloss:  1.86313  [38;2;180;60;0mgrad_norm:  2.4712  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,231  [36mtflops: 1,313.92  [35mmfu: N/A[39m
+[titan] 2026-07-12 13:51:20,700 - httpx - INFO - HTTP Request: GET https://huggingface.co/datasets/allenai/c4/resolve/1588ec454efa1a09f29cd18ddd04fe05fc8653a2/en/c4-train.00000-of-01024.json.gz "HTTP/1.1 302 Found"
+[titan] 2026-07-12 13:51:20,935 - httpx - INFO - HTTP Request: GET https://us.aws.cdn.hf.co/xet-bridge-us/621ffdd236468d709f182a80/6656aac078668b0d5feb1cfb7b04def05bff73e7e375d0a66e252827336ac1a8?X-Xet-Cas-Uid=public&response-content-type=application%2Fgzip&user_id=public&response-content-disposition=inline%3B+filename*%3DUTF-8%27%27c4-train.00000-of-01024.json.gz%3B+filename%3D%22c4-train.00000-of-01024.json.gz%22%3B&Expires=1783893080&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly91cy5hd3MuY2RuLmhmLmNvL3hldC1icmlkZ2UtdXMvNjIxZmZkZDIzNjQ2OGQ3MDlmMTgyYTgwLzY2NTZhYWMwNzg2NjhiMGQ1ZmViMWNmYjdiMDRkZWYwNWJmZjczZTdlMzc1ZDBhNjZlMjUyODI3MzM2YWMxYThcXD9YLVhldC1DYXMtVWlkPXB1YmxpYyZyZXNwb25zZS1jb250ZW50LXR5cGU9YXBwbGljYXRpb24lMkZnemlwJnVzZXJfaWQ9cHVibGljJnJlc3BvbnNlLWNvbnRlbnQtZGlzcG9zaXRpb249aW5saW5lJTNCK2ZpbGVuYW1lJTJBJTNEVVRGLTglMjclMjdjNC10cmFpbi4wMDAwMC1vZi0wMTAyNC5qc29uLmd6JTNCK2ZpbGVuYW1lJTNEJTIyYzQtdHJhaW4uMDAwMDAtb2YtMDEwMjQuanNvbi5neiUyMiUzQiIsIkNvbmRpdGlvbiI6eyJEYXRlTGVzc1RoYW4iOnsiRXBvY2hUaW1lIjoxNzgzODkzMDgwfSwiQnl0ZVJhbmdlIjp7IkV4cGVjdGVkSGVhZGVyIjoiYnl0ZXM9MTA0ODU3NzAtMTU4NTk3MjEifX19XX0_&Signature=MEYCIQDjALhNam%7ED4WxStMbpFrvd1WsmozCPwm6w3N-01klDHwIhANC6LCUAhbgJe4mQfNb-4Nt8VJGCjxP1uegRGvMTw4J5&Key-Pair-Id=01KAYHXK2CBJSW0YZTMNXK9W1M "HTTP/1.1 206 Partial Content"
+[titan] 2026-07-12 13:51:22,912 - root - INFO - [GC] Performing periodic GC collection took 0.00 seconds
+[titan] 2026-07-12 13:51:26,471 - root - INFO - [31mstep: 250  [32mloss:  1.84455  [38;2;180;60;0mgrad_norm:  2.4371  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,186  [36mtflops: 1,311.72  [35mmfu: N/A[39m
+[titan] 2026-07-12 13:51:50,487 - root - INFO - [31mstep: 260  [32mloss:  1.79204  [38;2;180;60;0mgrad_norm:  1.7973  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,289  [36mtflops: 1,316.71  [35mmfu: N/A[39m
+[titan] 2026-07-12 13:52:14,582 - root - INFO - [31mstep: 270  [32mloss:  1.77298  [38;2;180;60;0mgrad_norm:  2.2665  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,199  [36mtflops: 1,312.40  [35mmfu: N/A[39m
+[titan] 2026-07-12 13:52:38,745 - root - INFO - [31mstep: 280  [32mloss:  1.84672  [38;2;180;60;0mgrad_norm:  3.1973  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,124  [36mtflops: 1,308.76  [35mmfu: N/A[39m
+[titan] 2026-07-12 13:53:02,876 - root - INFO - [31mstep: 290  [32mloss:  1.66986  [38;2;180;60;0mgrad_norm:  1.4211  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,159  [36mtflops: 1,310.42  [35mmfu: N/A[39m
+USDT:2026-07-12 13:53:23 224154:224154 SyncActivityProfilerHandler.cpp:39] profiler_start
+[titan] 2026-07-12 13:53:23,477 - root - INFO - [GC] Performing periodic GC collection took 0.00 seconds
+[titan] 2026-07-12 13:53:27,101 - root - INFO - [31mstep: 300  [32mloss:  1.71831  [38;2;180;60;0mgrad_norm:  3.3935  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,054  [36mtflops: 1,305.36  [35mmfu: N/A[39m
+USDT:2026-07-12 13:53:27 224154:224154 SyncActivityProfilerHandler.cpp:46] profiler_stop
+[titan] 2026-07-12 13:53:27,402 - root - INFO - Dumping profiler traces at step 300
+Removed 368 noise events from empty streams
+[titan] 2026-07-12 13:53:29,906 - root - INFO - Annotated 19151 CUDAGraph kernel event(s) in profiler trace
+[titan] 2026-07-12 13:53:29,922 - root - INFO - Finished dumping profiler traces in 2.52 seconds
+[titan] 2026-07-12 13:53:54,067 - root - INFO - [31mstep: 310  [32mloss:  1.78942  [38;2;180;60;0mgrad_norm:  1.8757  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 24,304  [36mtflops: 1,172.69  [35mmfu: N/A[39m
+[titan] 2026-07-12 13:54:18,191 - root - INFO - [31mstep: 320  [32mloss:  1.76255  [38;2;180;60;0mgrad_norm:  2.2129  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,168  [36mtflops: 1,310.87  [35mmfu: N/A[39m
+[titan] 2026-07-12 13:54:42,343 - root - INFO - [31mstep: 330  [32mloss:  1.92700  [38;2;180;60;0mgrad_norm:  2.1494  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,135  [36mtflops: 1,309.30  [35mmfu: N/A[39m
+[titan] 2026-07-12 13:55:06,553 - root - INFO - [31mstep: 340  [32mloss:  1.66590  [38;2;180;60;0mgrad_norm:  1.7978  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,071  [36mtflops: 1,306.19  [35mmfu: N/A[39m
+[titan] 2026-07-12 13:55:27,048 - root - INFO - [GC] Performing periodic GC collection took 0.00 seconds
+[titan] 2026-07-12 13:55:30,636 - root - INFO - [31mstep: 350  [32mloss:  1.65187  [38;2;180;60;0mgrad_norm:  2.0969  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,213  [36mtflops: 1,313.07  [35mmfu: N/A[39m
+[titan] 2026-07-12 13:55:54,853 - root - INFO - [31mstep: 360  [32mloss:  1.61752  [38;2;180;60;0mgrad_norm:  1.8202  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,063  [36mtflops: 1,305.80  [35mmfu: N/A[39m
+[titan] 2026-07-12 13:56:19,039 - root - INFO - [31mstep: 370  [32mloss:  1.62821  [38;2;180;60;0mgrad_norm:  1.4786  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,097  [36mtflops: 1,307.45  [35mmfu: N/A[39m
+[titan] 2026-07-12 13:56:22,920 - httpx - INFO - HTTP Request: GET https://huggingface.co/datasets/allenai/c4/resolve/1588ec454efa1a09f29cd18ddd04fe05fc8653a2/en/c4-train.00000-of-01024.json.gz "HTTP/1.1 302 Found"
+[titan] 2026-07-12 13:56:23,193 - httpx - INFO - HTTP Request: GET https://us.aws.cdn.hf.co/xet-bridge-us/621ffdd236468d709f182a80/6656aac078668b0d5feb1cfb7b04def05bff73e7e375d0a66e252827336ac1a8?response-content-disposition=inline%3B+filename*%3DUTF-8%27%27c4-train.00000-of-01024.json.gz%3B+filename%3D%22c4-train.00000-of-01024.json.gz%22%3B&X-Xet-Cas-Uid=public&response-content-type=application%2Fgzip&user_id=public&Expires=1783893382&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly91cy5hd3MuY2RuLmhmLmNvL3hldC1icmlkZ2UtdXMvNjIxZmZkZDIzNjQ2OGQ3MDlmMTgyYTgwLzY2NTZhYWMwNzg2NjhiMGQ1ZmViMWNmYjdiMDRkZWYwNWJmZjczZTdlMzc1ZDBhNjZlMjUyODI3MzM2YWMxYThcXD9yZXNwb25zZS1jb250ZW50LWRpc3Bvc2l0aW9uPWlubGluZSUzQitmaWxlbmFtZSUyQSUzRFVURi04JTI3JTI3YzQtdHJhaW4uMDAwMDAtb2YtMDEwMjQuanNvbi5neiUzQitmaWxlbmFtZSUzRCUyMmM0LXRyYWluLjAwMDAwLW9mLTAxMDI0Lmpzb24uZ3olMjIlM0ImWC1YZXQtQ2FzLVVpZD1wdWJsaWMmcmVzcG9uc2UtY29udGVudC10eXBlPWFwcGxpY2F0aW9uJTJGZ3ppcCZ1c2VyX2lkPXB1YmxpYyIsIkNvbmRpdGlvbiI6eyJEYXRlTGVzc1RoYW4iOnsiRXBvY2hUaW1lIjoxNzgzODkzMzgyfSwiQnl0ZVJhbmdlIjp7IkV4cGVjdGVkSGVhZGVyIjoiYnl0ZXM9MTU4NTk3MjItMjEyMzM2NzMifX19XX0_&Signature=MEYCIQChuh0NAubKktTBskqti6FkNeAT587vDGCOwqdzyNUcIwIhALIf5pWSJyx51Gctm2qc0k5PJo-jR5dn29ASSEPpfUJw&Key-Pair-Id=01KAYHXK2CBJSW0YZTMNXK9W1M "HTTP/1.1 206 Partial Content"
+[titan] 2026-07-12 13:56:43,107 - root - INFO - [31mstep: 380  [32mloss:  1.58861  [38;2;180;60;0mgrad_norm:  1.4019  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,230  [36mtflops: 1,313.89  [35mmfu: N/A[39m
+[titan] 2026-07-12 13:57:07,277 - root - INFO - [31mstep: 390  [32mloss:  1.59977  [38;2;180;60;0mgrad_norm:  1.2342  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,115  [36mtflops: 1,308.33  [35mmfu: N/A[39m
+USDT:2026-07-12 13:57:27 224154:224154 SyncActivityProfilerHandler.cpp:39] profiler_start
+[titan] 2026-07-12 13:57:27,895 - root - INFO - [GC] Performing periodic GC collection took 0.00 seconds
+[titan] 2026-07-12 13:57:31,520 - root - INFO - [31mstep: 400  [32mloss:  1.56173  [38;2;180;60;0mgrad_norm:  1.3591  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,034  [36mtflops: 1,304.39  [35mmfu: N/A[39m
+USDT:2026-07-12 13:57:31 224154:224154 SyncActivityProfilerHandler.cpp:46] profiler_stop
+[titan] 2026-07-12 13:57:31,823 - root - INFO - Dumping profiler traces at step 400
+Removed 374 noise events from empty streams
+[titan] 2026-07-12 13:57:34,340 - root - INFO - Annotated 19143 CUDAGraph kernel event(s) in profiler trace
+[titan] 2026-07-12 13:57:34,356 - root - INFO - Finished dumping profiler traces in 2.53 seconds
+[titan] 2026-07-12 13:57:58,596 - root - INFO - [31mstep: 410  [32mloss:  1.47709  [38;2;180;60;0mgrad_norm:  1.1661  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 24,205  [36mtflops: 1,167.93  [35mmfu: N/A[39m
+[titan] 2026-07-12 13:58:22,778 - root - INFO - [31mstep: 420  [32mloss:  1.60883  [38;2;180;60;0mgrad_norm:  1.1004  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,102  [36mtflops: 1,307.69  [35mmfu: N/A[39m
+[titan] 2026-07-12 13:58:46,965 - root - INFO - [31mstep: 430  [32mloss:  1.56116  [38;2;180;60;0mgrad_norm:  1.3129  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,096  [36mtflops: 1,307.42  [35mmfu: N/A[39m
+[titan] 2026-07-12 13:59:11,114 - root - INFO - [31mstep: 440  [32mloss:  1.45766  [38;2;180;60;0mgrad_norm:  0.8880  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,139  [36mtflops: 1,309.47  [35mmfu: N/A[39m
+[titan] 2026-07-12 13:59:31,635 - root - INFO - [GC] Performing periodic GC collection took 0.00 seconds
+[titan] 2026-07-12 13:59:35,200 - root - INFO - [31mstep: 450  [32mloss:  1.53450  [38;2;180;60;0mgrad_norm:  1.0715  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,210  [36mtflops: 1,312.89  [35mmfu: N/A[39m
+[titan] 2026-07-12 13:59:59,405 - root - INFO - [31mstep: 460  [32mloss:  1.55419  [38;2;180;60;0mgrad_norm:  0.9730  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,077  [36mtflops: 1,306.48  [35mmfu: N/A[39m
+[titan] 2026-07-12 14:00:23,514 - root - INFO - [31mstep: 470  [32mloss:  1.55473  [38;2;180;60;0mgrad_norm:  0.8627  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,183  [36mtflops: 1,311.61  [35mmfu: N/A[39m
+[titan] 2026-07-12 14:00:47,688 - root - INFO - [31mstep: 480  [32mloss:  1.38721  [38;2;180;60;0mgrad_norm:  1.1655  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,111  [36mtflops: 1,308.15  [35mmfu: N/A[39m
+[titan] 2026-07-12 14:01:11,812 - root - INFO - [31mstep: 490  [32mloss:  1.44785  [38;2;180;60;0mgrad_norm:  0.7983  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,167  [36mtflops: 1,310.84  [35mmfu: N/A[39m
+USDT:2026-07-12 14:01:32 224154:224154 SyncActivityProfilerHandler.cpp:39] profiler_start
+[titan] 2026-07-12 14:01:32,425 - root - INFO - [GC] Performing periodic GC collection took 0.00 seconds
+[titan] 2026-07-12 14:01:36,041 - root - INFO - [31mstep: 500  [32mloss:  1.50385  [38;2;180;60;0mgrad_norm:  0.6157  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,050  [36mtflops: 1,305.16  [35mmfu: N/A[39m
+USDT:2026-07-12 14:01:36 224154:224154 SyncActivityProfilerHandler.cpp:46] profiler_stop
+[titan] 2026-07-12 14:01:36,341 - root - INFO - Dumping profiler traces at step 500
+Removed 371 noise events from empty streams
+[titan] 2026-07-12 14:01:38,850 - root - INFO - Annotated 19143 CUDAGraph kernel event(s) in profiler trace
+[titan] 2026-07-12 14:01:38,866 - root - INFO - Finished dumping profiler traces in 2.53 seconds
+[titan] 2026-07-12 14:02:03,071 - root - INFO - [31mstep: 510  [32mloss:  1.49046  [38;2;180;60;0mgrad_norm:  1.2596  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 24,246  [36mtflops: 1,169.91  [35mmfu: N/A[39m
+[titan] 2026-07-12 14:02:27,216 - root - INFO - [31mstep: 520  [32mloss:  1.43034  [38;2;180;60;0mgrad_norm:  0.6438  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,143  [36mtflops: 1,309.69  [35mmfu: N/A[39m
+[titan] 2026-07-12 14:02:51,346 - root - INFO - [31mstep: 530  [32mloss:  1.41582  [38;2;180;60;0mgrad_norm:  0.7684  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,160  [36mtflops: 1,310.50  [35mmfu: N/A[39m
+[titan] 2026-07-12 14:03:15,434 - root - INFO - [31mstep: 540  [32mloss:  1.40661  [38;2;180;60;0mgrad_norm:  0.5010  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,208  [36mtflops: 1,312.79  [35mmfu: N/A[39m
+[titan] 2026-07-12 14:03:36,115 - root - INFO - [GC] Performing periodic GC collection took 0.00 seconds
+[titan] 2026-07-12 14:03:39,719 - root - INFO - [31mstep: 550  [32mloss:  1.39484  [38;2;180;60;0mgrad_norm:  1.2907  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 26,986  [36mtflops: 1,302.11  [35mmfu: N/A[39m
+[titan] 2026-07-12 14:04:03,939 - root - INFO - [31mstep: 560  [32mloss:  1.45158  [38;2;180;60;0mgrad_norm:  0.9321  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,060  [36mtflops: 1,305.65  [35mmfu: N/A[39m
+[titan] 2026-07-12 14:04:28,060 - root - INFO - [31mstep: 570  [32mloss:  1.45744  [38;2;180;60;0mgrad_norm:  0.5168  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,171  [36mtflops: 1,311.00  [35mmfu: N/A[39m
+[titan] 2026-07-12 14:04:52,218 - root - INFO - [31mstep: 580  [32mloss:  1.40752  [38;2;180;60;0mgrad_norm:  0.5436  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,129  [36mtflops: 1,308.99  [35mmfu: N/A[39m
+[titan] 2026-07-12 14:05:16,386 - root - INFO - [31mstep: 590  [32mloss:  1.46300  [38;2;180;60;0mgrad_norm:  0.8542  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,117  [36mtflops: 1,308.44  [35mmfu: N/A[39m
+USDT:2026-07-12 14:05:37 224154:224154 SyncActivityProfilerHandler.cpp:39] profiler_start
+[titan] 2026-07-12 14:05:37,037 - root - INFO - [GC] Performing periodic GC collection took 0.00 seconds
+[titan] 2026-07-12 14:05:40,651 - root - INFO - [31mstep: 600  [32mloss:  1.42095  [38;2;180;60;0mgrad_norm:  0.7324  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,009  [36mtflops: 1,303.20  [35mmfu: N/A[39m
+USDT:2026-07-12 14:05:40 224154:224154 SyncActivityProfilerHandler.cpp:46] profiler_stop
+[titan] 2026-07-12 14:05:40,955 - root - INFO - Dumping profiler traces at step 600
+Removed 388 noise events from empty streams
+[titan] 2026-07-12 14:05:43,468 - root - INFO - Annotated 19143 CUDAGraph kernel event(s) in profiler trace
+[titan] 2026-07-12 14:05:43,484 - root - INFO - Finished dumping profiler traces in 2.53 seconds
+[titan] 2026-07-12 14:06:07,647 - root - INFO - [31mstep: 610  [32mloss:  1.38757  [38;2;180;60;0mgrad_norm:  0.8157  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 24,277  [36mtflops: 1,171.37  [35mmfu: N/A[39m
+[titan] 2026-07-12 14:06:31,763 - root - INFO - [31mstep: 620  [32mloss:  1.44817  [38;2;180;60;0mgrad_norm:  0.6808  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,176  [36mtflops: 1,311.27  [35mmfu: N/A[39m
+[titan] 2026-07-12 14:06:35,625 - httpx - INFO - HTTP Request: GET https://huggingface.co/datasets/allenai/c4/resolve/1588ec454efa1a09f29cd18ddd04fe05fc8653a2/en/c4-train.00000-of-01024.json.gz "HTTP/1.1 302 Found"
+[titan] 2026-07-12 14:06:35,895 - httpx - INFO - HTTP Request: GET https://us.aws.cdn.hf.co/xet-bridge-us/621ffdd236468d709f182a80/6656aac078668b0d5feb1cfb7b04def05bff73e7e375d0a66e252827336ac1a8?response-content-type=application%2Fgzip&user_id=public&response-content-disposition=inline%3B+filename*%3DUTF-8%27%27c4-train.00000-of-01024.json.gz%3B+filename%3D%22c4-train.00000-of-01024.json.gz%22%3B&X-Xet-Cas-Uid=public&Expires=1783893995&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly91cy5hd3MuY2RuLmhmLmNvL3hldC1icmlkZ2UtdXMvNjIxZmZkZDIzNjQ2OGQ3MDlmMTgyYTgwLzY2NTZhYWMwNzg2NjhiMGQ1ZmViMWNmYjdiMDRkZWYwNWJmZjczZTdlMzc1ZDBhNjZlMjUyODI3MzM2YWMxYThcXD9yZXNwb25zZS1jb250ZW50LXR5cGU9YXBwbGljYXRpb24lMkZnemlwJnVzZXJfaWQ9cHVibGljJnJlc3BvbnNlLWNvbnRlbnQtZGlzcG9zaXRpb249aW5saW5lJTNCK2ZpbGVuYW1lJTJBJTNEVVRGLTglMjclMjdjNC10cmFpbi4wMDAwMC1vZi0wMTAyNC5qc29uLmd6JTNCK2ZpbGVuYW1lJTNEJTIyYzQtdHJhaW4uMDAwMDAtb2YtMDEwMjQuanNvbi5neiUyMiUzQiZYLVhldC1DYXMtVWlkPXB1YmxpYyIsIkNvbmRpdGlvbiI6eyJEYXRlTGVzc1RoYW4iOnsiRXBvY2hUaW1lIjoxNzgzODkzOTk1fSwiQnl0ZVJhbmdlIjp7IkV4cGVjdGVkSGVhZGVyIjoiYnl0ZXM9MjEyMzM2NzQtMjY2MDc2MjUifX19XX0_&Signature=MEQCIBmha%7EuqSpGviSQgegOwquz7N21nLQ1UvQtJDcO4-tYpAiBGoN%7Edk020p7ITBXHCkEK4kupjzR08x1MgLfE-jPSrLA__&Key-Pair-Id=01KAYHXK2CBJSW0YZTMNXK9W1M "HTTP/1.1 206 Partial Content"
+[titan] 2026-07-12 14:06:55,914 - root - INFO - [31mstep: 630  [32mloss:  1.36540  [38;2;180;60;0mgrad_norm:  0.7081  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,138  [36mtflops: 1,309.41  [35mmfu: N/A[39m
+[titan] 2026-07-12 14:07:20,052 - root - INFO - [31mstep: 640  [32mloss:  1.38509  [38;2;180;60;0mgrad_norm:  0.7016  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,151  [36mtflops: 1,310.07  [35mmfu: N/A[39m
+[titan] 2026-07-12 14:07:40,570 - root - INFO - [GC] Performing periodic GC collection took 0.00 seconds
+[titan] 2026-07-12 14:07:44,143 - root - INFO - [31mstep: 650  [32mloss:  1.34515  [38;2;180;60;0mgrad_norm:  0.5508  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,205  [36mtflops: 1,312.64  [35mmfu: N/A[39m
+[titan] 2026-07-12 14:08:08,291 - root - INFO - [31mstep: 660  [32mloss:  1.33970  [38;2;180;60;0mgrad_norm:  0.4823  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,139  [36mtflops: 1,309.50  [35mmfu: N/A[39m
+[titan] 2026-07-12 14:08:32,385 - root - INFO - [31mstep: 670  [32mloss:  1.35454  [38;2;180;60;0mgrad_norm:  0.5110  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,201  [36mtflops: 1,312.48  [35mmfu: N/A[39m
+[titan] 2026-07-12 14:08:56,445 - root - INFO - [31mstep: 680  [32mloss:  1.40776  [38;2;180;60;0mgrad_norm:  0.4845  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,240  [36mtflops: 1,314.33  [35mmfu: N/A[39m
+[titan] 2026-07-12 14:09:20,561 - root - INFO - [31mstep: 690  [32mloss:  1.42436  [38;2;180;60;0mgrad_norm:  0.6176  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,176  [36mtflops: 1,311.26  [35mmfu: N/A[39m
+USDT:2026-07-12 14:09:41 224154:224154 SyncActivityProfilerHandler.cpp:39] profiler_start
+[titan] 2026-07-12 14:09:41,193 - root - INFO - [GC] Performing periodic GC collection took 0.00 seconds
+[titan] 2026-07-12 14:09:44,793 - root - INFO - [31mstep: 700  [32mloss:  1.34363  [38;2;180;60;0mgrad_norm:  0.3536  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,045  [36mtflops: 1,304.96  [35mmfu: N/A[39m
+USDT:2026-07-12 14:09:44 224154:224154 SyncActivityProfilerHandler.cpp:46] profiler_stop
+[titan] 2026-07-12 14:09:45,095 - root - INFO - Dumping profiler traces at step 700
+Removed 368 noise events from empty streams
+[titan] 2026-07-12 14:09:47,608 - root - INFO - Annotated 19128 CUDAGraph kernel event(s) in profiler trace
+[titan] 2026-07-12 14:09:47,624 - root - INFO - Finished dumping profiler traces in 2.53 seconds
+[titan] 2026-07-12 14:10:11,813 - root - INFO - [31mstep: 710  [32mloss:  1.27283  [38;2;180;60;0mgrad_norm:  0.4400  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 24,256  [36mtflops: 1,170.35  [35mmfu: N/A[39m
+[titan] 2026-07-12 14:10:35,942 - root - INFO - [31mstep: 720  [32mloss:  1.35380  [38;2;180;60;0mgrad_norm:  0.4415  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,161  [36mtflops: 1,310.55  [35mmfu: N/A[39m
+[titan] 2026-07-12 14:11:00,080 - root - INFO - [31mstep: 730  [32mloss:  1.37795  [38;2;180;60;0mgrad_norm:  0.3343  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,151  [36mtflops: 1,310.06  [35mmfu: N/A[39m
+[titan] 2026-07-12 14:11:24,292 - root - INFO - [31mstep: 740  [32mloss:  1.33044  [38;2;180;60;0mgrad_norm:  0.3500  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,069  [36mtflops: 1,306.11  [35mmfu: N/A[39m
+[titan] 2026-07-12 14:11:37,814 - httpx - INFO - HTTP Request: GET https://huggingface.co/datasets/allenai/c4/resolve/1588ec454efa1a09f29cd18ddd04fe05fc8653a2/en/c4-train.00000-of-01024.json.gz "HTTP/1.1 302 Found"
+[titan] 2026-07-12 14:11:38,108 - httpx - INFO - HTTP Request: GET https://us.aws.cdn.hf.co/xet-bridge-us/621ffdd236468d709f182a80/6656aac078668b0d5feb1cfb7b04def05bff73e7e375d0a66e252827336ac1a8?X-Xet-Cas-Uid=public&response-content-disposition=inline%3B+filename*%3DUTF-8%27%27c4-train.00000-of-01024.json.gz%3B+filename%3D%22c4-train.00000-of-01024.json.gz%22%3B&user_id=public&response-content-type=application%2Fgzip&Expires=1783894297&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly91cy5hd3MuY2RuLmhmLmNvL3hldC1icmlkZ2UtdXMvNjIxZmZkZDIzNjQ2OGQ3MDlmMTgyYTgwLzY2NTZhYWMwNzg2NjhiMGQ1ZmViMWNmYjdiMDRkZWYwNWJmZjczZTdlMzc1ZDBhNjZlMjUyODI3MzM2YWMxYThcXD9YLVhldC1DYXMtVWlkPXB1YmxpYyZyZXNwb25zZS1jb250ZW50LWRpc3Bvc2l0aW9uPWlubGluZSUzQitmaWxlbmFtZSUyQSUzRFVURi04JTI3JTI3YzQtdHJhaW4uMDAwMDAtb2YtMDEwMjQuanNvbi5neiUzQitmaWxlbmFtZSUzRCUyMmM0LXRyYWluLjAwMDAwLW9mLTAxMDI0Lmpzb24uZ3olMjIlM0ImdXNlcl9pZD1wdWJsaWMmcmVzcG9uc2UtY29udGVudC10eXBlPWFwcGxpY2F0aW9uJTJGZ3ppcCIsIkNvbmRpdGlvbiI6eyJEYXRlTGVzc1RoYW4iOnsiRXBvY2hUaW1lIjoxNzgzODk0Mjk3fSwiQnl0ZVJhbmdlIjp7IkV4cGVjdGVkSGVhZGVyIjoiYnl0ZXM9MjY2MDc2MjYtMzE5ODE1NzcifX19XX0_&Signature=MEUCIQCSzeRAB3z-QXacmApn-l3tY1ATN-F0SopJ9-YPS9W3cwIgDGULd-dswqg0KkXISfEu%7EhY7LxNoQT1lVAETT7RgzlM_&Key-Pair-Id=01KAYHXK2CBJSW0YZTMNXK9W1M "HTTP/1.1 206 Partial Content"
+[titan] 2026-07-12 14:11:44,894 - root - INFO - [GC] Performing periodic GC collection took 0.00 seconds
+[titan] 2026-07-12 14:11:48,484 - root - INFO - [31mstep: 750  [32mloss:  1.35610  [38;2;180;60;0mgrad_norm:  0.3063  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,091  [36mtflops: 1,307.15  [35mmfu: N/A[39m
+[titan] 2026-07-12 14:12:12,657 - root - INFO - [31mstep: 760  [32mloss:  1.33547  [38;2;180;60;0mgrad_norm:  0.2168  [38;2;54;234;195mmemory: 139.55GiB(75.72%)  [34mtps: 27,111  [36mtflops: 1,308.13  [35mmfu: N/A[39m
+[titan] 2026-07-12 14:12:18,765 - root - INFO - Sleeping 2 seconds for other ranks to complete
+[titan] 2026-07-12 14:12:20,766 - root - INFO - Training completed
+[titan] 2026-07-12 14:12:21,241 - root - INFO - Process group destroyed

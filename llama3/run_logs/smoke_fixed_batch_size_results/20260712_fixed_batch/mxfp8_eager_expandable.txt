@@ -1,0 +1,54 @@
+W0712 21:13:00.706000 26159 /opt/pytorch/pytorch/torch/distributed/run.py:874] 
+W0712 21:13:00.706000 26159 /opt/pytorch/pytorch/torch/distributed/run.py:874] *****************************************
+W0712 21:13:00.706000 26159 /opt/pytorch/pytorch/torch/distributed/run.py:874] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0712 21:13:00.706000 26159 /opt/pytorch/pytorch/torch/distributed/run.py:874] *****************************************
+W0712 21:13:10.153000 26237 /opt/pytorch/pytorch/torch/utils/_pytree.py:630] <enum 'KernelPreference'> is an Enum subclass and is now natively supported by torch.compile as an opaque value type. Calling register_constant() on Enum subclasses is deprecated and will be an error in a future release.
+W0712 21:13:10.725000 26237 /opt/pytorch/pytorch/torch/utils/_pytree.py:630] <enum 'ScaleCalculationMode'> is an Enum subclass and is now natively supported by torch.compile as an opaque value type. Calling register_constant() on Enum subclasses is deprecated and will be an error in a future release.
+[titan] 2026-07-12 21:13:11,692 - root - INFO - torchtitan version: 0.2.2 (0.0.0 means __version__ is not defined correctly).
+[titan] 2026-07-12 21:13:11,696 - root - WARNING - initial_load_model_only=True has no effect without an initial_load_path.
+[titan] 2026-07-12 21:13:11,698 - root - WARNING - torch.compile enablement is required for highest performance of MXFP8 dynamic quantization.
+[titan] 2026-07-12 21:13:11,699 - root - INFO - Converted Linear layers to MXFP8Linear
+[titan] 2026-07-12 21:13:11,762 - root - WARNING - initial_load_model_only=True has no effect without an initial_load_path.
+[titan] 2026-07-12 21:13:11,762 - torchtitan.observability.structured_logger.jsonl_handler - INFO - Structured logging -> JSONL: /home/me/nvfp4/third_party/torchtitan/outputs/structured_logs/training.global_rank_0.20260712-211311-LL2S6Z.jsonl
+[titan] 2026-07-12 21:13:12,321 - root - WARNING - ENV[TORCH_NCCL_ASYNC_ERROR_HANDLING] = 1 will be overridden to 3 based on job config
+[titan] 2026-07-12 21:13:12,334 - root - INFO - Building device mesh with parallelism: pp=1, dp_replicate=1, dp_shard=4, cp=1, tp=1, ep=1
+[titan] 2026-07-12 21:13:12,356 - root - INFO - Successfully created meshes with active dimensions: ['batch', 'loss', 'efsdp', 'fsdp']
+[titan] 2026-07-12 21:13:12,356 - root - INFO - [GC] Initial GC collection took 0.00 seconds
+[titan] 2026-07-12 21:13:16,535 - root - INFO - Building llama3 8B
+[titan] 2026-07-12 21:13:16,668 - root - INFO - TensorBoard logging enabled. Logs will be saved at ./outputs/tb/20260712-2113
+[titan] 2026-07-12 21:13:16,668 - root - INFO - CUDA capacity: NVIDIA GB200 with 184.30GiB memory
+[titan] 2026-07-12 21:13:16,735 - root - INFO - [34mModel llama3 8B [31msize: 8,030,261,248 total parameters[39m
+[titan] 2026-07-12 21:13:16,748 - root - INFO - Applied SelectiveAC activation checkpointing to the model
+[titan] 2026-07-12 21:13:16,762 - root - INFO - Compiling each TransformerBlock with torch.compile
+[titan] 2026-07-12 21:13:16,822 - root - INFO - Applied FSDP to the model
+[titan] 2026-07-12 21:13:17,361 - root - INFO - Peak FLOPS used for computing MFU: 2.500e+15
+[titan] 2026-07-12 21:13:17,361 - root - INFO - CUDA memory usage for model: 9.84GiB(5.34%)
+[titan] 2026-07-12 21:13:17,362 - root - INFO - Optimizer AdamW (model_part=0): 227 params [.*] {'fused': True, 'foreach': False, 'lr': 0.0003, 'betas': (0.9, 0.95), 'eps': 1e-08, 'weight_decay': 0.1}
+[titan] 2026-07-12 21:13:17,363 - root - WARNING - Warmup steps (200) exceed total steps (50). Adjusting warmup steps to 50.
+[titan] 2026-07-12 21:13:17,363 - root - INFO - Loading tokenizer from tokenizer.json
+[titan] 2026-07-12 21:13:17,367 - root - INFO - Preparing c4_test dataset from tests/assets/c4_test
+/usr/local/lib/python3.12/dist-packages/torchdata/stateful_dataloader/stateful_dataloader.py:379: UserWarning: 'set_vital' is deprecated, please do not call
+  torch.set_vital("Dataloader", "enabled", "True")  # type: ignore[attr-defined]
+[titan] 2026-07-12 21:13:17,448 - root - WARNING - model.safetensors.index.json not found at hf_assets_path: ./tests/assets/tokenizer/model.safetensors.index.json.                     Defaulting to saving a single safetensors file if checkpoint is saved in HF format
+[titan] 2026-07-12 21:13:17,449 - root - WARNING - initial_load_model_only=True has no effect without an initial_load_path.
+[titan] 2026-07-12 21:13:17,449 - root - INFO - Trainer is initialized with local batch size 32, global batch size 128, gradient accumulation steps 1, sequence length 2048, total steps 50 (warmup 200)
+[titan] 2026-07-12 21:13:17,449 - root - INFO - Training starts at step 1
+[titan] 2026-07-12 21:13:17,449 - root - INFO - Profiling active. Traces will be saved at ./outputs/profiling/traces
+[rank0]:W0712 21:13:20.487000 26237 /opt/pytorch/pytorch/torch/_logging/_internal.py:1350] [1/0] 
+[rank0]:W0712 21:13:20.487000 26237 /opt/pytorch/pytorch/torch/_logging/_internal.py:1350] [1/0] Detected that context_fn is passed to torch.utils.checkpoint under torch.compile.
+[rank0]:W0712 21:13:20.487000 26237 /opt/pytorch/pytorch/torch/_logging/_internal.py:1350] [1/0] Please make sure the checkpointed region does not contain in-place ops (e.g. torch.relu_).
+[rank0]:W0712 21:13:20.487000 26237 /opt/pytorch/pytorch/torch/_logging/_internal.py:1350] [1/0] 
+[titan] 2026-07-12 21:13:42,553 - root - INFO - [31mstep:  1  [32mloss: 12.34087  [38;2;180;60;0mgrad_norm: 25.5922  [38;2;54;234;195mmemory: 151.49GiB(82.20%)  [34mtps: 2,538  [36mtflops: 122.48  [35mmfu: N/A[39m
+[titan] 2026-07-12 21:13:42,554 - root - INFO - Synchronizing and adjusting timeout for all ProcessGroups to 0:01:40
+[titan] 2026-07-12 21:14:03,413 - root - INFO - [31mstep: 10  [32mloss:  4.63536  [38;2;180;60;0mgrad_norm: 28.5189  [38;2;54;234;195mmemory: 167.38GiB(90.82%)  [34mtps: 28,277  [36mtflops: 1,364.36  [35mmfu: N/A[39m
+[titan] 2026-07-12 21:14:11,957 - root - WARNING - Dataset c4_test is being re-looped (epoch 1)
+[titan] 2026-07-12 21:14:26,049 - root - INFO - [31mstep: 20  [32mloss:  3.23796  [38;2;180;60;0mgrad_norm: 12.6094  [38;2;54;234;195mmemory: 167.38GiB(90.82%)  [34mtps: 28,953  [36mtflops: 1,397.00  [35mmfu: N/A[39m
+[titan] 2026-07-12 21:14:43,693 - root - WARNING - Dataset c4_test is being re-looped (epoch 2)
+[titan] 2026-07-12 21:14:48,786 - root - INFO - [31mstep: 30  [32mloss:  2.92263  [38;2;180;60;0mgrad_norm:  4.9728  [38;2;54;234;195mmemory: 167.38GiB(90.82%)  [34mtps: 28,824  [36mtflops: 1,390.77  [35mmfu: N/A[39m
+[titan] 2026-07-12 21:15:11,637 - root - INFO - [31mstep: 40  [32mloss:  2.83747  [38;2;180;60;0mgrad_norm:  3.5749  [38;2;54;234;195mmemory: 167.38GiB(90.82%)  [34mtps: 28,680  [36mtflops: 1,383.85  [35mmfu: N/A[39m
+[titan] 2026-07-12 21:15:17,914 - root - WARNING - Dataset c4_test is being re-looped (epoch 3)
+[titan] 2026-07-12 21:15:31,607 - root - INFO - [GC] Performing periodic GC collection took 0.02 seconds
+[titan] 2026-07-12 21:15:34,435 - root - INFO - [31mstep: 50  [32mloss:  2.82737  [38;2;180;60;0mgrad_norm:  6.1169  [38;2;54;234;195mmemory: 167.38GiB(90.82%)  [34mtps: 28,747  [36mtflops: 1,387.05  [35mmfu: N/A[39m
+[titan] 2026-07-12 21:15:34,436 - root - INFO - Sleeping 2 seconds for other ranks to complete
+[titan] 2026-07-12 21:15:36,436 - root - INFO - Training completed
+[titan] 2026-07-12 21:15:36,683 - root - INFO - Process group destroyed

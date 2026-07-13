@@ -4,10 +4,15 @@ Date: 2026-07-13
 
 ## Goal
 
-The committed MXFP8 benchmarks (`smoke_fixed_batch_size_results/`, and the 200M-token runs) were
-produced with the torchao MXFP8 **dim1 cast forced to the TRITON kernel**, because the torchao in
-use had no compiled `_C` extension (the CUDA `torchao::mxfp8_quantize` op was unavailable). Those
+The committed MXFP8 benchmarks (`smoke_fixed_batch_size_results/`, and the original 200M-token runs)
+were produced with the torchao MXFP8 **dim1 cast forced to the TRITON kernel**, because the torchao
+in use had no compiled `_C` extension (the CUDA `torchao::mxfp8_quantize` op was unavailable). Those
 notes flagged that the TRITON numbers were therefore a likely **floor** for MXFP8 throughput.
+
+> Update (2026-07-13): motivated by this A/B, the two 200M-token MXFP8 benchmarks were subsequently
+> re-run on the compiled CUDA dim1 kernel and now carry CUDA numbers (eager `20260713_…`, graph
+> `20260713_…`). The `smoke_fixed_batch_size_results/` runs remain TRITON, so the cross-check below
+> is unaffected.
 
 This suite answers the narrow question directly: **how much throughput does the compiled CUDA dim1
 cast kernel recover versus TRITON?** It is a clean A/B — identical torchao, identical batch shapes,

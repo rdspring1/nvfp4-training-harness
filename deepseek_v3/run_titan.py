@@ -15,7 +15,13 @@ ROOT_DIR = PLUGIN_DIR.parent
 TORCHTITAN_DIR = ROOT_DIR / "third_party" / "torchtitan"
 DEEPSEEK_MODEL_DIR = TORCHTITAN_DIR / "torchtitan" / "models" / "deepseek_v3"
 RESULTS_DIR = ROOT_DIR / "deepseek_v3_results"
-NVFP4_OVERRIDE_MODULE = "torchtitan.overrides.nvfp4_grouped_experts"
+NVFP4_LINEAR_MODULE = "torchtitan.overrides.nvfp4_linear"
+NVFP4_GROUPED_EXPERTS_MODULE = "torchtitan.overrides.nvfp4_grouped_experts"
+NVFP4_TARGET_MODULES = {
+    "linear": [NVFP4_LINEAR_MODULE],
+    "grouped-experts": [NVFP4_GROUPED_EXPERTS_MODULE],
+    "both": [NVFP4_LINEAR_MODULE, NVFP4_GROUPED_EXPERTS_MODULE],
+}
 
 TRAINER_MODULES = {
     "eager": "deepseek_v3",
@@ -155,7 +161,7 @@ def _cmd(args: argparse.Namespace) -> list[str]:
             str(args.expert_parallel_degree or 2),
         ]
     if args.nvfp4:
-        cmd += ["--override.imports", NVFP4_OVERRIDE_MODULE]
+        cmd += ["--override.imports", ",".join(NVFP4_TARGET_MODULES[args.nvfp4_target])]
     if args.global_batch_size is not None:
         cmd += ["--training.global_batch_size", str(args.global_batch_size)]
     if args.trainer == "graph":
@@ -385,7 +391,13 @@ def main() -> None:
     parser.add_argument(
         "--nvfp4",
         action="store_true",
-        help=f"Enable torchao NVFP4 grouped experts via {NVFP4_OVERRIDE_MODULE}",
+        help="Enable torchao NVFP4 overrides (select which with --nvfp4-target)",
+    )
+    parser.add_argument(
+        "--nvfp4-target",
+        choices=sorted(NVFP4_TARGET_MODULES),
+        default="both",
+        help="Which NVFP4 override(s) to import when --nvfp4 is set (default: both)",
     )
     parser.add_argument(
         "--compile",

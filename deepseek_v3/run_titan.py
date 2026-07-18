@@ -15,7 +15,7 @@ ROOT_DIR = PLUGIN_DIR.parent
 TORCHTITAN_DIR = ROOT_DIR / "third_party" / "torchtitan"
 DEEPSEEK_MODEL_DIR = TORCHTITAN_DIR / "torchtitan" / "models" / "deepseek_v3"
 RESULTS_DIR = ROOT_DIR / "deepseek_v3_results"
-NVFP4_OVERRIDE_MODULE = "torchtitan_ao_dsv3.overrides"
+NVFP4_OVERRIDE_MODULE = "torchtitan.overrides.nvfp4_grouped_experts"
 
 TRAINER_MODULES = {
     "eager": "deepseek_v3",

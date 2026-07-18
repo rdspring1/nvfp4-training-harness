@@ -17,9 +17,11 @@ DEEPSEEK_MODEL_DIR = TORCHTITAN_DIR / "torchtitan" / "models" / "deepseek_v3"
 RESULTS_DIR = ROOT_DIR / "deepseek_v3_results"
 NVFP4_LINEAR_MODULE = "torchtitan.overrides.nvfp4_linear"
 NVFP4_GROUPED_EXPERTS_MODULE = "torchtitan.overrides.nvfp4_grouped_experts"
+TE_GROUPED_EXPERTS_MODULE = "te_moe_overrides.te_grouped_experts"
 NVFP4_TARGET_MODULES = {
     "linear": [NVFP4_LINEAR_MODULE],
     "grouped-experts": [NVFP4_GROUPED_EXPERTS_MODULE],
+    "te-grouped-experts": [TE_GROUPED_EXPERTS_MODULE],
     "both": [NVFP4_LINEAR_MODULE, NVFP4_GROUPED_EXPERTS_MODULE],
 }
 

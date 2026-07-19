@@ -96,22 +96,30 @@ did not affect the forward crossover — TE forward at E=64 is as good as E=8.
 ## Table 4 — Training fwd+bwd sweep (bf16 vs TorchAO vs TE)
 
 3-GEMM expert MLP, forward+backward, E=8. ms/iter; ratio to bf16 (<1 = beats bf16).
+Re-measured with the persistent `rht_amax` dispatch live (see Table 5).
 
 | tok/exp | rows | bf16 | TorchAO | TE | TorchAO/bf16 | TE/bf16 |
 |--------:|--------:|------:|--------:|------:|-------------:|--------:|
-|     512 |   4,096 |  2.12 |    7.91 |  5.88 |         3.73 |    2.77 |
-|   1,024 |   8,192 |  2.82 |    7.74 |  5.87 |         2.75 |    2.08 |
-|   2,048 |  16,384 |  4.17 |    7.90 |  5.93 |         1.89 |    1.42 |
-|   4,096 |  32,768 |  7.36 |   10.33 |  6.57 |         1.40 | **0.89** ← TE crosses |
-|   8,192 |  65,536 | 14.11 |   15.40 |  8.86 |         1.09 |    0.63 |
-|  16,384 | 131,072 | 30.23 |   25.66 | 15.04 | **0.85** ← AO crosses | 0.50 |
-|  32,768 | 262,144 | 60.75 |   46.18 | 27.60 |         0.76 |    0.45 |
+|     512 |   4,096 |  2.13 |    7.96 |  5.81 |         3.74 |    2.73 |
+|   1,024 |   8,192 |  2.80 |    8.00 |  5.81 |         2.86 |    2.08 |
+|   2,048 |  16,384 |  4.11 |    8.15 |  5.87 |         1.98 |    1.43 |
+|   4,096 |  32,768 |  7.20 |   10.03 |  6.47 |         1.39 | **0.90** ← TE crosses |
+|   8,192 |  65,536 | 13.65 |   14.38 |  8.84 |         1.05 |    0.65 |
+|  16,384 | 131,072 | 28.84 |   23.36 | 14.93 | **0.81** ← AO crosses | 0.52 |
+|  32,768 | 262,144 | 57.74 |   41.38 | 27.42 |         0.72 |    0.48 |
 
 **TE crosses bf16 at ~4K tok/expert; TorchAO at ~16K.** TE beats TorchAO at every
 point (post `unbind` fix) and the lead widens with scale — at 32K tok/expert TE is
-**1.7× faster than TorchAO and 2.2× faster than bf16** (9.5 vs 5.7 vs 4.3 Mtok/s).
+**1.5× faster than TorchAO and 2.1× faster than bf16** (9.6 vs 6.3 vs 4.5 Mtok/s).
 Memory is a tie (~21–23 GiB). So for training, TE is the winner above ~4K
 tok/expert; below ~4K bf16 wins; TorchAO only overtakes bf16 at ~16K.
+
+The persistent `rht_amax` dispatch trims TorchAO **~7–10% at ≥8K tok/expert** (32K:
+46.2→41.4 ms) — a scale-side efficiency win that narrows the TE↔AO gap but does **not**
+move AO's bf16 crossover (still ~16K; interpolated ~10K vs ~11K before). rht_amax is
+one of several quant kernels; the larger `rht_quantize_row_col` (unchanged) still
+governs the break-even. TE's numbers are unchanged (no code change), matching the
+prior sweep within noise.
 
 ## How the crossover point moves
 
@@ -140,28 +148,33 @@ compares one **grouped** launch over `E=8` experts against `E ×` the **single**
 kernel at the same per-expert size — i.e. the cost of just launching the single
 kernel once per expert. `ratio = grouped ÷ (E × single)`; **>1 means grouping is
 slower than per-expert launches.** DSV3-671B activation dim `N=7168`. Raw kernels,
-pre-allocated buffers (times the kernel body only). Repro:
-`nvfp4_grouped_kernel_grouping.py`.
+pre-allocated buffers (times the kernel body only). For `rht_amax`, grouped µs is
+the **dispatched** kernel body — tiled ≤1K avg rows/group, per-group-CTA persistent
+above (the fix, see below). Repro: `nvfp4_grouped_kernel_grouping.py`,
+`nvfp4_group_amax_persistent_proto.py`, `nvfp4_amax_dispatch_table5.py`.
 
 | kernel | tok/exp | grouped µs | E×single µs | ratio |
 |:-------|--------:|-----------:|------------:|------:|
-| **rht_amax** (act) |    512 |    42 |   139 | 0.30 |
-| rht_amax           |  2,048 |   138 |   186 | 0.74 |
-| rht_amax           |  4,096 |   265 |   238 | **1.11** |
-| rht_amax           |  8,192 |   517 |   358 | **1.44** |
+| **rht_amax** (act) |    512 |    43 |   139 | 0.31 |
+| rht_amax           |  2,048 |    78 |   186 | 0.42 |
+| rht_amax           |  4,096 |   130 |   238 | 0.55 |
+| rht_amax           |  8,192 |   232 |   358 | 0.65 |
 | **rht_quantize_row_col** (act) |    512 |    65 |   210 | 0.31 |
 | rht_quantize_row_col           |  4,096 |   445 |   532 | 0.84 |
 | rht_quantize_row_col           |  8,192 |   878 |   953 | 0.92 |
 | **weight_quantize_2d** (gate/up 2048×7168) | — | 287 | 350 | 0.82 |
 | weight_quantize_2d (down 7168×2048)        | — | 286 | 350 | 0.82 |
 
-**`rht_amax` is the one grouped kernel that loses to per-expert launches** above
-~3K tok/expert (**1.44× slower** at 8K). The other two group healthily:
-`rht_quantize_row_col` stays at/below break-even everywhere (0.31→0.92, margin
-shrinking with M but never negative), and `weight_quantize_2d` is a steady ~0.82
-(grouping ~18% faster; no token dependence).
+**`rht_amax` used to be the one grouped kernel that lost to per-expert launches**
+(**1.44× slower** at 8K with the tiled kernel). It no longer does: the public op now
+dispatches to a **per-group-CTA persistent kernel** above 1K avg rows/group, and the
+grouped µs above are that dispatched path. It stays at/below break-even everywhere
+(0.31→0.65) — a **2.25× kernel-body speedup** over the old tiled path at 8K. The other
+two group healthily too: `rht_quantize_row_col` stays at/below break-even everywhere
+(0.31→0.92, margin shrinking with M but never negative), and `weight_quantize_2d` is a
+steady ~0.82 (grouping ~18% faster; no token dependence).
 
-The `rht_amax` deficit is **not** atomic-max contention or grid overhead — an
+The original `rht_amax` deficit was **not** atomic-max contention or grid overhead — an
 E-sweep (`bench_amax_esweep.py`) rules both out. At fixed *total* rows (65536),
 grouped time is flat across E=1→64 (501→563 µs): spreading the same work over 64
 small groups instead of 1 big one barely helps, so per-group amax-scalar contention
@@ -174,9 +187,39 @@ grouped tiled kernel never captures. The gap only *looks* like it grows with row
 count because the single-kernel baseline keeps improving, not because grouping
 degrades.
 
-`rht_quantize_row_col` is the largest **absolute** per-launch cost (878 µs at 8K,
-2× the IO — row+col codes and scales), but it grouping-scales fine. So the
-highest-leverage target is `rht_amax`: it's redundant work — its per-group amax
-reads the same activations the quantize kernel's first pass already touches, so
-fusing amax into that pass removes an entire flat-bandwidth activation re-read
-(the launch that never reaches persistent-kernel efficiency).
+**The fix — a per-group-CTA persistent kernel.** The single kernel's edge was its
+persistent design; the tiled grouped kernel couldn't capture it. Binding
+`num_sms // E` CTAs to each group and striding its tiles with an elementwise
+cumulative max — the single kernel generalized (num_groups=1 recovers it) — restores
+that bandwidth: **~3.5 ns/row at 8K vs the tiled kernel's flat ~8 ns/row**, matching
+the single-tensor floor. It's warp-specializable (elementwise max, no in-loop
+reduction) and validated bitwise against the tiled oracle. Dispatch is gated at 1024
+avg rows/group (`_PERSISTENT_MIN_AVG_ROWS`, the measured crossover); below it the
+tiled kernel still wins — too few tiles per group to amortize the persistent prologue.
+Note: this closes the kernel-body gap; the public op still carries a fixed eager
+dispatch overhead (~320 µs) that is captured away under CUDA graphs in training.
+
+### Tiled vs persistent — the two launch strategies
+
+| | **Tiled (prior)** | **Persistent (fix)** |
+|:--|:--|:--|
+| Grid | `cdiv(M,128) × cdiv(N,128)` — one CTA per (128,128) tile | `E × (#SMs // E) ≈ #SMs` — CTAs binned by group |
+| CTA↔work | occupancy-based; scheduler fills SMs with tile-CTAs | each CTA bound to one group, strides its tiles (`num_stages`-pipelined) |
+| Accumulation | per-tile partial amax | elementwise cumulative max held in registers across the stride loop |
+| Atomics | one `atomic_max` **per tile** (~#tiles total) | one `atomic_max` **per CTA** (~#SMs total) |
+| Tile shape | fixed 128×128 | autotuned (64×128 usually wins) |
+
+The persistent kernel is the single-tensor kernel generalized: `E=1`,
+`CTAS_PER_GROUP=#SMs` recovers it exactly. It relies on **one CTA per group**, so
+dispatch is guarded by `E ≤ #SMs` *and* avg rows/group `≥ 1024`.
+
+**If `#SMs < E`** (`num_tensors > num_sms`) the guard fails and dispatch **falls back
+to the tiled kernel** — otherwise `ctas_per_group = #SMs // E` would be 0, giving an
+empty `grid = E × 0` launch. On GB200 (**152 SMs**) with realistic `E ≤ 64` this never
+triggers; the fallback is a safety net for small-GPU / pathological-E cases, not a
+training path. (The standalone prototype instead clamps `max(1, #SMs // E)`, keeping
+one CTA per group and oversubscribing when `E > #SMs` — correct, but a different
+choice than the upstreamed fallback.)
+
+`rht_quantize_row_col` is now the largest remaining **absolute** per-launch cost
+(878 µs at 8K, 2× the IO — row+col codes and scales) and groups fine.

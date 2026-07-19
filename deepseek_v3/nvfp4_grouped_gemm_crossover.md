@@ -96,30 +96,30 @@ did not affect the forward crossover — TE forward at E=64 is as good as E=8.
 ## Table 4 — Training fwd+bwd sweep (bf16 vs TorchAO vs TE)
 
 3-GEMM expert MLP, forward+backward, E=8. ms/iter; ratio to bf16 (<1 = beats bf16).
-Re-measured with the persistent `rht_amax` dispatch live (see Table 5).
+Re-measured with **both** TorchAO quant-kernel fixes live: persistent `rht_amax`
+dispatch and autotuned grouped quantize launches (see Table 5).
 
 | tok/exp | rows | bf16 | TorchAO | TE | TorchAO/bf16 | TE/bf16 |
 |--------:|--------:|------:|--------:|------:|-------------:|--------:|
-|     512 |   4,096 |  2.13 |    7.96 |  5.81 |         3.74 |    2.73 |
-|   1,024 |   8,192 |  2.80 |    8.00 |  5.81 |         2.86 |    2.08 |
-|   2,048 |  16,384 |  4.11 |    8.15 |  5.87 |         1.98 |    1.43 |
-|   4,096 |  32,768 |  7.20 |   10.03 |  6.47 |         1.39 | **0.90** ← TE crosses |
-|   8,192 |  65,536 | 13.65 |   14.38 |  8.84 |         1.05 |    0.65 |
-|  16,384 | 131,072 | 28.84 |   23.36 | 14.93 | **0.81** ← AO crosses | 0.52 |
-|  32,768 | 262,144 | 57.74 |   41.38 | 27.42 |         0.72 |    0.48 |
+|     512 |   4,096 |  2.13 |    8.45 |  6.44 |         3.96 |    3.02 |
+|   1,024 |   8,192 |  2.80 |    8.18 |  6.23 |         2.92 |    2.23 |
+|   2,048 |  16,384 |  4.16 |    8.33 |  6.27 |         2.00 |    1.51 |
+|   4,096 |  32,768 |  7.18 |    9.28 |  6.75 |         1.29 | **0.94** ← TE crosses |
+|   8,192 |  65,536 | 13.57 |   13.25 |  8.97 | **0.98** ← AO crosses | 0.66 |
+|  16,384 | 131,072 | 28.55 |   21.46 | 14.93 |         0.75 |    0.52 |
+|  32,768 | 262,144 | 57.62 |   37.99 | 27.21 |         0.66 |    0.47 |
 
-**TE crosses bf16 at ~4K tok/expert; TorchAO at ~16K.** TE beats TorchAO at every
-point (post `unbind` fix) and the lead widens with scale — at 32K tok/expert TE is
-**1.5× faster than TorchAO and 2.1× faster than bf16** (9.6 vs 6.3 vs 4.5 Mtok/s).
-Memory is a tie (~21–23 GiB). So for training, TE is the winner above ~4K
-tok/expert; below ~4K bf16 wins; TorchAO only overtakes bf16 at ~16K.
+**TE crosses bf16 at ~4K tok/expert; TorchAO now at ~8K** (was ~16K before the quant
+fixes). TE still beats TorchAO at every point and the lead widens with scale — at 32K
+tok/expert TE is **1.4× faster than TorchAO and 2.1× faster than bf16** (9.6 vs 6.9 vs
+4.6 Mtok/s). Memory is a tie (~21–23 GiB). So for training, TE wins above ~4K
+tok/expert; below ~4K bf16 wins; TorchAO now overtakes bf16 at ~8K.
 
-The persistent `rht_amax` dispatch trims TorchAO **~7–10% at ≥8K tok/expert** (32K:
-46.2→41.4 ms) — a scale-side efficiency win that narrows the TE↔AO gap but does **not**
-move AO's bf16 crossover (still ~16K; interpolated ~10K vs ~11K before). rht_amax is
-one of several quant kernels; the larger `rht_quantize_row_col` (unchanged) still
-governs the break-even. TE's numbers are unchanged (no code change), matching the
-prior sweep within noise.
+Two TorchAO quant-kernel fixes compound to **~15% faster AO at scale** and pull its bf16
+crossover in from ~16K to ~8K: (1) the persistent `rht_amax` dispatch (Table 5, ~7–10%),
+and (2) autotuning the grouped quantize launches (`num_warps` 8→4, ~1.4× on the dominant
+`rht_quantize_row_col`, ~8% end-to-end). Both are pure launch/kernel changes — no algorithm
+change, memory unchanged. TE is untouched (matches the prior sweep within noise).
 
 ## How the crossover point moves
 
@@ -129,17 +129,19 @@ prior sweep within noise.
 | **TE forward (quant + GEMM)** | **~8K** (measured) | TE's fused quantize is nearly flat (~0.85 ms floor), so it amortizes ~6× earlier than TorchAO's forward |
 | **TorchAO full fwd GEMM (quant + GEMM)** | **~50K** (extrapolated; full/bf16 still 1.2 at 32K) | Triton quantization tax is ~8–11× the matmul, pushing the break-even out ~40–60× |
 | **Training fwd+bwd — TE (3-GEMM MLP)** | **~4K** (measured) | TE's low, flat fused-quant floor + a cheap grouped backward amortize over the fwd + 2 bwd GEMMs |
-| **Training fwd+bwd — TorchAO (3-GEMM MLP)** | **~16K** (measured) | growing Triton quant tax (~8–11× the matmul), only partly amortized over fwd + 2 bwd GEMMs |
+| **Training fwd+bwd — TorchAO (3-GEMM MLP)** | **~8K** (measured; was ~16K) | Triton quant tax, cut ~15% by the persistent `rht_amax` dispatch + autotuned grouped quantize launches |
 
 The 4-bit kernels pay off early (~1K tok/expert), but the backends diverge on the
 per-call quantization tax. **TE** is the stronger training backend: fused, flat
 quant → crossover ~4K tok/expert, beating both bf16 (above ~4K) and TorchAO
-(everywhere). **TorchAO**'s per-call Triton re-quantization grows with M and pushes
-its training crossover out to ~16K; `torch.compile` gives only a constant-factor win
-(best ~25% mid-range, ~5% at large M) and does **not** shift it — the cost lives
-inside opaque hand-written Triton kernels dynamo cannot fuse into. The high-leverage
-TorchAO optimizations are algorithmic: caching quantized weights across microbatches
-and a cheaper activation transform.
+(everywhere). **TorchAO**'s per-call Triton re-quantization grows with M and pushed
+its training crossover out to ~16K; two kernel-level fixes (persistent `rht_amax`
+dispatch + autotuned grouped quantize launches) have since cut ~15% and pulled it in
+to ~8K. `torch.compile` gives only a constant-factor win (best ~25% mid-range, ~5% at
+large M) and does **not** shift it — the cost lives inside opaque hand-written Triton
+kernels dynamo cannot fuse into. The remaining high-leverage TorchAO optimizations are
+algorithmic: caching quantized weights across microbatches and a cheaper activation
+transform.
 
 ## Table 5 — Are TorchAO's grouped quant kernels worth grouping?
 
@@ -222,4 +224,22 @@ one CTA per group and oversubscribing when `E > #SMs` — correct, but a differe
 choice than the upstreamed fallback.)
 
 `rht_quantize_row_col` is now the largest remaining **absolute** per-launch cost
-(878 µs at 8K, 2× the IO — row+col codes and scales) and groups fine.
+(878 µs at 8K, 2× the IO — row+col codes and scales) and groups fine. The persistent
+strategy does **not** transfer to it: a per-group-CTA persistent prototype
+(`nvfp4_group_quantize_persistent_proto.py`, bitwise-validated) is **~15% slower**
+than the tiled kernel (0.85× at 8K). Unlike the launch-bound amax reduction, the
+quantize kernels are element-wise maps (output == input size, no accumulator, no
+atomics) and compute/IO-bound — their single-tensor twins are already
+persistent+autotuned yet the plain tiled grouped kernel still matches them per row, so
+there is no launch overhead for persistence to recover. The same holds for
+`weight_quantize_2d` (already 0.82, token-independent).
+
+The real lever for these kernels is **autotuning**, not persistence. The grouped
+quantize kernels ship with a fixed `num_warps=8/num_stages=3` launch while their
+single-tensor twins are `@triton.autotune`d. Sweeping that config space
+(`nvfp4_group_quantize_autotune_sweep.py`, all configs bitwise-validated) shows a
+**~1.4× speedup** on `rht_quantize_row_col` (882→618 µs at 8K), entirely from
+`num_warps=4` (the 128×128 tile is already optimal; 8 warps over-subscribes registers
+on this quantize-heavy body). This is the largest remaining quant kernel, so it's a
+near-free, high-leverage fix — add `@triton.autotune` (or just drop to `num_warps=4`)
+to `_group_rht_quantize_row_col_kernel` and `_group_weight_quantize_2d_kernel`.

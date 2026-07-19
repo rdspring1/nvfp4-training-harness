@@ -45,6 +45,13 @@ def build(backend, num_experts):
         m = TEGroupedExperts.Config(**kw).build().cuda()
         m._ensure_te_state()
         return m
+    if backend == "mxfp8":
+        from torchtitan.components.quantization.mx import (
+            _get_mxfp8_grouped_experts_cls,
+        )
+
+        cls = _get_mxfp8_grouped_experts_cls(GroupedExperts)
+        return cls.Config(**kw).build().cuda()
     raise SystemExit(f"unknown backend {backend}")
 
 

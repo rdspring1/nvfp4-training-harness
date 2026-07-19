@@ -93,27 +93,42 @@ Note: TE's graph-safe RHT quant kernel caps at 64 experts/launch
 chunking), but that is moot at realistic training EP (~4 experts/GPU). Expert count
 did not affect the forward crossover — TE forward at E=64 is as good as E=8.
 
-## Table 4 — Training fwd+bwd sweep (bf16 vs TorchAO vs TE)
+## Table 4 — Training fwd+bwd sweep (bf16 vs TorchAO vs TE vs MXFP8)
 
 3-GEMM expert MLP, forward+backward, E=8. ms/iter; ratio to bf16 (<1 = beats bf16).
 Re-measured with **both** TorchAO quant-kernel fixes live: persistent `rht_amax`
 dispatch and autotuned grouped quantize launches (see Table 5).
 
-| tok/exp | rows | bf16 | TorchAO | TE | TorchAO/bf16 | TE/bf16 |
-|--------:|--------:|------:|--------:|------:|-------------:|--------:|
-|     512 |   4,096 |  2.13 |    8.45 |  6.44 |         3.96 |    3.02 |
-|   1,024 |   8,192 |  2.80 |    8.18 |  6.23 |         2.92 |    2.23 |
-|   2,048 |  16,384 |  4.16 |    8.33 |  6.27 |         2.00 |    1.51 |
-|   4,096 |  32,768 |  7.18 |    9.28 |  6.75 |         1.29 | **0.94** ← TE crosses |
-|   8,192 |  65,536 | 13.57 |   13.25 |  8.97 | **0.98** ← AO crosses | 0.66 |
-|  16,384 | 131,072 | 28.55 |   21.46 | 14.93 |         0.75 |    0.52 |
-|  32,768 | 262,144 | 57.62 |   37.99 | 27.21 |         0.66 |    0.47 |
+MXFP8 uses torchtitan's first-class `MXFP8GroupedExpertsConverter` (recipe `mxfp8_rceil`,
+e4m3 data + e8m0 block-32 scales), measured on the **CUDA-built** torchao (the `_C_mxfp8`
+extension; the editable `USE_CPP=0` build lacks it). Same harness, same GB200; bf16 column
+is the shared ratio reference.
+
+| tok/exp | rows | bf16 | TorchAO | TE | MXFP8 | TorchAO/bf16 | TE/bf16 | MXFP8/bf16 |
+|--------:|--------:|------:|--------:|------:|------:|-------------:|--------:|-----------:|
+|     512 |   4,096 |  2.13 |    8.45 |  6.44 |  4.72 |         3.96 |    3.02 |       2.22 |
+|   1,024 |   8,192 |  2.80 |    8.18 |  6.23 |  4.75 |         2.92 |    2.23 |       1.70 |
+|   2,048 |  16,384 |  4.16 |    8.33 |  6.27 |  4.73 |         2.00 |    1.51 |       1.14 |
+|   4,096 |  32,768 |  7.18 |    9.28 |  6.75 |  6.13 |         1.29 | **0.94** ← TE | **0.85** ← MXFP8 |
+|   8,192 |  65,536 | 13.57 |   13.25 |  8.97 | 10.36 | **0.98** ← AO | 0.66 |       0.76 |
+|  16,384 | 131,072 | 28.55 |   21.46 | 14.93 | 19.00 |         0.75 |    0.52 |       0.67 |
+|  32,768 | 262,144 | 57.62 |   37.99 | 27.21 | 36.72 |         0.66 |    0.47 |       0.64 |
 
 **TE crosses bf16 at ~4K tok/expert; TorchAO now at ~8K** (was ~16K before the quant
 fixes). TE still beats TorchAO at every point and the lead widens with scale — at 32K
 tok/expert TE is **1.4× faster than TorchAO and 2.1× faster than bf16** (9.6 vs 6.9 vs
-4.6 Mtok/s). Memory is a tie (~21–23 GiB). So for training, TE wins above ~4K
+4.6 Mtok/s). Memory is a tie (~21–24 GiB). So for training, TE wins above ~4K
 tok/expert; below ~4K bf16 wins; TorchAO now overtakes bf16 at ~8K.
+
+**MXFP8 also crosses bf16 at ~4K and beats TorchAO-NVFP4 at every M ≥ 4K.** Its MX 8-bit
+quant is a single cheap block-scale cast (flat ~4.7 ms floor to 2K, like TE's fused quant),
+so it amortizes far earlier than TorchAO's 4-bit RHT + amax + row/col Triton stack — MXFP8
+is the lowest-overhead backend below ~4K and at 4K even edges TE (6.13 vs 6.75 ms). But
+8-bit compute tops out at ~2× bf16, so above ~8K TE-NVFP4's 4-bit tensor cores pull ahead
+and TorchAO-NVFP4 catches up (at 32K: TE 27.2 < MXFP8 36.7 ≈ TorchAO 38.0 < bf16 57.6 ms).
+**Ordering at scale: TE < MXFP8 ≈ TorchAO < bf16** — MXFP8 is the safe early-crossover
+middle ground (higher precision, earliest amortization); the 4-bit backends only win the
+top end once their quant tax is paid off.
 
 Two TorchAO quant-kernel fixes compound to **~15% faster AO at scale** and pull its bf16
 crossover in from ~16K to ~8K: (1) the persistent `rht_amax` dispatch (Table 5, ~7–10%),
@@ -130,6 +145,7 @@ change, memory unchanged. TE is untouched (matches the prior sweep within noise)
 | **TorchAO full fwd GEMM (quant + GEMM)** | **~50K** (extrapolated; full/bf16 still 1.2 at 32K) | Triton quantization tax is ~8–11× the matmul, pushing the break-even out ~40–60× |
 | **Training fwd+bwd — TE (3-GEMM MLP)** | **~4K** (measured) | TE's low, flat fused-quant floor + a cheap grouped backward amortize over the fwd + 2 bwd GEMMs |
 | **Training fwd+bwd — TorchAO (3-GEMM MLP)** | **~8K** (measured; was ~16K) | Triton quant tax, cut ~15% by the persistent `rht_amax` dispatch + autotuned grouped quantize launches |
+| **Training fwd+bwd — MXFP8 (3-GEMM MLP)** | **~4K** (measured) | MX 8-bit single block-scale cast → flat ~4.7 ms quant floor (like TE), amortizes early; beats TorchAO-NVFP4 at all M≥4K, but 8-bit compute (~2× bf16) yields to TE-NVFP4's 4-bit above ~8K |
 
 The 4-bit kernels pay off early (~1K tok/expert), but the backends diverge on the
 per-call quantization tax. **TE** is the stronger training backend: fused, flat

@@ -155,16 +155,28 @@ pre-allocated buffers (times the kernel body only). Repro:
 | **weight_quantize_2d** (gate/up 2048×7168) | — | 287 | 350 | 0.82 |
 | weight_quantize_2d (down 7168×2048)        | — | 286 | 350 | 0.82 |
 
-**`rht_amax` is the one pathological grouped kernel** — grouping *loses* to
-per-expert launches above ~3K tok/expert (**1.44× slower** at 8K). Its tiled grid +
-per-group atomic-max scales worse than the single persistent kernel as row count
-grows. The other two group healthily: `rht_quantize_row_col` stays at/below
-break-even everywhere (0.31→0.92, margin shrinking with M but never negative), and
-`weight_quantize_2d` is a steady ~0.82 (grouping ~18% faster; no token dependence).
+**`rht_amax` is the one grouped kernel that loses to per-expert launches** above
+~3K tok/expert (**1.44× slower** at 8K). The other two group healthily:
+`rht_quantize_row_col` stays at/below break-even everywhere (0.31→0.92, margin
+shrinking with M but never negative), and `weight_quantize_2d` is a steady ~0.82
+(grouping ~18% faster; no token dependence).
+
+The `rht_amax` deficit is **not** atomic-max contention or grid overhead — an
+E-sweep (`bench_amax_esweep.py`) rules both out. At fixed *total* rows (65536),
+grouped time is flat across E=1→64 (501→563 µs): spreading the same work over 64
+small groups instead of 1 big one barely helps, so per-group amax-scalar contention
+is not the driver. At fixed tok/expert, grouped time is exactly linear in E (~64 µs
+per group, zero cross-group interference). The grouped kernel runs at a **constant
+~0.0078 µs/row** regardless of M. What actually moves the ratio is the *single*
+kernel: it is a persistent kernel that amortizes launch/setup over rows, so its
+µs/row falls from 0.019 (M=1024) to 0.0033 (M=65536) — a 5.7× efficiency gain the
+grouped tiled kernel never captures. The gap only *looks* like it grows with row
+count because the single-kernel baseline keeps improving, not because grouping
+degrades.
 
 `rht_quantize_row_col` is the largest **absolute** per-launch cost (878 µs at 8K,
 2× the IO — row+col codes and scales), but it grouping-scales fine. So the
 highest-leverage target is `rht_amax`: it's redundant work — its per-group amax
 reads the same activations the quantize kernel's first pass already touches, so
-fusing amax into that pass removes both the pathological grouped launch and a full
-activation re-read.
+fusing amax into that pass removes an entire flat-bandwidth activation re-read
+(the launch that never reaches persistent-kernel efficiency).

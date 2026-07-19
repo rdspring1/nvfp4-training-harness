@@ -165,7 +165,10 @@ class TEGroupedExperts(GroupedExperts):
         flow back to the base parameters.
         """
         num_gemms = weight_EOI.size(0)
-        weights = [weight_EOI[i] for i in range(num_gemms)]
+        # unbind (one op) rather than per-index select: its backward stacks the E
+        # weight grads into a single (E, O, I) tensor, instead of E full-size
+        # select_backward scatter-adds that dominate the grouped backward at large E.
+        weights = list(torch.unbind(weight_EOI, dim=0))
         # use_bias=False, but the Function indexes biases[0]; pass placeholders.
         biases = [x_Rin.new_empty(0) for _ in range(num_gemms)]
 

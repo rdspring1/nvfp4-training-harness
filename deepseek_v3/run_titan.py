@@ -3,6 +3,7 @@
 
 import argparse
 import datetime
+import math
 import os
 import re
 import subprocess
@@ -43,6 +44,9 @@ FLAVOR_DEFAULTS = {
     "debugmodel": {"batch_size": 8, "seq_len": 2048, "steps": 10},
     "16b": {"batch_size": 1, "seq_len": 1024, "steps": 1},
 }
+# 16b MoE routing (torchtitan/models/deepseek_v3/__init__.py:341,359)
+MOE_16B_NUM_EXPERTS = 64
+MOE_16B_TOP_K = 6
 HF_ASSET_PATHS = {
     "16b": TORCHTITAN_DIR / "assets" / "hf" / "deepseek-moe-16b-base",
 }
@@ -295,6 +299,15 @@ def run(args: argparse.Namespace) -> None:
     print(f"GPUs: {','.join(gpus)}")
     print(f"Processes: {args.nproc_per_node}")
     print(f"Batch {args.batch_size} x seq {args.seq_len}")
+    if args.target_tokens_per_expert is not None:
+        ep = args.expert_parallel_degree or 2
+        tokens = args.batch_size * args.seq_len
+        per_expert = tokens * MOE_16B_TOP_K * ep / MOE_16B_NUM_EXPERTS
+        aggregate = tokens * MOE_16B_TOP_K
+        print(
+            f"MoE M: T={tokens:,} (batch*seq) -> per-expert M={per_expert:,.0f} "
+            f"(EP={ep}, {MOE_16B_NUM_EXPERTS // ep} local experts), aggregate/rank={aggregate:,}"
+        )
     if args.global_batch_size is not None:
         print(f"Global batch: {args.global_batch_size}")
     print(f"Steps: {args.steps}")
@@ -384,6 +397,13 @@ def main() -> None:
         help="Expert parallelism degree override",
     )
     parser.add_argument(
+        "--target-tokens-per-expert",
+        type=int,
+        default=None,
+        help="For --flavor 16b: size local batch so each local expert's grouped-GEMM sees "
+        "~this many tokens (per-expert M). Overrides --batch-size",
+    )
+    parser.add_argument(
         "--dataset",
         type=str,
         default="c4_test",
@@ -414,6 +434,14 @@ def main() -> None:
         args.batch_size = defaults["batch_size"]
     if args.seq_len is None:
         args.seq_len = defaults["seq_len"]
+    if args.target_tokens_per_expert is not None:
+        if args.flavor != "16b":
+            raise SystemExit("--target-tokens-per-expert is only supported for --flavor 16b")
+        if args.target_tokens_per_expert <= 0:
+            raise SystemExit("--target-tokens-per-expert must be positive")
+        ep = args.expert_parallel_degree or 2
+        per_unit_batch = MOE_16B_TOP_K * ep * args.seq_len / MOE_16B_NUM_EXPERTS
+        args.batch_size = math.ceil(args.target_tokens_per_expert / per_unit_batch)
     run(args)
 
 

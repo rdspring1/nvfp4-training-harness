@@ -1,100 +1,97 @@
-"""Grouped-GEMM crossover: bf16 vs NVFP4 (pure kernel, pre-quantized) vs NVFP4
-(quantize+GEMM), random data, one grouped GEMM at 671B gate-proj shape
-(K=7168, N=2048, E=8). Sweeps tokens/expert. Produces the two tables in
-nvfp4_grouped_gemm_crossover.md.
+"""Training (fwd+bwd) grouped-experts crossover sweep: bf16 vs TorchAO NVFP4 vs TE
+NVFP4, at DSV3-671B expert dims (dim=7168, hidden=2048). Runs the 3-GEMM expert
+MLP (gate/up/down) forward+backward and sweeps tokens/expert to find where each
+NVFP4 backend overtakes bf16. Produces Table 4 in nvfp4_grouped_gemm_crossover.md.
 
-  pure  = 4-bit tensor-core matmul only (inputs pre-quantized once)  -> compute crossover
-  full  = pure + on-the-fly RHT quantize of x and weights           -> real training cost
+128-aligned token counts -> no TorchAO group-pad waste. One backend per process
+for clean peak-memory numbers.
 
-Run from the repo root so `torchao` is importable:
-    PYTHONPATH=. python deepseek_v3/nvfp4_grouped_gemm_crossover.py
+Run from the repo root so `torchtitan`, `torchao`, and `te_moe_overrides` import:
+    PYTHONPATH=. python deepseek_v3/nvfp4_grouped_gemm_crossover.py <bf16|torchao|te>
 """
 
+import sys
+
 import torch
-import torch.nn.functional as F
 
-from torchao.prototype.moe_training.nvfp4_training.nvfp4_grouped_mm import (
-    _scaled_grouped_mm,
-)
-from torchao.prototype.moe_training.nvfp4_training.group_hadamard_amax_triton import (
-    triton_group_rht_amax,
-)
-from torchao.prototype.moe_training.nvfp4_training.group_rht_quantize_row_col_triton import (
-    triton_group_rht_quantize_row_col,
-)
-from torchao.prototype.moe_training.nvfp4_training.group_quantize_2d_triton import (
-    triton_group_weight_quantize_2d,
-)
-from torchao.prototype.moe_training.nvfp4_training.group_hadamard_utils import (
-    VARYING_FIRST_DIM,
-)
+from torchtitan.models.common.moe import GroupedExperts
+from torchtitan.models.common.token_dispatcher import LocalTokenDispatcher
 
-K = 7168
-N = 2048
-E = 8
-TOKENS = [128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768]
-SIGN = list(1 if i % 2 == 0 else -1 for i in range(16))
-FP4 = torch.float4_e2m1fn_x2
-WARMUP, ITERS = 5, 20
+DIM = 7168
+HIDDEN = 2048
+TOP_K = 8
+WARMUP = 3
+ITERS = 10
+
+EXPERTS = [8]
+TOKENS = [512, 1024, 2048, 4096, 8192, 16384, 32768]
 
 
-def time_ms(fn):
+def build(backend, num_experts):
+    disp = LocalTokenDispatcher.Config(num_experts=num_experts, top_k=TOP_K)
+    kw = dict(dim=DIM, hidden_dim=HIDDEN, num_experts=num_experts, token_dispatcher=disp)
+    if backend == "bf16":
+        return GroupedExperts.Config(**kw).build().cuda()
+    if backend == "torchao":
+        from torchtitan.overrides.nvfp4_grouped_experts import NVFP4GroupedExperts
+
+        m = NVFP4GroupedExperts.Config(**kw).build().cuda()
+        m._init_self_buffers(buffer_device=torch.device("cuda"))
+        return m
+    if backend == "te":
+        from te_moe_overrides.te_grouped_experts import TEGroupedExperts
+
+        m = TEGroupedExperts.Config(**kw).build().cuda()
+        m._ensure_te_state()
+        return m
+    raise SystemExit(f"unknown backend {backend}")
+
+
+def bench(m, num_experts, tpe):
+    num_tokens = torch.full((num_experts,), tpe, device="cuda", dtype=torch.int64)
+    rows = int(num_tokens.sum())
+    x = torch.randn(rows, DIM, device="cuda", dtype=torch.bfloat16, requires_grad=True)
+
+    def step():
+        m.zero_grad(set_to_none=True)
+        x.grad = None
+        out = m._experts_forward(x, num_tokens)
+        out.backward(torch.ones_like(out))
+
     for _ in range(WARMUP):
-        fn()
+        step()
     torch.cuda.synchronize()
-    s = torch.cuda.Event(enable_timing=True)
-    e = torch.cuda.Event(enable_timing=True)
-    s.record()
+    torch.cuda.reset_peak_memory_stats()
+    start = torch.cuda.Event(enable_timing=True)
+    end = torch.cuda.Event(enable_timing=True)
+    start.record()
     for _ in range(ITERS):
-        fn()
-    e.record()
+        step()
+    end.record()
     torch.cuda.synchronize()
-    return s.elapsed_time(e) / ITERS
-
-
-def quantize(x, w, offs):
-    M = x.shape[0]
-    logical = offs[-1:]
-    xc_amax, xr_amax = triton_group_rht_amax(
-        x, SIGN, offs, E, M, K, VARYING_FIRST_DIM, logical_packed_length=logical
-    )
-    xr_codes, xr_sf, _, _ = triton_group_rht_quantize_row_col(
-        x, SIGN, offs, E, M, K, VARYING_FIRST_DIM, xr_amax, xc_amax,
-        rng_state=None, enable_stochastic_rounding=False, logical_packed_length=logical,
-    )
-    w_amax = w.float().abs().amax(dim=(1, 2))
-    w_codes, w_sf, _, _ = triton_group_weight_quantize_2d(w, w_amax, E)
-    return xr_codes, xr_sf, xr_amax, w_codes, w_sf, w_amax
-
-
-def gemm(xr_codes, xr_sf, xr_amax, w_codes, w_sf, w_amax, offs):
-    return _scaled_grouped_mm(
-        xr_codes.view(FP4),
-        w_codes.view(FP4).transpose(-2, -1),
-        xr_sf, xr_amax, w_sf.flatten(1), w_amax, offs,
-    )
+    ms = start.elapsed_time(end) / ITERS
+    peak = torch.cuda.max_memory_allocated() / 1024**3
+    return ms, rows / (ms / 1e3), peak
 
 
 def main():
+    backend = sys.argv[1]
     torch.manual_seed(0)
-    print(f"# grouped GEMM  K={K} N={N} E={E}  (gate proj)  random data")
-    print(f"{'tok/exp':>7} {'M':>7} {'bf16':>8} {'nvfp4_pure':>11} {'nvfp4_full':>11}"
-          f" {'pure/bf16':>9} {'full/bf16':>9}")
-    for tpe in TOKENS:
-        M = E * tpe
-        x = torch.randn(M, K, device="cuda", dtype=torch.bfloat16)
-        w = (0.02 * torch.randn(E, N, K, device="cuda", dtype=torch.bfloat16))
-        offs = torch.arange(tpe, M + 1, tpe, device="cuda", dtype=torch.int32)
-
-        wt = w.transpose(-2, -1).contiguous()  # (E, K, N) for bf16 grouped mm
-        t_bf16 = time_ms(lambda: torch._grouped_mm(x, wt, offs=offs))
-
-        q = quantize(x, w, offs)
-        t_pure = time_ms(lambda: gemm(*q, offs))
-        t_full = time_ms(lambda: gemm(*quantize(x, w, offs), offs))
-
-        print(f"{tpe:>7} {M:>7} {t_bf16:>8.3f} {t_pure:>11.3f} {t_full:>11.3f}"
-              f" {t_pure/t_bf16:>9.2f} {t_full/t_bf16:>9.2f}")
+    print(f"# backend={backend} fwd+bwd dim={DIM} hidden={HIDDEN}")
+    print(f"{'experts':>7} {'tok/exp':>7} {'rows':>7} {'ms':>8} {'Mtok/s':>8} {'mem_GiB':>7}")
+    for e in EXPERTS:
+        m = build(backend, e)
+        with torch.no_grad():
+            for p in (m.w1_EFD, m.w2_EDF, m.w3_EFD):
+                p.copy_(0.02 * torch.randn_like(p))
+        for tpe in TOKENS:
+            try:
+                ms, tok_s, peak = bench(m, e, tpe)
+                print(f"{e:>7} {tpe:>7} {e*tpe:>7} {ms:>8.3f} {tok_s/1e6:>8.3f} {peak:>7.2f}")
+            except Exception as ex:
+                print(f"{e:>7} {tpe:>7} {e*tpe:>7}   FAIL: {type(ex).__name__}: {str(ex)[:50]}")
+        del m
+        torch.cuda.empty_cache()
 
 
 if __name__ == "__main__":

@@ -132,3 +132,39 @@ its training crossover out to ~16K; `torch.compile` gives only a constant-factor
 inside opaque hand-written Triton kernels dynamo cannot fuse into. The high-leverage
 TorchAO optimizations are algorithmic: caching quantized weights across microbatches
 and a cheaper activation transform.
+
+## Table 5 — Are TorchAO's grouped quant kernels worth grouping?
+
+Each of TorchAO's three forward NVFP4 quant kernels has a single-expert twin. This
+compares one **grouped** launch over `E=8` experts against `E ×` the **single**
+kernel at the same per-expert size — i.e. the cost of just launching the single
+kernel once per expert. `ratio = grouped ÷ (E × single)`; **>1 means grouping is
+slower than per-expert launches.** DSV3-671B activation dim `N=7168`. Raw kernels,
+pre-allocated buffers (times the kernel body only). Repro:
+`nvfp4_grouped_kernel_grouping.py`.
+
+| kernel | tok/exp | grouped µs | E×single µs | ratio |
+|:-------|--------:|-----------:|------------:|------:|
+| **rht_amax** (act) |    512 |    42 |   139 | 0.30 |
+| rht_amax           |  2,048 |   138 |   186 | 0.74 |
+| rht_amax           |  4,096 |   265 |   238 | **1.11** |
+| rht_amax           |  8,192 |   517 |   358 | **1.44** |
+| **rht_quantize_row_col** (act) |    512 |    65 |   210 | 0.31 |
+| rht_quantize_row_col           |  4,096 |   445 |   532 | 0.84 |
+| rht_quantize_row_col           |  8,192 |   878 |   953 | 0.92 |
+| **weight_quantize_2d** (gate/up 2048×7168) | — | 287 | 350 | 0.82 |
+| weight_quantize_2d (down 7168×2048)        | — | 286 | 350 | 0.82 |
+
+**`rht_amax` is the one pathological grouped kernel** — grouping *loses* to
+per-expert launches above ~3K tok/expert (**1.44× slower** at 8K). Its tiled grid +
+per-group atomic-max scales worse than the single persistent kernel as row count
+grows. The other two group healthily: `rht_quantize_row_col` stays at/below
+break-even everywhere (0.31→0.92, margin shrinking with M but never negative), and
+`weight_quantize_2d` is a steady ~0.82 (grouping ~18% faster; no token dependence).
+
+`rht_quantize_row_col` is the largest **absolute** per-launch cost (878 µs at 8K,
+2× the IO — row+col codes and scales), but it grouping-scales fine. So the
+highest-leverage target is `rht_amax`: it's redundant work — its per-group amax
+reads the same activations the quantize kernel's first pass already touches, so
+fusing amax into that pass removes both the pathological grouped launch and a full
+activation re-read.

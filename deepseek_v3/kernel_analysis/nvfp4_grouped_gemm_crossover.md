@@ -143,6 +143,44 @@ kernels dynamo cannot fuse into. The remaining high-leverage TorchAO optimizatio
 algorithmic: caching quantized weights across microbatches and a cheaper activation
 transform.
 
+## Which operating point is realistic? (2025 default vs 2026 frontier)
+
+The crossover only matters relative to the **M/expert** an actual run produces:
+
+```
+M/expert            = local_tokens × top_k × EP / num_experts
+total routed rows/GPU = local_tokens × top_k   (EP-invariant)
+```
+
+**The torchtitan DSV3-671B default is *not* a representative operating point.** It ships
+`local_batch=4, seq_len=4096, EP=2` → M = 2·4·4096·8/256 = **1,024 tok/expert** — the
+bottom of the table, where bf16 *beats* NVFP4 (AO 2.9×, TE 2.2× at 1K). That's an
+`EP=2` small-scale/template artifact (128 experts/GPU, tiny per-expert GEMMs), not the
+production layout. DeepSeek's actual training used EP=64 → M ≈ 8K–32K.
+
+**Summer-2026 frontier MoE configs land deep in the NVFP4-winning regime.** Assuming a
+1M-context packed sequence sharded across 64 token-parallel ranks (16,384 local tokens/GPU):
+
+| Model (routed experts, top-k) | EP | E_local | M/expert | rows/GPU | ~AO/bf16 | ~TE/bf16 |
+|:------|---:|---:|---:|---:|---:|---:|
+| DeepSeek V4-Pro (384, top-6) | 64 | 6 | 16,384 | 98,304 | 0.75 | 0.52 |
+| GLM-5.2 (256, top-8) | 32 | 8 | 16,384 | 131,072 | 0.75 | 0.52 |
+| GLM-5.2 | 64 | 4 | 32,768 | 131,072 | 0.66 | 0.47 |
+| Kimi K3 (896, top-16) | 64 | 14 | 18,725 | 262,144 | 0.74 | 0.51 |
+| Kimi K3 | 128 | 7 | 37,449 | 262,144 | ~0.65 | ~0.46 |
+
+Every config sits at **M ≥ 16K tok/expert** — 2–9× past the crossover — so NVFP4 is
+**~1.3–1.5× faster than bf16 (TorchAO) and ~2× (TE)** across the board. Long context +
+high top-k (6/8/16) keep per-expert M large *even with heavy expert sharding*: token
+parallelism cuts local_tokens but top_k multiplies routed rows back up. **EP is the
+knob** — it trades E_local for M/expert at constant total work, so raising EP pushes
+*deeper* into the NVFP4 win (GLM: EP 32→64 moves M 16K→32K, AO 0.75→0.66), paying only
+more all-to-all. All five have avg rows/group ≫ the 1K persistent-`rht_amax` threshold
+and E_local ≪ 152 SMs, so the persistent + autotune fixes are always active here.
+
+(Ratios interpolated from Table 4's E=8, DSV3 dims — regime holds regardless of exact
+expert dims since the crossover is governed by M.)
+
 ## Table 5 — Are TorchAO's grouped quant kernels worth grouping?
 
 Each of TorchAO's three forward NVFP4 quant kernels has a single-expert twin. This
@@ -152,8 +190,7 @@ kernel once per expert. `ratio = grouped ÷ (E × single)`; **>1 means grouping 
 slower than per-expert launches.** DSV3-671B activation dim `N=7168`. Raw kernels,
 pre-allocated buffers (times the kernel body only). For `rht_amax`, grouped µs is
 the **dispatched** kernel body — tiled ≤1K avg rows/group, per-group-CTA persistent
-above (the fix, see below). Repro: `nvfp4_grouped_kernel_grouping.py`,
-`nvfp4_group_amax_persistent_proto.py`, `nvfp4_amax_dispatch_table5.py`.
+above (the fix, see below). Repro: `nvfp4_grouped_kernel_grouping.py`.
 
 | kernel | tok/exp | grouped µs | E×single µs | ratio |
 |:-------|--------:|-----------:|------------:|------:|
@@ -177,7 +214,7 @@ two group healthily too: `rht_quantize_row_col` stays at/below break-even everyw
 steady ~0.82 (grouping ~18% faster; no token dependence).
 
 The original `rht_amax` deficit was **not** atomic-max contention or grid overhead — an
-E-sweep (`bench_amax_esweep.py`) rules both out. At fixed *total* rows (65536),
+E-sweep rules both out. At fixed *total* rows (65536),
 grouped time is flat across E=1→64 (501→563 µs): spreading the same work over 64
 small groups instead of 1 big one barely helps, so per-group amax-scalar contention
 is not the driver. At fixed tok/expert, grouped time is exactly linear in E (~64 µs
@@ -225,9 +262,8 @@ choice than the upstreamed fallback.)
 
 `rht_quantize_row_col` is now the largest remaining **absolute** per-launch cost
 (878 µs at 8K, 2× the IO — row+col codes and scales) and groups fine. The persistent
-strategy does **not** transfer to it: a per-group-CTA persistent prototype
-(`nvfp4_group_quantize_persistent_proto.py`, bitwise-validated) is **~15% slower**
-than the tiled kernel (0.85× at 8K). Unlike the launch-bound amax reduction, the
+strategy does **not** transfer to it: a bitwise-validated per-group-CTA persistent
+prototype is **~15% slower** than the tiled kernel (0.85× at 8K). Unlike the launch-bound amax reduction, the
 quantize kernels are element-wise maps (output == input size, no accumulator, no
 atomics) and compute/IO-bound — their single-tensor twins are already
 persistent+autotuned yet the plain tiled grouped kernel still matches them per row, so
@@ -237,7 +273,7 @@ there is no launch overhead for persistence to recover. The same holds for
 The real lever for these kernels is **autotuning**, not persistence. The grouped
 quantize kernels ship with a fixed `num_warps=8/num_stages=3` launch while their
 single-tensor twins are `@triton.autotune`d. Sweeping that config space
-(`nvfp4_group_quantize_autotune_sweep.py`, all configs bitwise-validated) shows a
+(all configs bitwise-validated) shows a
 **~1.4× speedup** on `rht_quantize_row_col` (882→618 µs at 8K), entirely from
 `num_warps=4` (the 128×128 tile is already optimal; 8 warps over-subscribes registers
 on this quantize-heavy body). This is the largest remaining quant kernel, so it's a

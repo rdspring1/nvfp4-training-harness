@@ -21,7 +21,7 @@ nvfp4_grouped_gemm_crossover.md. Run from the torchao repo root (needs its
 `benchmarks` and `torchao` packages importable):
 
     cd third_party/torchao && \\
-        PYTHONPATH=. python ../../deepseek_v3/nvfp4_grouped_kernel_grouping.py
+        PYTHONPATH=. python ../../deepseek_v3/kernel_analysis/nvfp4_grouped_kernel_grouping.py
 """
 
 import torch

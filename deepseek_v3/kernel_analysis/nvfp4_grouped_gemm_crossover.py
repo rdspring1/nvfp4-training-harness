@@ -6,8 +6,9 @@ NVFP4 backend overtakes bf16. Produces Table 4 in nvfp4_grouped_gemm_crossover.m
 128-aligned token counts -> no TorchAO group-pad waste. One backend per process
 for clean peak-memory numbers.
 
-Run from the repo root so `torchtitan`, `torchao`, and `te_moe_overrides` import:
-    PYTHONPATH=. python deepseek_v3/nvfp4_grouped_gemm_crossover.py <bf16|torchao|te>
+Run from the repo root; PYTHONPATH=deepseek_v3 puts `te_moe_overrides` on the path
+(`torchtitan`/`torchao` are editable-installed):
+    PYTHONPATH=deepseek_v3 python deepseek_v3/kernel_analysis/nvfp4_grouped_gemm_crossover.py <bf16|torchao|te>
 """
 
 import sys

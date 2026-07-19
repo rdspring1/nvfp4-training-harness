@@ -25,6 +25,11 @@ NVFP4_TARGET_MODULES = {
     "te-grouped-experts": [TE_GROUPED_EXPERTS_MODULE],
     "both": [NVFP4_LINEAR_MODULE, NVFP4_GROUPED_EXPERTS_MODULE],
 }
+# MXFP8 MoE grouped-experts via torchtitan's first-class converter, bridged into
+# the override registry (mxfp8_overrides/). Needs the CUDA-built torchao (the
+# _C_mxfp8 extension); the editable USE_CPP=0 build lacks the MXFP8 quant kernel.
+MXFP8_GROUPED_EXPERTS_MODULE = "mxfp8_overrides.mxfp8_grouped_experts"
+MXFP8_TORCHAO_BUILD = Path("/opt/pytorch/ao/build/lib.linux-aarch64-cpython-312")
 
 TRAINER_MODULES = {
     "eager": "deepseek_v3",
@@ -120,7 +125,7 @@ def _ensure_assets(flavor: str) -> None:
 def _parse_gpus(args: argparse.Namespace) -> list[str]:
     if args.gpus is None:
         if args.flavor == "debugmodel":
-            return ["0", "1"] if args.nvfp4 else [str(args.gpu)]
+            return ["0", "1"] if (args.nvfp4 or args.mxfp8) else [str(args.gpu)]
         return ["0", "1", "2", "3"]
 
     gpus = [gpu.strip() for gpu in args.gpus.split(",") if gpu.strip()]
@@ -159,7 +164,7 @@ def _cmd(args: argparse.Namespace) -> list[str]:
             "--parallelism.expert_parallel_degree",
             str(args.expert_parallel_degree or 2),
         ]
-    elif args.nvfp4:
+    elif args.nvfp4 or args.mxfp8:
         cmd += [
             "--parallelism.data_parallel_shard_degree",
             str(args.nproc_per_node),
@@ -168,6 +173,8 @@ def _cmd(args: argparse.Namespace) -> list[str]:
         ]
     if args.nvfp4:
         cmd += ["--override.imports", ",".join(NVFP4_TARGET_MODULES[args.nvfp4_target])]
+    elif args.mxfp8:
+        cmd += ["--override.imports", MXFP8_GROUPED_EXPERTS_MODULE]
     if args.global_batch_size is not None:
         cmd += ["--training.global_batch_size", str(args.global_batch_size)]
     if args.trainer == "graph":
@@ -268,19 +275,28 @@ def run(args: argparse.Namespace) -> None:
         raise SystemExit("--global-batch-size must be positive")
     if args.expert_parallel_degree is not None and args.expert_parallel_degree <= 0:
         raise SystemExit("--expert-parallel-degree must be positive")
+    if args.nvfp4 and args.mxfp8:
+        raise SystemExit("--nvfp4 and --mxfp8 are mutually exclusive")
+    if args.mxfp8 and not MXFP8_TORCHAO_BUILD.exists():
+        raise SystemExit(
+            f"--mxfp8 requires the CUDA-built torchao at {MXFP8_TORCHAO_BUILD} "
+            "(the _C_mxfp8 extension); the editable USE_CPP=0 build lacks it."
+        )
 
     gpus = _parse_gpus(args)
     args.nproc_per_node = len(gpus)
     if args.flavor == "16b" and args.nproc_per_node != 4:
         raise SystemExit("--flavor 16b requires exactly 4 GPUs via --gpus")
-    if args.flavor == "debugmodel" and args.nvfp4 and args.nproc_per_node != 2:
-        raise SystemExit("--nvfp4 debugmodel requires exactly 2 GPUs via --gpus")
+    if args.flavor == "debugmodel" and (args.nvfp4 or args.mxfp8) and args.nproc_per_node != 2:
+        raise SystemExit(
+            "--nvfp4/--mxfp8 debugmodel requires exactly 2 GPUs via --gpus"
+        )
 
     _ensure_assets(args.flavor)
 
     RESULTS_DIR.mkdir(exist_ok=True)
     ts = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    precision = "nvfp4" if args.nvfp4 else "bf16"
+    precision = "mxfp8" if args.mxfp8 else "nvfp4" if args.nvfp4 else "bf16"
     compile_suffix = "_compile" if args.trainer == "graph" or args.compile else ""
     log_path = RESULTS_DIR / (
         f"{ts}_titan_deepseek_v3_{args.flavor}_{args.trainer}_{precision}"
@@ -288,7 +304,12 @@ def run(args: argparse.Namespace) -> None:
     )
     cmd = _cmd(args)
     env = {**os.environ, "CUDA_VISIBLE_DEVICES": ",".join(gpus)}
-    if args.nvfp4:
+    if args.mxfp8:
+        # CUDA-built torchao first (MXFP8 _C_mxfp8 kernel), then plugin dir for the override.
+        env["PYTHONPATH"] = (
+            f"{MXFP8_TORCHAO_BUILD}:{PLUGIN_DIR}:{os.environ.get('PYTHONPATH', '')}"
+        )
+    elif args.nvfp4:
         env["PYTHONPATH"] = f"{PLUGIN_DIR}:{os.environ.get('PYTHONPATH', '')}"
 
     print()
@@ -420,6 +441,12 @@ def main() -> None:
         choices=sorted(NVFP4_TARGET_MODULES),
         default="both",
         help="Which NVFP4 override(s) to import when --nvfp4 is set (default: both)",
+    )
+    parser.add_argument(
+        "--mxfp8",
+        action="store_true",
+        help="Enable MXFP8 MoE grouped-experts quantization (torchtitan MXFP8 converter; "
+        "requires the CUDA-built torchao). Mutually exclusive with --nvfp4",
     )
     parser.add_argument(
         "--compile",

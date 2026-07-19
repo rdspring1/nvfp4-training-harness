@@ -93,6 +93,26 @@ Note: TE's graph-safe RHT quant kernel caps at 64 experts/launch
 chunking), but that is moot at realistic training EP (~4 experts/GPU). Expert count
 did not affect the forward crossover — TE forward at E=64 is as good as E=8.
 
+## Table 4 — Training fwd+bwd sweep (bf16 vs TorchAO vs TE)
+
+3-GEMM expert MLP, forward+backward, E=8. ms/iter; ratio to bf16 (<1 = beats bf16).
+
+| tok/exp | rows | bf16 | TorchAO | TE | TorchAO/bf16 | TE/bf16 |
+|--------:|--------:|------:|--------:|------:|-------------:|--------:|
+|     512 |   4,096 |  2.12 |    7.91 |  5.88 |         3.73 |    2.77 |
+|   1,024 |   8,192 |  2.82 |    7.74 |  5.87 |         2.75 |    2.08 |
+|   2,048 |  16,384 |  4.17 |    7.90 |  5.93 |         1.89 |    1.42 |
+|   4,096 |  32,768 |  7.36 |   10.33 |  6.57 |         1.40 | **0.89** ← TE crosses |
+|   8,192 |  65,536 | 14.11 |   15.40 |  8.86 |         1.09 |    0.63 |
+|  16,384 | 131,072 | 30.23 |   25.66 | 15.04 | **0.85** ← AO crosses | 0.50 |
+|  32,768 | 262,144 | 60.75 |   46.18 | 27.60 |         0.76 |    0.45 |
+
+**TE crosses bf16 at ~4K tok/expert; TorchAO at ~16K.** TE beats TorchAO at every
+point (post `unbind` fix) and the lead widens with scale — at 32K tok/expert TE is
+**1.7× faster than TorchAO and 2.2× faster than bf16** (9.5 vs 5.7 vs 4.3 Mtok/s).
+Memory is a tie (~21–23 GiB). So for training, TE is the winner above ~4K
+tok/expert; below ~4K bf16 wins; TorchAO only overtakes bf16 at ~16K.
+
 ## How the crossover point moves
 
 | Regime | Crossover (tokens/expert) | Why |
@@ -100,12 +120,15 @@ did not affect the forward crossover — TE forward at E=64 is as good as E=8.
 | **Pure 4-bit GEMM** | **~1K** | raw tensor-core compute; only kernel launch overhead to amortize |
 | **TE forward (quant + GEMM)** | **~8K** (measured) | TE's fused quantize is nearly flat (~0.85 ms floor), so it amortizes ~6× earlier than TorchAO's forward |
 | **TorchAO full fwd GEMM (quant + GEMM)** | **~50K** (extrapolated; full/bf16 still 1.2 at 32K) | Triton quantization tax is ~8–11× the matmul, pushing the break-even out ~40–60× |
-| **Real training fwd+bwd (3-GEMM expert MLP)** | **~16K** (TorchAO, measured) | the quantized activations/weights + RHT are computed once and **reused across the forward + 2 backward GEMMs**, amortizing the quant tax over ~3× more matmul work |
+| **Training fwd+bwd — TE (3-GEMM MLP)** | **~4K** (measured) | TE's low, flat fused-quant floor + a cheap grouped backward amortize over the fwd + 2 bwd GEMMs |
+| **Training fwd+bwd — TorchAO (3-GEMM MLP)** | **~16K** (measured) | growing Triton quant tax (~8–11× the matmul), only partly amortized over fwd + 2 bwd GEMMs |
 
-The 4-bit kernels pay off early (~1K tok/expert), but this override's per-call
-Triton **re-quantization** is the bottleneck that moves the practical training
-crossover out to ~16K tokens/expert. `torch.compile` on the full path gives only a
-constant-factor win (best ~25% mid-range, ~5% at large M) and does **not** shift
-the crossover — the cost lives inside opaque hand-written Triton kernels that
-dynamo cannot fuse into. The high-leverage optimizations are algorithmic:
-caching quantized weights across microbatches and a cheaper activation transform.
+The 4-bit kernels pay off early (~1K tok/expert), but the backends diverge on the
+per-call quantization tax. **TE** is the stronger training backend: fused, flat
+quant → crossover ~4K tok/expert, beating both bf16 (above ~4K) and TorchAO
+(everywhere). **TorchAO**'s per-call Triton re-quantization grows with M and pushes
+its training crossover out to ~16K; `torch.compile` gives only a constant-factor win
+(best ~25% mid-range, ~5% at large M) and does **not** shift it — the cost lives
+inside opaque hand-written Triton kernels dynamo cannot fuse into. The high-leverage
+TorchAO optimizations are algorithmic: caching quantized weights across microbatches
+and a cheaper activation transform.

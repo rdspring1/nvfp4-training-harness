@@ -156,7 +156,8 @@ total routed rows/GPU = local_tokens × top_k   (EP-invariant)
 `local_batch=4, seq_len=4096, EP=2` → M = 2·4·4096·8/256 = **1,024 tok/expert** — the
 bottom of the table, where bf16 *beats* NVFP4 (AO 2.9×, TE 2.2× at 1K). That's an
 `EP=2` small-scale/template artifact (128 experts/GPU, tiny per-expert GEMMs), not the
-production layout. DeepSeek's actual training used EP=64 → M ≈ 8K–32K.
+production layout. DeepSeek's actual training used EP=64 → M ≈ 8K–32K at `local_batch`
+1–4, and **131K at `local_batch=16`** (M scales with `local_batch`; verified below).
 
 **Summer-2026 frontier MoE configs land deep in the NVFP4-winning regime.** Assuming a
 1M-context packed sequence sharded across 64 token-parallel ranks (16,384 local tokens/GPU):
@@ -180,6 +181,80 @@ and E_local ≪ 152 SMs, so the persistent + autotune fixes are always active he
 
 (Ratios interpolated from Table 4's E=8, DSV3 dims — regime holds regardless of exact
 expert dims since the crossover is governed by M.)
+
+### Verified: how M/expert is actually produced (instrumented torchtitan run)
+
+The formula above is not just arithmetic — the token flow was traced end-to-end in
+torchtitan (`trainer.py`, `models/common/moe.py`, `token_dispatcher.py`) and confirmed
+with an instrumented run, because the M an operating point produces is easy to
+mis-derive by a factor of `local_batch` or `EP`.
+
+**One `model.forward` processes the entire local batch — all sequences at once, never
+one.** `trainer.py` splits a step into `gradient_accumulation_steps = global_batch /
+(local_batch × dp)` microbatches, but **each microbatch is the full `(local_batch,
+seq_len)` tensor** (`trainer.py:772,791`); the MoE flattens it to `T = local_batch ×
+seq_len` rows before routing (`moe.py:129`). Grad-accum repeats the full-local-batch
+forward — it never slices down to a sequence. So "one microbatch = one sequence" is
+wrong; `M` scales with `local_batch`, not with 1.
+
+Empirical trace — debugmodel, EP=1, `local_batch=16, seq=4096`, `MOE_INSTR=1`
+(env-gated hook at the MoE call site):
+
+```
+Trainer: local batch 16, global batch 16, gradient accumulation steps 1, seq 4096
+moe_forward   T(pre_routing_tokens)=65536  K=3  routed_slots(T*K)=196608   # every forward
+experts_forward e=8  R(sumM)=196608  M_i=[…4902 … 55023 …]                 # ∑M = T×top_k
+```
+
+- `T = 65,536 = 16 × 4096` on **every** forward → full local batch, confirmed.
+- At EP=1, `∑Mᵢ = T × top_k` exactly (the grouped GEMM sees all locally-routed slots).
+- `Mᵢ` is **heavily skewed** — 4.9K–55K vs 24.6K mean (≈2.2× hot/mean), not uniform.
+
+**The EP all-to-all conserves rows per GPU; it does not divide them.** With EP>1
+(`token_dispatcher.py:460,475`) a rank ships its `T×top_k` routed slots out to `EP`
+ranks (~`T×top_k / EP` to each) and receives a comparable count back for its
+`E_local = E/EP` experts. By send≈receive symmetry the grouped GEMM's aggregate stays
+pinned near `T×top_k`:
+
+```
+∑Mᵢ per expert GPU ≈ local_tokens × top_k          (conserved — NOT ÷ EP)
+per-expert M       = ∑Mᵢ / E_local = local_tokens × top_k × EP / E
+```
+
+Dividing the aggregate by `EP` gives the per-(source-rank → destination-GPU) shard, not
+a per-GPU or per-expert quantity. Raising `EP` gives each GPU *fewer* experts, so it
+*concentrates* rows per expert (pushes deeper into NVFP4), at constant aggregate/GPU.
+
+**The stated DSV3 recipe (`local_batch=16, seq=4096, top-8, 256 experts, EP=64`) lands
+at M ≈ 131K — 16× past the ~8K AO crossover, deep in the NVFP4 win:**
+
+```
+∑Mᵢ per GPU = 65,536 × 8              = 524,288 rows   (E_local = 256/64 = 4)
+per-expert M = 65,536 × 8 × 64 / 256  = 131,072 rows
+```
+
+It is skew-robust: even a cold expert at ~0.4× mean ≈ 52K is ~6× past crossover, and
+the 128-row group padding wastes ≤ 128/131072 ≈ **0.1%** at this scale (vs ~1–3% near
+the crossover). `M` scales linearly with `local_batch` — the only knob that moves it:
+
+| local_batch (seq=4096, EP=64) | per-expert M | ∑Mᵢ/GPU | vs AO crossover ~8K |
+|--:|--:|--:|:--|
+| 16 (stated recipe) | 131,072 | 524,288 | 16× — deep NVFP4 |
+| 4 (torchtitan `deepseek_v3_671b` default) | 32,768 | 131,072 | 4× — solid NVFP4 |
+| 1 | 8,192 | 32,768 | ~1× — at the crossover |
+
+**Grouped-GEMM launches per optimizer step.** Each MoE layer issues **3
+`torch._grouped_mm`** (w1, w3, w2; `moe.py:97-108`); profiler count on one layer's
+fwd+bwd is **9 `aten::_grouped_mm`** (3 fwd + 6 bwd). DSV3-671B has **58 MoE layers**
+(`n_layers=61, n_dense=3`), so per optimizer step:
+
+```
+≈ 9 × 58 × grad_accum_steps  ≈ 522·g grouped-GEMM launches   (no activation ckpt)
+≈ 12 × 58 × grad_accum_steps ≈ 696·g                          (with SelectiveAC recompute)
+```
+
+(SelectiveAC re-runs the 3 forward GEMMs in backward — the instrumented run showed the
+forward path executing twice per step, matching 12/layer.)
 
 ## Table 5 — Are TorchAO's grouped quant kernels worth grouping?
 

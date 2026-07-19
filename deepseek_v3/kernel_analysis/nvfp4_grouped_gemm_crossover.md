@@ -130,6 +130,14 @@ and TorchAO-NVFP4 catches up (at 32K: TE 27.2 < MXFP8 36.7 ≈ TorchAO 38.0 < bf
 middle ground (higher precision, earliest amortization); the 4-bit backends only win the
 top end once their quant tax is paid off.
 
+**TE-NVFP4 vs MXFP8 crossover (~6K tok/expert).** These two swap which is faster where
+4-bit compute overtakes 8-bit's lower quant floor. Below ~4K MXFP8 wins on its cheaper cast
+(at 512: MXFP8 4.72 vs TE 6.44 ms — **MXFP8 1.36×**); the lines cross between 4K and 8K;
+above that TE-NVFP4 pulls ahead and widens — **TE 1.15× at 8K, 1.27× at 16K, 1.35× at 32K**
+(27.2 vs 36.7 ms). So at production M (≥16K) **TE-NVFP4 is ~1.3× faster than MXFP8**, while
+below ~6K MXFP8 is the faster (and higher-precision) choice — pick MXFP8 for small/short-context
+per-expert loads, TE-NVFP4 for large.
+
 Two TorchAO quant-kernel fixes compound to **~15% faster AO at scale** and pull its bf16
 crossover in from ~16K to ~8K: (1) the persistent `rht_amax` dispatch (Table 5, ~7–10%),
 and (2) autotuning the grouped quantize launches (`num_warps` 8→4, ~1.4× on the dominant

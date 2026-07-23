@@ -44,7 +44,6 @@ PLUGIN_DIR = Path(__file__).resolve().parent
 ROOT_DIR = PLUGIN_DIR.parent
 TORCHTITAN_DIR = ROOT_DIR / "third_party" / "torchtitan"
 RESULTS_DIR = ROOT_DIR / "llama3_results"
-NVFP4_OVERRIDE_MODULE = "torchtitan.overrides.nvfp4_linear"
 MXFP8_OVERRIDE_MODULE = "torchtitan.overrides.mxfp8_linear"
 SEQ_LEN = 2048
 LR = 3e-4
@@ -165,8 +164,8 @@ def _hf_assets_path_for_config(base_config: str) -> str | None:
 
 
 def _precision_flags(nvfp4: bool, mxfp8: bool) -> list[str]:
-    if nvfp4:
-        return ["--override.imports", NVFP4_OVERRIDE_MODULE]
+    # NVFP4 is selected via the `_nvfp4` config flavor (NVFP4LinearConverter baked
+    # in, compile enabled), not an override import. MXFP8 still uses its override.
     if mxfp8:
         return ["--override.imports", MXFP8_OVERRIDE_MODULE]
     return []
@@ -235,7 +234,8 @@ def run_single(args):
     smoke = args.smoke
     base_config = "llama3_debugmodel" if smoke else "llama3_8b"
     module = _trainer_module(args.graph)
-    config = _trainer_config(base_config, args.graph)
+    flavor = base_config + ("_nvfp4" if args.nvfp4 else "")
+    config = _trainer_config(flavor, args.graph)
     dataset = "c4_test" if smoke else "c4"
     steps = 10 if smoke else SINGLE_STEPS_CEILING
     wall_hours = 5 / 60 if smoke else SINGLE_WALL_HOURS
@@ -444,7 +444,8 @@ def run_multi(args):
     )
     base_config = "llama3_8b" if needs_8b or not smoke else "llama3_debugmodel"
     module = _trainer_module(args.graph)
-    config = _trainer_config(base_config, args.graph)
+    flavor = base_config + ("_nvfp4" if args.nvfp4 else "")
+    config = _trainer_config(flavor, args.graph)
     if args.data is None:
         args.data = "c4_test" if smoke else "c4"
     wall_hours = MULTI_SMOKE_WALL_HOURS if smoke else MULTI_WALL_HOURS
@@ -656,7 +657,7 @@ def main():
     single_precision.add_argument(
         "--nvfp4",
         action="store_true",
-        help=f"Enable torchao NVFP4 via override module {NVFP4_OVERRIDE_MODULE}",
+        help="Enable NVFP4 via the `_nvfp4` config flavor (converter; compile baked in)",
     )
     single_precision.add_argument(
         "--mxfp8",
@@ -721,7 +722,7 @@ def main():
     multi_precision.add_argument(
         "--nvfp4",
         action="store_true",
-        help=f"Enable torchao NVFP4 via override module {NVFP4_OVERRIDE_MODULE}",
+        help="Enable NVFP4 via the `_nvfp4` config flavor (converter; compile baked in)",
     )
     multi_precision.add_argument(
         "--mxfp8",

@@ -163,6 +163,16 @@ def _hf_assets_path_for_config(base_config: str) -> str | None:
     return None
 
 
+def _nvfp4_flavor_suffix(args) -> str:
+    # NVFP4 flavors bake in the converter + compile; `_nvfp4_mixed` additionally
+    # keeps the last ~15% of decoder layers in bf16 (bf16-tail recipe).
+    if args.nvfp4_mixed:
+        return "_nvfp4_mixed"
+    if args.nvfp4:
+        return "_nvfp4"
+    return ""
+
+
 def _precision_flags(nvfp4: bool, mxfp8: bool) -> list[str]:
     # NVFP4 is selected via the `_nvfp4` config flavor (NVFP4LinearConverter baked
     # in, compile enabled), not an override import. MXFP8 still uses its override.
@@ -171,7 +181,9 @@ def _precision_flags(nvfp4: bool, mxfp8: bool) -> list[str]:
     return []
 
 
-def _precision_tag(nvfp4: bool, mxfp8: bool) -> str:
+def _precision_tag(nvfp4: bool, mxfp8: bool, nvfp4_mixed: bool = False) -> str:
+    if nvfp4_mixed:
+        return "nvfp4_mixed"
     if nvfp4:
         return "nvfp4"
     if mxfp8:
@@ -234,14 +246,14 @@ def run_single(args):
     smoke = args.smoke
     base_config = "llama3_debugmodel" if smoke else "llama3_8b"
     module = _trainer_module(args.graph)
-    flavor = base_config + ("_nvfp4" if args.nvfp4 else "")
+    flavor = base_config + _nvfp4_flavor_suffix(args)
     config = _trainer_config(flavor, args.graph)
     dataset = "c4_test" if smoke else "c4"
     steps = 10 if smoke else SINGLE_STEPS_CEILING
     wall_hours = 5 / 60 if smoke else SINGLE_WALL_HOURS
     gpu = args.gpu
 
-    precision = _precision_tag(args.nvfp4, args.mxfp8)
+    precision = _precision_tag(args.nvfp4, args.mxfp8, args.nvfp4_mixed)
     label_parts = [precision]
     if args.graph:
         label_parts.append("graph")
@@ -408,10 +420,17 @@ def _multi_cmd(
 
 
 def _multi_label(
-    exp: dict, compile_enabled: bool, nvfp4: bool, mxfp8: bool, graph: bool
+    exp: dict,
+    compile_enabled: bool,
+    nvfp4: bool,
+    mxfp8: bool,
+    graph: bool,
+    nvfp4_mixed: bool = False,
 ) -> str:
     parts = [exp["name"]]
-    if nvfp4:
+    if nvfp4_mixed:
+        parts.append("nvfp4_mixed")
+    elif nvfp4:
         parts.append("nvfp4")
     elif mxfp8:
         parts.append("mxfp8")
@@ -435,7 +454,7 @@ def run_multi(args):
     # smoke run with a TP shape.
     needs_8b = (
         smoke
-        and args.nvfp4
+        and (args.nvfp4 or args.nvfp4_mixed)
         and any(
             e["tp"] > 1
             for e in MULTI_EXPERIMENTS
@@ -444,7 +463,7 @@ def run_multi(args):
     )
     base_config = "llama3_8b" if needs_8b or not smoke else "llama3_debugmodel"
     module = _trainer_module(args.graph)
-    flavor = base_config + ("_nvfp4" if args.nvfp4 else "")
+    flavor = base_config + _nvfp4_flavor_suffix(args)
     config = _trainer_config(flavor, args.graph)
     if args.data is None:
         args.data = "c4_test" if smoke else "c4"
@@ -462,7 +481,7 @@ def run_multi(args):
             f"Choices: {[e['name'] for e in MULTI_EXPERIMENTS]}"
         )
 
-    precision = _precision_tag(args.nvfp4, args.mxfp8)
+    precision = _precision_tag(args.nvfp4, args.mxfp8, args.nvfp4_mixed)
     print()
     print("=" * 72)
     print(
@@ -500,7 +519,7 @@ def run_multi(args):
         world_size = exp["tp"] * exp["fsdp"]
         batch_size = args.batch_size or exp["batch_size"]
         label = _multi_label(
-            exp, args.compile, args.nvfp4, args.mxfp8, args.graph
+            exp, args.compile, args.nvfp4, args.mxfp8, args.graph, args.nvfp4_mixed
         )
         log_path = RESULTS_DIR / f"{ts}_titan_multi_{label}.txt"
 
@@ -660,6 +679,11 @@ def main():
         help="Enable NVFP4 via the `_nvfp4` config flavor (converter; compile baked in)",
     )
     single_precision.add_argument(
+        "--nvfp4-mixed",
+        action="store_true",
+        help="Enable mixed NVFP4 via the `_nvfp4_mixed` flavor (last ~15%% of layers kept in bf16)",
+    )
+    single_precision.add_argument(
         "--mxfp8",
         action="store_true",
         help=f"Enable torchao MXFP8 via override module {MXFP8_OVERRIDE_MODULE}",
@@ -723,6 +747,11 @@ def main():
         "--nvfp4",
         action="store_true",
         help="Enable NVFP4 via the `_nvfp4` config flavor (converter; compile baked in)",
+    )
+    multi_precision.add_argument(
+        "--nvfp4-mixed",
+        action="store_true",
+        help="Enable mixed NVFP4 via the `_nvfp4_mixed` flavor (last ~15%% of layers kept in bf16)",
     )
     multi_precision.add_argument(
         "--mxfp8",

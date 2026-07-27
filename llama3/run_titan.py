@@ -383,6 +383,7 @@ def _multi_cmd(
     nvfp4: bool,
     mxfp8: bool,
     hf_assets_path: str | None = None,
+    nvfp4_mixed: bool = False,
 ) -> list[str]:
     cmd = [
         "torchrun",
@@ -416,6 +417,11 @@ def _multi_cmd(
         cmd += ["--optimizer.param-groups.0.optimizer-kwargs.lr", str(LR)]
     if hf_assets_path is not None:
         cmd += ["--hf-assets-path", hf_assets_path]
+    # NVFP4's GEMM is an opaque op run on local shards inside spmd.local_map; only
+    # the spmd_types backend re-types activations through that boundary, so TP (tp>1)
+    # needs it or the rowwise input reaches the wrong placement and local_map raises.
+    if (nvfp4 or nvfp4_mixed) and exp["tp"] > 1:
+        cmd += ["--parallelism.spmd_backend", "spmd_types"]
     return cmd + _compile_flags(compile_enabled) + _precision_flags(nvfp4, mxfp8)
 
 
@@ -551,6 +557,7 @@ def run_multi(args):
             args.nvfp4,
             args.mxfp8,
             hf_assets_path,
+            args.nvfp4_mixed,
         )
         env = _plugin_env(
             {"OMP_NUM_THREADS": os.environ.get("OMP_NUM_THREADS", "1")}

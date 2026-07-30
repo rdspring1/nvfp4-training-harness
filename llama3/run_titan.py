@@ -163,29 +163,17 @@ def _hf_assets_path_for_config(base_config: str) -> str | None:
     return None
 
 
-def _nvfp4_flavor_suffix(args) -> str:
-    # NVFP4 flavors bake in the converter + compile; `_nvfp4_mixed` additionally
-    # keeps the last ~15% of decoder layers in bf16 (bf16-tail recipe).
-    if args.nvfp4_mixed:
-        return "_nvfp4_mixed"
-    if args.nvfp4:
-        return "_nvfp4"
-    return ""
-
-
-def _precision_flags(nvfp4: bool, mxfp8: bool) -> list[str]:
-    # NVFP4 is selected via the `_nvfp4` config flavor (NVFP4LinearConverter baked
-    # in, compile enabled), not an override import. MXFP8 still uses its override.
+def _precision_flags(mxfp8: bool) -> list[str]:
+    # NVFP4 is selected via the `llama3_8b_nvfp4_mixed` config (converter and
+    # compile baked in), not an override import. MXFP8 still uses its override.
     if mxfp8:
         return ["--override.imports", MXFP8_OVERRIDE_MODULE]
     return []
 
 
-def _precision_tag(nvfp4: bool, mxfp8: bool, nvfp4_mixed: bool = False) -> str:
+def _precision_tag(mxfp8: bool, nvfp4_mixed: bool = False) -> str:
     if nvfp4_mixed:
         return "nvfp4_mixed"
-    if nvfp4:
-        return "nvfp4"
     if mxfp8:
         return "mxfp8"
     return "bf16"
@@ -209,7 +197,6 @@ def _single_cmd(
     steps: int,
     dataset: str,
     compile_enabled: bool,
-    nvfp4: bool,
     mxfp8: bool,
     hf_assets_path: str | None = None,
 ) -> list[str]:
@@ -239,21 +226,31 @@ def _single_cmd(
         cmd += ["--optimizer.param-groups.0.optimizer-kwargs.lr", str(LR)]
     if hf_assets_path is not None:
         cmd += ["--hf-assets-path", hf_assets_path]
-    return cmd + _compile_flags(compile_enabled) + _precision_flags(nvfp4, mxfp8)
+    return cmd + _compile_flags(compile_enabled) + _precision_flags(mxfp8)
 
 
 def run_single(args):
     smoke = args.smoke
-    base_config = "llama3_debugmodel" if smoke else "llama3_8b"
+    if args.nvfp4_mixed and args.graph:
+        raise SystemExit(
+            "--nvfp4-mixed does not support --graph; "
+            "TorchTitan only provides llama3_8b_nvfp4_mixed"
+        )
+    base_config = (
+        "llama3_8b" if args.nvfp4_mixed or not smoke else "llama3_debugmodel"
+    )
     module = _trainer_module(args.graph)
-    flavor = base_config + _nvfp4_flavor_suffix(args)
-    config = _trainer_config(flavor, args.graph)
+    config = (
+        "llama3_8b_nvfp4_mixed"
+        if args.nvfp4_mixed
+        else _trainer_config(base_config, args.graph)
+    )
     dataset = "c4_test" if smoke else "c4"
     steps = 10 if smoke else SINGLE_STEPS_CEILING
     wall_hours = 5 / 60 if smoke else SINGLE_WALL_HOURS
     gpu = args.gpu
 
-    precision = _precision_tag(args.nvfp4, args.mxfp8, args.nvfp4_mixed)
+    precision = _precision_tag(args.mxfp8, args.nvfp4_mixed)
     label_parts = [precision]
     if args.graph:
         label_parts.append("graph")
@@ -271,7 +268,14 @@ def run_single(args):
     )
     print(f"Batch {SINGLE_BATCH} × seq {SEQ_LEN} = {SINGLE_BATCH * SEQ_LEN} tok/step")
     print(f"Steps ceiling: {steps:,}")
-    print(f"Mode: {'SMOKE (debugmodel)' if smoke else 'FULL (8B)'}")
+    print(
+        "Mode: "
+        + (
+            f"SMOKE ({'8B' if args.nvfp4_mixed else 'debugmodel'})"
+            if smoke
+            else "FULL (8B)"
+        )
+    )
     print(f"Module: {module}")
     print(f"Config: {config}")
     print(
@@ -291,7 +295,6 @@ def run_single(args):
         steps,
         dataset,
         args.compile and not args.graph,
-        args.nvfp4,
         args.mxfp8,
         _hf_assets_path_for_config(base_config),
     )
@@ -380,7 +383,6 @@ def _multi_cmd(
     config: str,
     compile_enabled: bool,
     data: str,
-    nvfp4: bool,
     mxfp8: bool,
     hf_assets_path: str | None = None,
     nvfp4_mixed: bool = False,
@@ -420,15 +422,14 @@ def _multi_cmd(
     # NVFP4's GEMM is an opaque op run on local shards inside spmd.local_map; only
     # the spmd_types backend re-types activations through that boundary, so TP (tp>1)
     # needs it or the rowwise input reaches the wrong placement and local_map raises.
-    if (nvfp4 or nvfp4_mixed) and exp["tp"] > 1:
+    if nvfp4_mixed and exp["tp"] > 1:
         cmd += ["--parallelism.spmd_backend", "spmd_types"]
-    return cmd + _compile_flags(compile_enabled) + _precision_flags(nvfp4, mxfp8)
+    return cmd + _compile_flags(compile_enabled) + _precision_flags(mxfp8)
 
 
 def _multi_label(
     exp: dict,
     compile_enabled: bool,
-    nvfp4: bool,
     mxfp8: bool,
     graph: bool,
     nvfp4_mixed: bool = False,
@@ -436,8 +437,6 @@ def _multi_label(
     parts = [exp["name"]]
     if nvfp4_mixed:
         parts.append("nvfp4_mixed")
-    elif nvfp4:
-        parts.append("nvfp4")
     elif mxfp8:
         parts.append("mxfp8")
     if graph:
@@ -454,23 +453,20 @@ def run_multi(args):
         raise SystemExit("--batch-size must be positive")
 
     smoke = args.smoke
-    # torchao NVFP4 quantization requires per-rank GEMM dims divisible by 128.
-    # llama3_debugmodel (dim=256) collapses below that under TP, and the
-    # override raises on the invalid local dim, so use 8B for any --nvfp4
-    # smoke run with a TP shape.
-    needs_8b = (
-        smoke
-        and (args.nvfp4 or args.nvfp4_mixed)
-        and any(
-            e["tp"] > 1
-            for e in MULTI_EXPERIMENTS
-            if args.only is None or e["name"] == args.only
+    if args.nvfp4_mixed and args.graph:
+        raise SystemExit(
+            "--nvfp4-mixed does not support --graph; "
+            "TorchTitan only provides llama3_8b_nvfp4_mixed"
         )
+    base_config = (
+        "llama3_8b" if args.nvfp4_mixed or not smoke else "llama3_debugmodel"
     )
-    base_config = "llama3_8b" if needs_8b or not smoke else "llama3_debugmodel"
     module = _trainer_module(args.graph)
-    flavor = base_config + _nvfp4_flavor_suffix(args)
-    config = _trainer_config(flavor, args.graph)
+    config = (
+        "llama3_8b_nvfp4_mixed"
+        if args.nvfp4_mixed
+        else _trainer_config(base_config, args.graph)
+    )
     if args.data is None:
         args.data = "c4_test" if smoke else "c4"
     wall_hours = MULTI_SMOKE_WALL_HOURS if smoke else MULTI_WALL_HOURS
@@ -487,7 +483,7 @@ def run_multi(args):
             f"Choices: {[e['name'] for e in MULTI_EXPERIMENTS]}"
         )
 
-    precision = _precision_tag(args.nvfp4, args.mxfp8, args.nvfp4_mixed)
+    precision = _precision_tag(args.mxfp8, args.nvfp4_mixed)
     print()
     print("=" * 72)
     print(
@@ -525,7 +521,7 @@ def run_multi(args):
         world_size = exp["tp"] * exp["fsdp"]
         batch_size = args.batch_size or exp["batch_size"]
         label = _multi_label(
-            exp, args.compile, args.nvfp4, args.mxfp8, args.graph, args.nvfp4_mixed
+            exp, args.compile, args.mxfp8, args.graph, args.nvfp4_mixed
         )
         log_path = RESULTS_DIR / f"{ts}_titan_multi_{label}.txt"
 
@@ -554,7 +550,6 @@ def run_multi(args):
             config,
             args.compile and not args.graph,
             args.data,
-            args.nvfp4,
             args.mxfp8,
             hf_assets_path,
             args.nvfp4_mixed,
@@ -657,7 +652,7 @@ def main():
     p_single.add_argument(
         "--smoke",
         action="store_true",
-        help="5-min wall clock, llama3_debugmodel, 10 steps",
+        help="5-min wall clock, 10 steps (debugmodel; 8B for mixed NVFP4)",
     )
     p_single.add_argument(
         "--gpu",
@@ -681,14 +676,12 @@ def main():
     )
     single_precision = p_single.add_mutually_exclusive_group()
     single_precision.add_argument(
-        "--nvfp4",
-        action="store_true",
-        help="Enable NVFP4 via the `_nvfp4` config flavor (converter; compile baked in)",
-    )
-    single_precision.add_argument(
         "--nvfp4-mixed",
         action="store_true",
-        help="Enable mixed NVFP4 via the `_nvfp4_mixed` flavor (last ~15%% of layers kept in bf16)",
+        help=(
+            "Enable mixed NVFP4 via llama3_8b_nvfp4_mixed "
+            "(last ~15%% of layers kept in bf16)"
+        ),
     )
     single_precision.add_argument(
         "--mxfp8",
@@ -701,7 +694,10 @@ def main():
     p_multi.add_argument(
         "--smoke",
         action="store_true",
-        help=f"10-min wall clock/shape, debugmodel, {MULTI_SMOKE_STEPS} steps",
+        help=(
+            f"10-min wall clock/shape, {MULTI_SMOKE_STEPS} steps "
+            "(debugmodel; 8B for mixed NVFP4)"
+        ),
     )
     p_multi.add_argument(
         "--only",
@@ -751,14 +747,12 @@ def main():
     )
     multi_precision = p_multi.add_mutually_exclusive_group()
     multi_precision.add_argument(
-        "--nvfp4",
-        action="store_true",
-        help="Enable NVFP4 via the `_nvfp4` config flavor (converter; compile baked in)",
-    )
-    multi_precision.add_argument(
         "--nvfp4-mixed",
         action="store_true",
-        help="Enable mixed NVFP4 via the `_nvfp4_mixed` flavor (last ~15%% of layers kept in bf16)",
+        help=(
+            "Enable mixed NVFP4 via llama3_8b_nvfp4_mixed "
+            "(last ~15%% of layers kept in bf16)"
+        ),
     )
     multi_precision.add_argument(
         "--mxfp8",

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-"""Plot Qwen3-8B C4 pretraining loss comparisons for both initialization lanes."""
+"""Plot Qwen3-8B C4 pretraining loss comparisons."""
 
+import argparse
 import re
 from pathlib import Path
 
@@ -36,7 +37,15 @@ def _series(path: Path) -> tuple[list[int], list[float]]:
 
 
 def main() -> None:
-    for lane in ("random_init", "continued_pretraining"):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--lane",
+        choices=("random_init", "continued_pretraining"),
+        help="Plot one initialization lane",
+    )
+    args = parser.parse_args()
+    lanes = (args.lane,) if args.lane else ("random_init", "continued_pretraining")
+    for lane in lanes:
         log_dir = LOG_ROOT / lane / "eager_trainer"
         plt.figure(figsize=(10, 6))
         for precision, label, color in SERIES:

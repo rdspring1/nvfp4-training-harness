@@ -17,6 +17,7 @@ PRECISIONS = {
     "bf16": "sft_qwen3_8b_math",
     "mxfp8": "qwen3_8b_mxfp8",
     "nvfp4-mixed": "qwen3_8b_nvfp4_mixed",
+    "nvfp4-mixed-30": "qwen3_8b_nvfp4_mixed_30",
 }
 _ANSI_RE = re.compile(r"\x1b\[[0-9;]*m")
 _METRIC_RE = re.compile(
@@ -50,7 +51,7 @@ def _download_assets() -> None:
     )
 
 
-def _command(precision: str, steps: int) -> list[str]:
+def _command(precision: str, steps: int, lr: float | None) -> list[str]:
     command = [
         "torchrun",
         "--standalone",
@@ -81,6 +82,8 @@ def _command(precision: str, steps: int) -> list[str]:
     ]
     if precision == "bf16":
         command += ["--compile.enable", "--compile.components", "model"]
+    if lr is not None:
+        command += ["--optimizer.param-groups.0.optimizer-kwargs.lr", str(lr)]
     return command
 
 
@@ -90,7 +93,9 @@ def _git_revision(directory: Path) -> str:
     ).strip()
 
 
-def _summary(precision: str, command: list[str], log_path: Path, started: datetime) -> str:
+def _summary(
+    precision: str, command: list[str], log_path: Path, started: datetime, steps: int
+) -> str:
     metrics = None
     for line in log_path.read_text(errors="replace").splitlines():
         match = _METRIC_RE.search(_ANSI_RE.sub("", line))
@@ -113,7 +118,7 @@ def _summary(precision: str, command: list[str], log_path: Path, started: dateti
         "- Model/dataset: Qwen3-8B SFT on `openai/gsm8k` (`main/train`)",
         "- Parallelism: FSDP 4, TP 1",
         "- Local/global batch size: 1 / 4 (gradient accumulation 1)",
-        "- Sequence length/steps: 2048 / 180",
+        f"- Sequence length/steps: 2048 / {steps}",
         f"- TorchTitan revision: `{_git_revision(TORCHTITAN_DIR)}`",
         f"- Harness revision: `{_git_revision(ROOT_DIR)}`",
         "",
@@ -132,11 +137,15 @@ def _summary(precision: str, command: list[str], log_path: Path, started: dateti
     return "\n".join(lines) + "\n"
 
 
-def _run(precision: str, command: list[str], env: dict[str, str]) -> None:
+def _run(
+    precision: str, command: list[str], env: dict[str, str], steps: int, tag: str | None
+) -> None:
     LOG_DIR.mkdir(parents=True, exist_ok=True)
     stamp = datetime.now(UTC).strftime("%Y%m%d")
-    tag = f"{stamp}_titan_fsdp4_{precision.replace('-', '_')}_eager_compile_sft_gbs4_lbs1_ga1"
-    log_path = LOG_DIR / f"{tag}.txt"
+    run_tag = f"{stamp}_titan_fsdp4_{precision.replace('-', '_')}_eager_compile_sft_gbs4_lbs1_ga1"
+    if tag:
+        run_tag += f"_{re.sub(r'[^a-zA-Z0-9_-]', '_', tag)}"
+    log_path = LOG_DIR / f"{run_tag}.txt"
     started = datetime.now(UTC)
     print(f"[{precision}] {' '.join(command)}", flush=True)
     with log_path.open("w") as log_file:
@@ -156,7 +165,7 @@ def _run(precision: str, command: list[str], env: dict[str, str]) -> None:
         if process.wait() != 0:
             raise SystemExit(f"{precision} run failed; raw log retained at {log_path}")
     summary_path = log_path.with_suffix(".md")
-    summary_path.write_text(_summary(precision, command, log_path, started))
+    summary_path.write_text(_summary(precision, command, log_path, started, steps))
     print(f"[{precision}] wrote {log_path} and {summary_path}", flush=True)
 
 
@@ -165,6 +174,8 @@ def main() -> None:
     parser.add_argument("--only", choices=PRECISIONS, help="Run one precision only")
     parser.add_argument("--steps", type=int, default=180, help="SFT steps per precision")
     parser.add_argument("--gpus", help="Comma-separated four GPU indices")
+    parser.add_argument("--lr", type=float, help="Override the SFT AdamW learning rate")
+    parser.add_argument("--tag", help="Suffix log filenames for an ablation")
     parser.add_argument("--download-assets", action="store_true", help="Download missing Qwen3-8B assets")
     parser.add_argument("--dry-run", action="store_true", help="Print commands without launching")
     args = parser.parse_args()
@@ -174,7 +185,7 @@ def main() -> None:
     precisions = [args.only] if args.only else list(PRECISIONS)
     if args.dry_run:
         for precision in precisions:
-            print(f"[{precision}] {' '.join(_command(precision, args.steps))}")
+            print(f"[{precision}] {' '.join(_command(precision, args.steps, args.lr))}")
         return
     if not _assets_ready():
         if not args.download_assets:
@@ -191,7 +202,13 @@ def main() -> None:
         env["CUDA_VISIBLE_DEVICES"] = ",".join(gpus)
     env["PYTHONUNBUFFERED"] = "1"
     for precision in precisions:
-        _run(precision, _command(precision, args.steps), env)
+        _run(
+            precision,
+            _command(precision, args.steps, args.lr),
+            env,
+            args.steps,
+            args.tag,
+        )
 
 
 if __name__ == "__main__":

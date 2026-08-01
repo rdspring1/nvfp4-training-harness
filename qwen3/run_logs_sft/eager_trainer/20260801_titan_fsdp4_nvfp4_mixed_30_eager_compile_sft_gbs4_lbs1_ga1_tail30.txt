@@ -1,0 +1,186 @@
+W0801 12:45:59.681000 273148 /opt/pytorch/pytorch/torch/distributed/run.py:874] 
+W0801 12:45:59.681000 273148 /opt/pytorch/pytorch/torch/distributed/run.py:874] *****************************************
+W0801 12:45:59.681000 273148 /opt/pytorch/pytorch/torch/distributed/run.py:874] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0801 12:45:59.681000 273148 /opt/pytorch/pytorch/torch/distributed/run.py:874] *****************************************
+W0801 12:46:08.750000 273218 /opt/pytorch/pytorch/torch/utils/_pytree.py:630] <enum 'KernelPreference'> is an Enum subclass and is now natively supported by torch.compile as an opaque value type. Calling register_constant() on Enum subclasses is deprecated and will be an error in a future release.
+W0801 12:46:09.301000 273218 /opt/pytorch/pytorch/torch/utils/_pytree.py:630] <enum 'ScaleCalculationMode'> is an Enum subclass and is now natively supported by torch.compile as an opaque value type. Calling register_constant() on Enum subclasses is deprecated and will be an error in a future release.
+[titan] 2026-08-01 12:46:10,322 - root - INFO - torchtitan version: 0.2.2 (0.0.0 means __version__ is not defined correctly).
+[titan] 2026-08-01 12:46:10,327 - root - WARNING - initial_load_model_only=True has no effect without an initial_load_path.
+[titan] 2026-08-01 12:46:10,329 - root - INFO - Converted Linear layers to NVFP4Linear
+[titan] 2026-08-01 12:46:10,403 - root - WARNING - initial_load_model_only=True has no effect without an initial_load_path.
+[titan] 2026-08-01 12:46:10,404 - torchtitan.observability.structured_logger.jsonl_handler - INFO - Structured logging -> JSONL: /home/me/nvfp4/third_party/torchtitan/outputs/structured_logs/training.global_rank_0.20260801-124610-TGKXRS.jsonl
+[titan] 2026-08-01 12:46:11,387 - root - WARNING - ENV[TORCH_NCCL_ASYNC_ERROR_HANDLING] = 1 will be overridden to 3 based on job config
+[titan] 2026-08-01 12:46:11,400 - root - INFO - Building device mesh with parallelism: pp=1, dp_replicate=1, dp_shard=4, cp=1, tp=1, ep=1
+[titan] 2026-08-01 12:46:11,419 - root - INFO - Successfully created meshes with active dimensions: ['batch', 'loss', 'efsdp', 'dp', 'dp_shard']
+[titan] 2026-08-01 12:46:11,419 - root - INFO - [GC] Initial GC collection took 0.00 seconds
+[titan] 2026-08-01 12:46:15,161 - root - INFO - Building qwen3 8B
+[titan] 2026-08-01 12:46:15,438 - root - INFO - CUDA capacity: NVIDIA GB200 with 184.30GiB memory
+[titan] 2026-08-01 12:46:15,497 - root - INFO - Total parameter count: dense 8,190,735,360, sparse 0, vision 0, active 8,190,735,360
+[titan] 2026-08-01 12:46:15,497 - root - INFO - [34mModel qwen3 8B [31msize: 8,190,735,360 total parameters[39m
+[titan] 2026-08-01 12:46:15,531 - root - INFO - Applied SelectiveAC activation checkpointing to the model
+[titan] 2026-08-01 12:46:15,545 - root - INFO - Compiling each TransformerBlock with torch.compile
+[titan] 2026-08-01 12:46:15,672 - root - INFO - Applied FSDP to the model
+[titan] 2026-08-01 12:46:16,203 - root - INFO - Peak FLOPS used for computing MFU: 2.500e+15
+[titan] 2026-08-01 12:46:16,203 - root - INFO - CUDA memory usage for model: 10.72GiB(5.82%)
+[titan] 2026-08-01 12:46:16,205 - root - INFO - Optimizer AdamW (model_part=0): 327 params [.*] {'fused': True, 'foreach': False, 'lr': 2e-05, 'betas': (0.9, 0.95), 'eps': 1e-08, 'weight_decay': 0.1}
+[titan] 2026-08-01 12:46:16,206 - root - INFO - Loading tokenizer from tokenizer.json
+[titan] 2026-08-01 12:46:16,631 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/datasets/openai/gsm8k/resolve/main/README.md "HTTP/1.1 307 Temporary Redirect"
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[titan] 2026-08-01 12:46:16,632 - huggingface_hub.utils._http - WARNING - Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[titan] 2026-08-01 12:46:16,659 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/datasets/openai/gsm8k/740312add88f781978c0658806c59bc2815b9866/README.md "HTTP/1.1 200 OK"
+[titan] 2026-08-01 12:46:16,756 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/datasets/openai/gsm8k/resolve/740312add88f781978c0658806c59bc2815b9866/gsm8k.py "HTTP/1.1 404 Not Found"
+[titan] 2026-08-01 12:46:17,017 - httpx - INFO - HTTP Request: HEAD https://s3.amazonaws.com/datasets.huggingface.co/datasets/datasets/openai/gsm8k/openai/gsm8k.py "HTTP/1.1 404 Not Found"
+[titan] 2026-08-01 12:46:17,115 - httpx - INFO - HTTP Request: GET https://huggingface.co/api/datasets/openai/gsm8k/revision/740312add88f781978c0658806c59bc2815b9866 "HTTP/1.1 200 OK"
+[titan] 2026-08-01 12:46:17,211 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/datasets/openai/gsm8k/resolve/740312add88f781978c0658806c59bc2815b9866/.huggingface.yaml "HTTP/1.1 404 Not Found"
+[titan] 2026-08-01 12:46:17,400 - httpx - INFO - HTTP Request: GET https://datasets-server.huggingface.co/info?dataset=openai/gsm8k "HTTP/1.1 200 OK"
+[titan] 2026-08-01 12:46:17,500 - httpx - INFO - HTTP Request: GET https://huggingface.co/api/datasets/openai/gsm8k/tree/740312add88f781978c0658806c59bc2815b9866/main?recursive=true&expand=false "HTTP/1.1 200 OK"
+[titan] 2026-08-01 12:46:17,599 - httpx - INFO - HTTP Request: GET https://huggingface.co/api/datasets/openai/gsm8k/tree/740312add88f781978c0658806c59bc2815b9866?recursive=false&expand=false "HTTP/1.1 200 OK"
+[titan] 2026-08-01 12:46:17,695 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/datasets/openai/gsm8k/resolve/740312add88f781978c0658806c59bc2815b9866/dataset_infos.json "HTTP/1.1 404 Not Found"
+/usr/local/lib/python3.12/dist-packages/torchdata/stateful_dataloader/stateful_dataloader.py:379: UserWarning: 'set_vital' is deprecated, please do not call
+  torch.set_vital("Dataloader", "enabled", "True")  # type: ignore[attr-defined]
+[titan] 2026-08-01 12:46:17,754 - root - WARNING - initial_load_model_only=True has no effect without an initial_load_path.
+[titan] 2026-08-01 12:46:17,814 - root - INFO - Checkpointing active. Checkpoints will be loaded from and saved to ./outputs/checkpoint
+[titan] 2026-08-01 12:46:17,815 - root - INFO - Trainer is initialized with local batch size 1, global batch size 4, gradient accumulation steps 1, sequence length 2048, total steps 180 (warmup 15)
+[titan] 2026-08-01 12:46:17,815 - root - INFO - Loading HF safetensors from --model.hf_assets_path: ./assets/hf/Qwen3-8B
+[titan] 2026-08-01 12:46:17,815 - root - INFO - Loading the checkpoint from ./assets/hf/Qwen3-8B.
+[titan] 2026-08-01 12:46:19,118 - root - INFO - [GC] GC collection for checkpoint loading. took 0.02 seconds
+[titan] 2026-08-01 12:46:19,118 - root - INFO - Finished loading the checkpoint in 1.30 seconds.
+[titan] 2026-08-01 12:46:19,119 - root - INFO - Training starts at step 1
+[titan] 2026-08-01 12:46:19,122 - root - INFO - [ChatDataset] First sample full:
+<|im_start|>user
+Mimi picked up 2 dozen seashells on the beach.  Kyle found twice as many shells as Mimi and put them in his pocket. Leigh grabbed one-third of the shells that Kyle found.  How many seashells did Leigh have?<|im_end|>
+<|im_start|>assistant
+<think>
+Mimi has 2 x 12 = <<2*12=24>>24 sea shells.
+Kyle has 24 x 2 = <<24*2=48>>48 sea shells.
+Leigh has 48 / 3 = <<48/3=16>>16 sea shells.
+</think>
+
+16<|im_end|>
+[rank0]:W0801 12:46:20.060000 273218 /opt/pytorch/pytorch/torch/_logging/_internal.py:1350] [0/0] 
+[rank0]:W0801 12:46:20.060000 273218 /opt/pytorch/pytorch/torch/_logging/_internal.py:1350] [0/0] Detected that context_fn is passed to torch.utils.checkpoint under torch.compile.
+[rank0]:W0801 12:46:20.060000 273218 /opt/pytorch/pytorch/torch/_logging/_internal.py:1350] [0/0] Please make sure the checkpointed region does not contain in-place ops (e.g. torch.relu_).
+[rank0]:W0801 12:46:20.060000 273218 /opt/pytorch/pytorch/torch/_logging/_internal.py:1350] [0/0] 
+/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/cute/core.py:5791: DeprecationWarning: Use explicit `struct.scalar.ptr` for pointer instead.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/cute/core.py:5791: DeprecationWarning: Use explicit `struct.scalar.ptr` for pointer instead.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/cute/core.py:5791: DeprecationWarning: Use explicit `struct.scalar.ptr` for pointer instead.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/cute/core.py:5791: DeprecationWarning: Use explicit `struct.scalar.ptr` for pointer instead.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/cute/core.py:5791: DeprecationWarning: Use explicit `struct.scalar.ptr` for pointer instead.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/cute/core.py:5791: DeprecationWarning: Use explicit `struct.scalar.ptr` for pointer instead.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/cute/core.py:5791: DeprecationWarning: Use explicit `struct.scalar.ptr` for pointer instead.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/cute/core.py:5791: DeprecationWarning: Use explicit `struct.scalar.ptr` for pointer instead.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/cute/core.py:5791: DeprecationWarning: Use explicit `struct.scalar.ptr` for pointer instead.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/cute/core.py:5791: DeprecationWarning: Use explicit `struct.scalar.ptr` for pointer instead.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/cute/core.py:5791: DeprecationWarning: Use explicit `struct.scalar.ptr` for pointer instead.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/cute/core.py:5791: DeprecationWarning: Use explicit `struct.scalar.ptr` for pointer instead.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/cute/core.py:5791: DeprecationWarning: Use explicit `struct.scalar.ptr` for pointer instead.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/cute/core.py:5791: DeprecationWarning: Use explicit `struct.scalar.ptr` for pointer instead.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/cute/core.py:5791: DeprecationWarning: Use explicit `struct.scalar.ptr` for pointer instead.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/cute/core.py:5791: DeprecationWarning: Use explicit `struct.scalar.ptr` for pointer instead.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/cute/core.py:5791: DeprecationWarning: Use explicit `struct.scalar.ptr` for pointer instead.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/cute/core.py:5791: DeprecationWarning: Use explicit `struct.scalar.ptr` for pointer instead.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/cute/core.py:5791: DeprecationWarning: Use explicit `struct.scalar.ptr` for pointer instead.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/cute/core.py:5791: DeprecationWarning: Use explicit `struct.scalar.ptr` for pointer instead.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/cute/core.py:5791: DeprecationWarning: Use explicit `struct.scalar.ptr` for pointer instead.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/cute/core.py:5791: DeprecationWarning: Use explicit `struct.scalar.ptr` for pointer instead.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/cute/core.py:5791: DeprecationWarning: Use explicit `struct.scalar.ptr` for pointer instead.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/cute/core.py:5791: DeprecationWarning: Use explicit `struct.scalar.ptr` for pointer instead.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/cute/core.py:5791: DeprecationWarning: Use explicit `struct.scalar.ptr` for pointer instead.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/cute/core.py:5791: DeprecationWarning: Use explicit `struct.scalar.ptr` for pointer instead.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/cute/core.py:5791: DeprecationWarning: Use explicit `struct.scalar.ptr` for pointer instead.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/cute/core.py:5791: DeprecationWarning: Use explicit `struct.scalar.ptr` for pointer instead.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/cute/core.py:5791: DeprecationWarning: Use explicit `struct.scalar.ptr` for pointer instead.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/cute/core.py:5791: DeprecationWarning: Use explicit `struct.scalar.ptr` for pointer instead.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/cute/core.py:5791: DeprecationWarning: Use explicit `struct.scalar.ptr` for pointer instead.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/cute/core.py:5791: DeprecationWarning: Use explicit `struct.scalar.ptr` for pointer instead.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/cute/core.py:5791: DeprecationWarning: Use explicit `struct.scalar.ptr` for pointer instead.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/cute/core.py:5791: DeprecationWarning: Use explicit `struct.scalar.ptr` for pointer instead.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/cute/core.py:5791: DeprecationWarning: Use explicit `struct.scalar.ptr` for pointer instead.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/cute/core.py:5791: DeprecationWarning: Use explicit `struct.scalar.ptr` for pointer instead.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/cute/core.py:5791: DeprecationWarning: Use explicit `struct.scalar.ptr` for pointer instead.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/cute/core.py:5791: DeprecationWarning: Use explicit `struct.scalar.ptr` for pointer instead.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/cute/core.py:5791: DeprecationWarning: Use explicit `struct.scalar.ptr` for pointer instead.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/cute/core.py:5791: DeprecationWarning: Use explicit `struct.scalar.ptr` for pointer instead.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/cute/core.py:5791: DeprecationWarning: Use explicit `struct.scalar.ptr` for pointer instead.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/cute/core.py:5791: DeprecationWarning: Use explicit `struct.scalar.ptr` for pointer instead.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/cute/core.py:5791: DeprecationWarning: Use explicit `struct.scalar.ptr` for pointer instead.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/cute/core.py:5791: DeprecationWarning: Use explicit `struct.scalar.ptr` for pointer instead.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/cute/core.py:5791: DeprecationWarning: Use explicit `struct.scalar.ptr` for pointer instead.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/cute/core.py:5791: DeprecationWarning: Use explicit `struct.scalar.ptr` for pointer instead.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/cute/core.py:5791: DeprecationWarning: Use explicit `struct.scalar.ptr` for pointer instead.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/cute/core.py:5791: DeprecationWarning: Use explicit `struct.scalar.ptr` for pointer instead.
+  warnings.warn(
+[titan] 2026-08-01 12:47:18,996 - root - INFO - [31mstep:  1  [32mloss:  1.08518  [38;2;180;60;0mgrad_norm: 19.7981  [38;2;54;234;195mmemory: 37.67GiB(20.44%)  [34mtps: 32  [36mtflops: 1.58  [35mmfu: N/A[39m
+[titan] 2026-08-01 12:47:18,996 - root - INFO - Synchronizing and adjusting timeout for all ProcessGroups to 0:01:40
+[titan] 2026-08-01 12:47:30,286 - root - INFO - [31mstep: 10  [32mloss:  0.40487  [38;2;180;60;0mgrad_norm:  2.7262  [38;2;54;234;195mmemory: 46.95GiB(25.47%)  [34mtps: 1,633  [36mtflops: 80.06  [35mmfu: N/A[39m
+[titan] 2026-08-01 12:47:35,048 - root - INFO - [31mstep: 20  [32mloss:  0.39075  [38;2;180;60;0mgrad_norm:  1.6767  [38;2;54;234;195mmemory: 46.95GiB(25.47%)  [34mtps: 4,300  [36mtflops: 210.86  [35mmfu: N/A[39m
+[titan] 2026-08-01 12:47:39,782 - root - INFO - [31mstep: 30  [32mloss:  0.34969  [38;2;180;60;0mgrad_norm:  1.4851  [38;2;54;234;195mmemory: 46.95GiB(25.47%)  [34mtps: 4,327  [36mtflops: 212.17  [35mmfu: N/A[39m
+[titan] 2026-08-01 12:47:44,549 - root - INFO - [31mstep: 40  [32mloss:  0.40478  [38;2;180;60;0mgrad_norm:  1.3791  [38;2;54;234;195mmemory: 46.95GiB(25.47%)  [34mtps: 4,296  [36mtflops: 210.64  [35mmfu: N/A[39m
+[titan] 2026-08-01 12:47:48,876 - root - INFO - [GC] Performing periodic GC collection took 0.00 seconds
+[titan] 2026-08-01 12:47:49,367 - root - INFO - [31mstep: 50  [32mloss:  0.35656  [38;2;180;60;0mgrad_norm:  1.3449  [38;2;54;234;195mmemory: 46.95GiB(25.47%)  [34mtps: 4,251  [36mtflops: 208.46  [35mmfu: N/A[39m
+[titan] 2026-08-01 12:47:54,102 - root - INFO - [31mstep: 60  [32mloss:  0.36135  [38;2;180;60;0mgrad_norm:  1.2266  [38;2;54;234;195mmemory: 46.95GiB(25.47%)  [34mtps: 4,325  [36mtflops: 212.08  [35mmfu: N/A[39m
+[titan] 2026-08-01 12:47:58,795 - root - INFO - [31mstep: 70  [32mloss:  0.33589  [38;2;180;60;0mgrad_norm:  1.2402  [38;2;54;234;195mmemory: 46.95GiB(25.47%)  [34mtps: 4,364  [36mtflops: 214.01  [35mmfu: N/A[39m
+[titan] 2026-08-01 12:48:03,488 - root - INFO - [31mstep: 80  [32mloss:  0.33625  [38;2;180;60;0mgrad_norm:  1.1726  [38;2;54;234;195mmemory: 46.95GiB(25.47%)  [34mtps: 4,364  [36mtflops: 213.98  [35mmfu: N/A[39m
+[titan] 2026-08-01 12:48:08,166 - root - INFO - [31mstep: 90  [32mloss:  0.30298  [38;2;180;60;0mgrad_norm:  1.0326  [38;2;54;234;195mmemory: 46.95GiB(25.47%)  [34mtps: 4,378  [36mtflops: 214.69  [35mmfu: N/A[39m
+[titan] 2026-08-01 12:48:12,350 - root - INFO - [GC] Performing periodic GC collection took 0.00 seconds
+[titan] 2026-08-01 12:48:12,827 - root - INFO - [31mstep: 100  [32mloss:  0.32605  [38;2;180;60;0mgrad_norm:  1.1651  [38;2;54;234;195mmemory: 46.95GiB(25.47%)  [34mtps: 4,394  [36mtflops: 215.47  [35mmfu: N/A[39m
+[titan] 2026-08-01 12:48:17,490 - root - INFO - [31mstep: 110  [32mloss:  0.30801  [38;2;180;60;0mgrad_norm:  1.0487  [38;2;54;234;195mmemory: 46.95GiB(25.47%)  [34mtps: 4,393  [36mtflops: 215.39  [35mmfu: N/A[39m
+[titan] 2026-08-01 12:48:22,168 - root - INFO - [31mstep: 120  [32mloss:  0.32706  [38;2;180;60;0mgrad_norm:  1.1573  [38;2;54;234;195mmemory: 46.95GiB(25.47%)  [34mtps: 4,378  [36mtflops: 214.66  [35mmfu: N/A[39m
+[titan] 2026-08-01 12:48:26,881 - root - INFO - [31mstep: 130  [32mloss:  0.31649  [38;2;180;60;0mgrad_norm:  1.2760  [38;2;54;234;195mmemory: 46.95GiB(25.47%)  [34mtps: 4,346  [36mtflops: 213.08  [35mmfu: N/A[39m
+[titan] 2026-08-01 12:48:31,561 - root - INFO - [31mstep: 140  [32mloss:  0.34002  [38;2;180;60;0mgrad_norm:  1.2312  [38;2;54;234;195mmemory: 46.95GiB(25.47%)  [34mtps: 4,377  [36mtflops: 214.61  [35mmfu: N/A[39m
+[titan] 2026-08-01 12:48:35,753 - root - INFO - [GC] Performing periodic GC collection took 0.00 seconds
+[titan] 2026-08-01 12:48:36,228 - root - INFO - [31mstep: 150  [32mloss:  0.35579  [38;2;180;60;0mgrad_norm:  1.1958  [38;2;54;234;195mmemory: 46.95GiB(25.47%)  [34mtps: 4,388  [36mtflops: 215.14  [35mmfu: N/A[39m
+[titan] 2026-08-01 12:48:40,924 - root - INFO - [31mstep: 160  [32mloss:  0.35098  [38;2;180;60;0mgrad_norm:  1.2172  [38;2;54;234;195mmemory: 46.95GiB(25.47%)  [34mtps: 4,362  [36mtflops: 213.90  [35mmfu: N/A[39m
+[titan] 2026-08-01 12:48:45,594 - root - INFO - [31mstep: 170  [32mloss:  0.31342  [38;2;180;60;0mgrad_norm:  1.1500  [38;2;54;234;195mmemory: 46.95GiB(25.47%)  [34mtps: 4,385  [36mtflops: 215.02  [35mmfu: N/A[39m
+[titan] 2026-08-01 12:48:50,279 - root - INFO - [31mstep: 180  [32mloss:  0.29794  [38;2;180;60;0mgrad_norm:  1.2433  [38;2;54;234;195mmemory: 46.95GiB(25.47%)  [34mtps: 4,372  [36mtflops: 214.37  [35mmfu: N/A[39m
+[titan] 2026-08-01 12:48:50,279 - root - INFO - Sleeping 2 seconds for other ranks to complete
+[titan] 2026-08-01 12:48:52,279 - root - INFO - Training completed
+[titan] 2026-08-01 12:48:52,279 - root - INFO - Destroying the purge thread.
+[titan] 2026-08-01 12:48:52,372 - root - INFO - Process group destroyed

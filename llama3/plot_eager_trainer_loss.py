@@ -23,7 +23,7 @@ _STEP_RE = re.compile(r"step:\s*(\d+).*?loss:\s*([\d.]+)")
 # (log filename, legend label, color). Colors match the prior PNG.
 SERIES = [
     (
-        "20260727_titan_fsdp4_nvfp4_mixed_eager_compile_200m_gbs128_lbs32_ga1.txt",
+        "20260801_titan_fsdp4_nvfp4_mixed_eager_compile_200m_gbs128_lbs32_ga1.txt",
         "NVFP4 (bf16 tail) eager + compile",
         "C0",
     ),

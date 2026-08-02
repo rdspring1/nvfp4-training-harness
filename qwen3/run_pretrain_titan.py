@@ -134,7 +134,14 @@ def _summary(
     return "\n".join(lines) + "\n"
 
 
-def _run(lane: str, precision: str, command: list[str], env: dict[str, str], steps: int) -> None:
+def _run(
+    lane: str,
+    precision: str,
+    command: list[str],
+    env: dict[str, str],
+    steps: int,
+    tag: str | None,
+) -> None:
     log_dir = LOG_ROOT / lane / "eager_trainer"
     log_dir.mkdir(parents=True, exist_ok=True)
     stamp = datetime.now(UTC).strftime("%Y%m%d")
@@ -142,6 +149,8 @@ def _run(lane: str, precision: str, command: list[str], env: dict[str, str], ste
         f"{stamp}_titan_fsdp4_{precision.replace('-', '_')}_eager_compile_"
         f"200m_gbs64_lbs16_ga1"
     )
+    if tag:
+        run_tag += f"_{re.sub(r'[^a-zA-Z0-9_-]', '_', tag)}"
     log_path = log_dir / f"{run_tag}.txt"
     started = datetime.now(UTC)
     print(f"[{lane}/{precision}] {' '.join(command)}", flush=True)
@@ -187,6 +196,7 @@ def main() -> None:
     parser.add_argument("--gpus", help="Comma-separated four GPU indices")
     parser.add_argument("--dry-run", action="store_true", help="Print commands without launching")
     parser.add_argument("--resume", action="store_true", help="Skip completed runs and write missing summaries")
+    parser.add_argument("--tag", help="Suffix log filenames for a distinct rerun")
     args = parser.parse_args()
     if args.total_tokens <= 0:
         raise SystemExit("--total-tokens must be positive")
@@ -225,7 +235,14 @@ def main() -> None:
                     )
                 print(f"[{lane}/{precision}] already completed: {log_path}", flush=True)
                 continue
-            _run(lane, precision, _command(lane, precision, steps), env, steps)
+            _run(
+                lane,
+                precision,
+                _command(lane, precision, steps),
+                env,
+                steps,
+                args.tag,
+            )
 
 
 if __name__ == "__main__":

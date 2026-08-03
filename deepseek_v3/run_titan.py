@@ -3,6 +3,7 @@
 
 import argparse
 import datetime
+import math
 import os
 import re
 import subprocess
@@ -10,20 +11,47 @@ import sys
 import threading
 from pathlib import Path
 
-ROOT_DIR = Path(__file__).resolve().parent.parent
+PLUGIN_DIR = Path(__file__).resolve().parent
+ROOT_DIR = PLUGIN_DIR.parent
 TORCHTITAN_DIR = ROOT_DIR / "third_party" / "torchtitan"
 DEEPSEEK_MODEL_DIR = TORCHTITAN_DIR / "torchtitan" / "models" / "deepseek_v3"
 RESULTS_DIR = ROOT_DIR / "deepseek_v3_results"
+NVFP4_LINEAR_MODULE = "torchtitan.overrides.nvfp4_linear"
+NVFP4_GROUPED_EXPERTS_MODULE = "torchtitan.overrides.nvfp4_grouped_experts"
+TE_GROUPED_EXPERTS_MODULE = "te_moe_overrides.te_grouped_experts"
+NVFP4_TARGET_MODULES = {
+    "linear": [NVFP4_LINEAR_MODULE],
+    "grouped-experts": [NVFP4_GROUPED_EXPERTS_MODULE],
+    "te-grouped-experts": [TE_GROUPED_EXPERTS_MODULE],
+    "both": [NVFP4_LINEAR_MODULE, NVFP4_GROUPED_EXPERTS_MODULE],
+}
+# MXFP8 MoE grouped-experts via torchtitan's first-class converter, bridged into
+# the override registry (mxfp8_overrides/). Needs the CUDA-built torchao (the
+# _C_mxfp8 extension); the editable USE_CPP=0 build lacks the MXFP8 quant kernel.
+MXFP8_GROUPED_EXPERTS_MODULE = "mxfp8_overrides.mxfp8_grouped_experts"
+MXFP8_TORCHAO_BUILD = Path("/opt/pytorch/ao/build/lib.linux-aarch64-cpython-312")
 
-MODULE = "deepseek_v3"
+TRAINER_MODULES = {
+    "eager": "deepseek_v3",
+    "graph": "graph_trainer.deepseek_v3",
+}
 FLAVOR_CONFIGS = {
-    "debugmodel": "deepseek_v3_debugmodel",
-    "16b": "deepseek_v3_16b",
+    "eager": {
+        "debugmodel": "deepseek_v3_debugmodel",
+        "16b": "deepseek_v3_16b",
+    },
+    "graph": {
+        "debugmodel": "graph_trainer_deepseek_v3_debugmodel",
+        "16b": "graph_trainer_deepseek_v3_16b",
+    },
 }
 FLAVOR_DEFAULTS = {
     "debugmodel": {"batch_size": 8, "seq_len": 2048, "steps": 10},
     "16b": {"batch_size": 1, "seq_len": 1024, "steps": 1},
 }
+# 16b MoE routing (torchtitan/models/deepseek_v3/__init__.py:341,359)
+MOE_16B_NUM_EXPERTS = 64
+MOE_16B_TOP_K = 6
 HF_ASSET_PATHS = {
     "16b": TORCHTITAN_DIR / "assets" / "hf" / "deepseek-moe-16b-base",
 }
@@ -96,7 +124,9 @@ def _ensure_assets(flavor: str) -> None:
 
 def _parse_gpus(args: argparse.Namespace) -> list[str]:
     if args.gpus is None:
-        return [str(args.gpu)] if args.flavor == "debugmodel" else ["0", "1", "2", "3"]
+        if args.flavor == "debugmodel":
+            return ["0", "1"] if (args.nvfp4 or args.mxfp8) else [str(args.gpu)]
+        return ["0", "1", "2", "3"]
 
     gpus = [gpu.strip() for gpu in args.gpus.split(",") if gpu.strip()]
     if not gpus:
@@ -113,9 +143,9 @@ def _cmd(args: argparse.Namespace) -> list[str]:
         "-m",
         "torchtitan.train",
         "--module",
-        MODULE,
+        TRAINER_MODULES[args.trainer],
         "--config",
-        FLAVOR_CONFIGS[args.flavor],
+        FLAVOR_CONFIGS[args.trainer][args.flavor],
         "--training.local_batch_size",
         str(args.batch_size),
         "--training.seq_len",
@@ -123,7 +153,7 @@ def _cmd(args: argparse.Namespace) -> list[str]:
         "--training.steps",
         str(args.steps),
         "--dataloader.dataset",
-        "c4_test",
+        args.dataset,
         "--metrics.log_freq",
         str(args.log_freq),
     ]
@@ -132,8 +162,25 @@ def _cmd(args: argparse.Namespace) -> list[str]:
             "--parallelism.data_parallel_shard_degree",
             "4",
             "--parallelism.expert_parallel_degree",
-            "2",
+            str(args.expert_parallel_degree or 2),
         ]
+    elif args.nvfp4 or args.mxfp8:
+        cmd += [
+            "--parallelism.data_parallel_shard_degree",
+            str(args.nproc_per_node),
+            "--parallelism.expert_parallel_degree",
+            str(args.expert_parallel_degree or 2),
+        ]
+    if args.nvfp4:
+        cmd += ["--override.imports", ",".join(NVFP4_TARGET_MODULES[args.nvfp4_target])]
+    elif args.mxfp8:
+        cmd += ["--override.imports", MXFP8_GROUPED_EXPERTS_MODULE]
+    if args.global_batch_size is not None:
+        cmd += ["--training.global_batch_size", str(args.global_batch_size)]
+    if args.trainer == "graph":
+        cmd += ["--compile.mode", "aot_fx_trace"]
+    elif args.compile:
+        cmd += ["--compile.enable"]
     return cmd
 
 
@@ -149,27 +196,42 @@ def _stream_to_file(proc: subprocess.Popen, log_path: Path) -> None:
 
 def _parse_log(log_path: Path):
     last = None
+    completed = False
     try:
         with open(log_path) as f:
             for line in f:
-                match = _STEP_RE.search(_ANSI_RE.sub("", line))
+                clean = _ANSI_RE.sub("", line)
+                if "Training completed" in clean:
+                    completed = True
+                match = _STEP_RE.search(clean)
                 if match:
-                    last = (
+                    metric = (
                         int(match.group(1)),
                         float(match.group(2)),
                         float(match.group(3)),
                         int(match.group(4).replace(",", "")),
                         float(match.group(5).replace(",", "")),
                     )
+                    if last is None or metric[0] > last[0]:
+                        last = metric
+                    elif metric[0] == last[0] and metric[2] > last[2]:
+                        last = metric
     except FileNotFoundError:
         pass
-    return last
+    return last, completed
 
 
 def _print_summary(
-    log_path: Path, batch_size: int, seq_len: int, data_parallel_degree: int
+    log_path: Path,
+    batch_size: int,
+    seq_len: int,
+    data_parallel_degree: int,
+    global_batch_size: int | None,
+    trainer: str,
+    requested_steps: int,
 ) -> None:
-    global_batch_size = batch_size * data_parallel_degree
+    global_batch_size = global_batch_size or batch_size * data_parallel_degree
+    run_name = f"deepseek_v3/{trainer}"
     print()
     print("=" * 96)
     print(
@@ -178,18 +240,21 @@ def _print_summary(
     )
     print("-" * 96)
 
-    result = _parse_log(log_path)
+    result, completed = _parse_log(log_path)
     if result is None:
-        print(f"{'deepseek_v3':<16} {'NO DATA':>8}  {log_path.name}")
+        print(f"{run_name:<16} {'NO DATA':>8}  {log_path.name}")
     else:
-        step, loss, mem, tps, tflops = result
-        tokens = step * global_batch_size * seq_len
+        metric_step, loss, mem, tps, tflops = result
+        steps = requested_steps if completed else metric_step
+        tokens = steps * global_batch_size * seq_len
         print(
-            f"{'deepseek_v3':<16} {step:>8,} {loss:>12.4f} {tps:>10,} "
+            f"{run_name:<16} {steps:>8,} {loss:>12.4f} {tps:>10,} "
             f"{tflops:>8.2f} {mem:>10.2f}  {log_path.name}"
         )
+        if metric_step != steps:
+            print(f"Last metric: step {metric_step:,}")
         print(
-            f"Tokens: {step:,} (step) * {global_batch_size:,} "
+            f"Tokens: {steps:,} (step) * {global_batch_size:,} "
             f"(global batch) * {seq_len:,} (seq_len) = {tokens:,}"
         )
     print("=" * 96)
@@ -206,26 +271,66 @@ def run(args: argparse.Namespace) -> None:
         raise SystemExit("--seq-len must be positive")
     if args.log_freq <= 0:
         raise SystemExit("--log-freq must be positive")
+    if args.global_batch_size is not None and args.global_batch_size <= 0:
+        raise SystemExit("--global-batch-size must be positive")
+    if args.expert_parallel_degree is not None and args.expert_parallel_degree <= 0:
+        raise SystemExit("--expert-parallel-degree must be positive")
+    if args.nvfp4 and args.mxfp8:
+        raise SystemExit("--nvfp4 and --mxfp8 are mutually exclusive")
+    if args.mxfp8 and not MXFP8_TORCHAO_BUILD.exists():
+        raise SystemExit(
+            f"--mxfp8 requires the CUDA-built torchao at {MXFP8_TORCHAO_BUILD} "
+            "(the _C_mxfp8 extension); the editable USE_CPP=0 build lacks it."
+        )
 
     gpus = _parse_gpus(args)
     args.nproc_per_node = len(gpus)
     if args.flavor == "16b" and args.nproc_per_node != 4:
         raise SystemExit("--flavor 16b requires exactly 4 GPUs via --gpus")
+    if args.flavor == "debugmodel" and (args.nvfp4 or args.mxfp8) and args.nproc_per_node != 2:
+        raise SystemExit(
+            "--nvfp4/--mxfp8 debugmodel requires exactly 2 GPUs via --gpus"
+        )
 
     _ensure_assets(args.flavor)
 
     RESULTS_DIR.mkdir(exist_ok=True)
     ts = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    log_path = RESULTS_DIR / f"{ts}_titan_deepseek_v3_{args.flavor}.txt"
+    precision = "mxfp8" if args.mxfp8 else "nvfp4" if args.nvfp4 else "bf16"
+    compile_suffix = "_compile" if args.trainer == "graph" or args.compile else ""
+    log_path = RESULTS_DIR / (
+        f"{ts}_titan_deepseek_v3_{args.flavor}_{args.trainer}_{precision}"
+        f"{compile_suffix}.txt"
+    )
     cmd = _cmd(args)
     env = {**os.environ, "CUDA_VISIBLE_DEVICES": ",".join(gpus)}
+    if args.mxfp8:
+        # CUDA-built torchao first (MXFP8 _C_mxfp8 kernel), then plugin dir for the override.
+        env["PYTHONPATH"] = (
+            f"{MXFP8_TORCHAO_BUILD}:{PLUGIN_DIR}:{os.environ.get('PYTHONPATH', '')}"
+        )
+    elif args.nvfp4:
+        env["PYTHONPATH"] = f"{PLUGIN_DIR}:{os.environ.get('PYTHONPATH', '')}"
 
     print()
     print("=" * 72)
     print(f"TorchTitan DeepSeek V3 {args.flavor}")
+    print(f"Trainer: {args.trainer}")
+    print(f"Compile: {'yes' if args.trainer == 'graph' or args.compile else 'no'}")
     print(f"GPUs: {','.join(gpus)}")
     print(f"Processes: {args.nproc_per_node}")
     print(f"Batch {args.batch_size} x seq {args.seq_len}")
+    if args.target_tokens_per_expert is not None:
+        ep = args.expert_parallel_degree or 2
+        tokens = args.batch_size * args.seq_len
+        per_expert = tokens * MOE_16B_TOP_K * ep / MOE_16B_NUM_EXPERTS
+        aggregate = tokens * MOE_16B_TOP_K
+        print(
+            f"MoE M: T={tokens:,} (batch*seq) -> per-expert M={per_expert:,.0f} "
+            f"(EP={ep}, {MOE_16B_NUM_EXPERTS // ep} local experts), aggregate/rank={aggregate:,}"
+        )
+    if args.global_batch_size is not None:
+        print(f"Global batch: {args.global_batch_size}")
     print(f"Steps: {args.steps}")
     print(f"Log: {log_path}")
     print("=" * 72)
@@ -251,7 +356,15 @@ def run(args: argparse.Namespace) -> None:
     finally:
         thread.join(timeout=10)
 
-    _print_summary(log_path, args.batch_size, args.seq_len, args.nproc_per_node)
+    _print_summary(
+        log_path,
+        args.batch_size,
+        args.seq_len,
+        args.nproc_per_node,
+        args.global_batch_size,
+        args.trainer,
+        args.steps,
+    )
     if proc.returncode != 0:
         raise SystemExit(proc.returncode)
 
@@ -262,9 +375,15 @@ def main() -> None:
     )
     parser.add_argument(
         "--flavor",
-        choices=sorted(FLAVOR_CONFIGS),
+        choices=sorted(FLAVOR_DEFAULTS),
         default="debugmodel",
         help="DeepSeek V3 model flavor",
+    )
+    parser.add_argument(
+        "--trainer",
+        choices=sorted(TRAINER_MODULES),
+        default="eager",
+        help="Trainer implementation to launch",
     )
     parser.add_argument("--steps", type=int, default=None, help="Training steps")
     parser.add_argument("--gpu", type=int, default=0, help="GPU index")
@@ -286,7 +405,54 @@ def main() -> None:
         default=None,
         help="Sequence length",
     )
+    parser.add_argument(
+        "--global-batch-size",
+        type=int,
+        default=None,
+        help="Global batch size; enables gradient accumulation when larger than local batch times data-parallel degree",
+    )
+    parser.add_argument(
+        "--expert-parallel-degree",
+        type=int,
+        default=None,
+        help="Expert parallelism degree override",
+    )
+    parser.add_argument(
+        "--target-tokens-per-expert",
+        type=int,
+        default=None,
+        help="For --flavor 16b: size local batch so each local expert's grouped-GEMM sees "
+        "~this many tokens (per-expert M). Overrides --batch-size",
+    )
+    parser.add_argument(
+        "--dataset",
+        type=str,
+        default="c4_test",
+        help="TorchTitan dataloader dataset",
+    )
     parser.add_argument("--log-freq", type=int, default=1, help="Metrics log frequency")
+    parser.add_argument(
+        "--nvfp4",
+        action="store_true",
+        help="Enable torchao NVFP4 overrides (select which with --nvfp4-target)",
+    )
+    parser.add_argument(
+        "--nvfp4-target",
+        choices=sorted(NVFP4_TARGET_MODULES),
+        default="both",
+        help="Which NVFP4 override(s) to import when --nvfp4 is set (default: both)",
+    )
+    parser.add_argument(
+        "--mxfp8",
+        action="store_true",
+        help="Enable MXFP8 MoE grouped-experts quantization (torchtitan MXFP8 converter; "
+        "requires the CUDA-built torchao). Mutually exclusive with --nvfp4",
+    )
+    parser.add_argument(
+        "--compile",
+        action="store_true",
+        help="Enable TorchTitan compile for the eager trainer; graph trainer compiles by default",
+    )
     args = parser.parse_args()
     defaults = FLAVOR_DEFAULTS[args.flavor]
     if args.steps is None:
@@ -295,6 +461,14 @@ def main() -> None:
         args.batch_size = defaults["batch_size"]
     if args.seq_len is None:
         args.seq_len = defaults["seq_len"]
+    if args.target_tokens_per_expert is not None:
+        if args.flavor != "16b":
+            raise SystemExit("--target-tokens-per-expert is only supported for --flavor 16b")
+        if args.target_tokens_per_expert <= 0:
+            raise SystemExit("--target-tokens-per-expert must be positive")
+        ep = args.expert_parallel_degree or 2
+        per_unit_batch = MOE_16B_TOP_K * ep * args.seq_len / MOE_16B_NUM_EXPERTS
+        args.batch_size = math.ceil(args.target_tokens_per_expert / per_unit_batch)
     run(args)
 
 

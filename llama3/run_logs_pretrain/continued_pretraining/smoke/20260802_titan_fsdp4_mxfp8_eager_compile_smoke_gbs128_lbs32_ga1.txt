@@ -1,0 +1,69 @@
+W0802 12:11:01.830000 140025 /opt/pytorch/pytorch/torch/distributed/run.py:874] 
+W0802 12:11:01.830000 140025 /opt/pytorch/pytorch/torch/distributed/run.py:874] *****************************************
+W0802 12:11:01.830000 140025 /opt/pytorch/pytorch/torch/distributed/run.py:874] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0802 12:11:01.830000 140025 /opt/pytorch/pytorch/torch/distributed/run.py:874] *****************************************
+W0802 12:11:11.089000 140095 /opt/pytorch/pytorch/torch/utils/_pytree.py:630] <enum 'KernelPreference'> is an Enum subclass and is now natively supported by torch.compile as an opaque value type. Calling register_constant() on Enum subclasses is deprecated and will be an error in a future release.
+W0802 12:11:11.628000 140095 /opt/pytorch/pytorch/torch/utils/_pytree.py:630] <enum 'ScaleCalculationMode'> is an Enum subclass and is now natively supported by torch.compile as an opaque value type. Calling register_constant() on Enum subclasses is deprecated and will be an error in a future release.
+[titan] 2026-08-02 12:11:12,636 - root - INFO - torchtitan version: 0.2.2 (0.0.0 means __version__ is not defined correctly).
+[titan] 2026-08-02 12:11:12,641 - root - WARNING - initial_load_model_only=True has no effect without an initial_load_path.
+[titan] 2026-08-02 12:11:12,643 - root - INFO - Converted Linear layers to MXFP8Linear
+[titan] 2026-08-02 12:11:12,709 - root - WARNING - initial_load_model_only=True has no effect without an initial_load_path.
+[titan] 2026-08-02 12:11:12,710 - torchtitan.observability.structured_logger.jsonl_handler - INFO - Structured logging -> JSONL: /home/me/nvfp4/third_party/torchtitan/outputs/structured_logs/training.global_rank_0.20260802-121112-QQ2N7U.jsonl
+[titan] 2026-08-02 12:11:13,285 - root - WARNING - ENV[TORCH_NCCL_ASYNC_ERROR_HANDLING] = 1 will be overridden to 3 based on job config
+[titan] 2026-08-02 12:11:13,299 - root - INFO - Building device mesh with parallelism: pp=1, dp_replicate=1, dp_shard=4, cp=1, tp=1, ep=1
+[titan] 2026-08-02 12:11:13,312 - root - INFO - Successfully created meshes with active dimensions: ['batch', 'loss', 'efsdp', 'fsdp']
+[titan] 2026-08-02 12:11:13,312 - root - INFO - [GC] Initial GC collection took 0.00 seconds
+[titan] 2026-08-02 12:11:16,960 - root - INFO - Building llama3 8B
+[titan] 2026-08-02 12:11:17,096 - root - INFO - CUDA capacity: NVIDIA GB200 with 184.30GiB memory
+[titan] 2026-08-02 12:11:17,161 - root - INFO - [34mModel llama3 8B [31msize: 8,030,261,248 total parameters[39m
+[titan] 2026-08-02 12:11:17,174 - root - INFO - Applied SelectiveAC activation checkpointing to the model
+[titan] 2026-08-02 12:11:17,188 - root - INFO - Compiling each TransformerBlock with torch.compile
+[titan] 2026-08-02 12:11:17,247 - root - INFO - Applied FSDP to the model
+[titan] 2026-08-02 12:11:17,731 - root - INFO - Peak FLOPS used for computing MFU: 2.500e+15
+[titan] 2026-08-02 12:11:17,731 - root - INFO - CUDA memory usage for model: 10.10GiB(5.48%)
+[titan] 2026-08-02 12:11:17,732 - root - INFO - Optimizer AdamW (model_part=0): 227 params [.*] {'fused': True, 'foreach': False, 'lr': 2e-05, 'betas': (0.9, 0.95), 'eps': 1e-08, 'weight_decay': 0.1}
+[titan] 2026-08-02 12:11:17,733 - root - WARNING - Warmup steps (200) exceed total steps (2). Adjusting warmup steps to 2.
+[titan] 2026-08-02 12:11:17,733 - root - INFO - Loading tokenizer from tokenizer.json
+[titan] 2026-08-02 12:11:17,973 - root - INFO - Preparing c4 dataset from allenai/c4
+[titan] 2026-08-02 12:11:18,182 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/datasets/allenai/c4/resolve/main/README.md "HTTP/1.1 307 Temporary Redirect"
+[titan] 2026-08-02 12:11:18,209 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/datasets/allenai/c4/1588ec454efa1a09f29cd18ddd04fe05fc8653a2/README.md "HTTP/1.1 200 OK"
+[titan] 2026-08-02 12:11:18,329 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/datasets/allenai/c4/resolve/1588ec454efa1a09f29cd18ddd04fe05fc8653a2/c4.py "HTTP/1.1 404 Not Found"
+[titan] 2026-08-02 12:11:18,553 - httpx - INFO - HTTP Request: HEAD https://s3.amazonaws.com/datasets.huggingface.co/datasets/datasets/allenai/c4/allenai/c4.py "HTTP/1.1 404 Not Found"
+[titan] 2026-08-02 12:11:18,762 - httpx - INFO - HTTP Request: GET https://huggingface.co/api/datasets/allenai/c4/revision/1588ec454efa1a09f29cd18ddd04fe05fc8653a2 "HTTP/1.1 200 OK"
+[titan] 2026-08-02 12:11:19,051 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/datasets/allenai/c4/resolve/1588ec454efa1a09f29cd18ddd04fe05fc8653a2/.huggingface.yaml "HTTP/1.1 404 Not Found"
+[titan] 2026-08-02 12:11:19,274 - httpx - INFO - HTTP Request: GET https://datasets-server.huggingface.co/info?dataset=allenai/c4 "HTTP/1.1 200 OK"
+[titan] 2026-08-02 12:11:19,449 - httpx - INFO - HTTP Request: GET https://huggingface.co/api/datasets/allenai/c4/tree/1588ec454efa1a09f29cd18ddd04fe05fc8653a2/en?recursive=true&expand=false "HTTP/1.1 200 OK"
+[titan] 2026-08-02 12:11:19,605 - httpx - INFO - HTTP Request: GET https://huggingface.co/api/datasets/allenai/c4/tree/1588ec454efa1a09f29cd18ddd04fe05fc8653a2/en?expand=false&recursive=true&limit=1000&cursor=ZXlKbWFXeGxYMjVoYldVaU9pSmxiaTlqTkMxMGNtRnBiaTR3TURrNU9TMXZaaTB3TVRBeU5DNXFjMjl1TG1kNklpd2lkSEpsWlY5dmFXUWlPaUprWXprME0yTTBZelF3WmpVelpEQXlZak14WTJWa01XUmxabUUzWlRWbU5ETTRaRFU0TmpKbEluMD06MTAwMA%3D%3D "HTTP/1.1 200 OK"
+[titan] 2026-08-02 12:11:19,718 - httpx - INFO - HTTP Request: GET https://huggingface.co/api/datasets/allenai/c4/tree/1588ec454efa1a09f29cd18ddd04fe05fc8653a2?recursive=false&expand=false "HTTP/1.1 200 OK"
+[titan] 2026-08-02 12:11:19,903 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/datasets/allenai/c4/resolve/1588ec454efa1a09f29cd18ddd04fe05fc8653a2/dataset_infos.json "HTTP/1.1 404 Not Found"
+/usr/local/lib/python3.12/dist-packages/torchdata/stateful_dataloader/stateful_dataloader.py:379: UserWarning: 'set_vital' is deprecated, please do not call
+  torch.set_vital("Dataloader", "enabled", "True")  # type: ignore[attr-defined]
+[titan] 2026-08-02 12:11:20,020 - root - WARNING - initial_load_model_only=True has no effect without an initial_load_path.
+[titan] 2026-08-02 12:11:20,071 - root - INFO - Checkpointing active. Checkpoints will be loaded from and saved to ./outputs/checkpoint
+[titan] 2026-08-02 12:11:20,071 - root - INFO - Trainer is initialized with local batch size 32, global batch size 128, gradient accumulation steps 1, sequence length 2048, total steps 2 (warmup 200)
+[titan] 2026-08-02 12:11:20,071 - root - INFO - Loading HF safetensors from --model.hf_assets_path: ./assets/hf/Llama-3.1-8B
+[titan] 2026-08-02 12:11:20,071 - root - INFO - Loading the checkpoint from ./assets/hf/Llama-3.1-8B.
+[titan] 2026-08-02 12:11:21,483 - root - INFO - [GC] GC collection for checkpoint loading. took 0.01 seconds
+[titan] 2026-08-02 12:11:21,483 - root - INFO - Finished loading the checkpoint in 1.41 seconds.
+[titan] 2026-08-02 12:11:21,483 - root - INFO - Training starts at step 1
+[titan] 2026-08-02 12:11:21,629 - httpx - INFO - HTTP Request: GET https://huggingface.co/api/datasets/allenai/c4/revision/1588ec454efa1a09f29cd18ddd04fe05fc8653a2 "HTTP/1.1 200 OK"
+[titan] 2026-08-02 12:11:21,866 - httpx - INFO - HTTP Request: GET https://huggingface.co/api/datasets/allenai/c4/tree/1588ec454efa1a09f29cd18ddd04fe05fc8653a2/en?recursive=false&expand=false "HTTP/1.1 200 OK"
+[titan] 2026-08-02 12:11:22,102 - httpx - INFO - HTTP Request: GET https://huggingface.co/api/datasets/allenai/c4/tree/1588ec454efa1a09f29cd18ddd04fe05fc8653a2/en?expand=false&recursive=false&limit=1000&cursor=ZXlKbWFXeGxYMjVoYldVaU9pSmxiaTlqTkMxMGNtRnBiaTR3TURrNU9TMXZaaTB3TVRBeU5DNXFjMjl1TG1kNklpd2lkSEpsWlY5dmFXUWlPaUprWXprME0yTTBZelF3WmpVelpEQXlZak14WTJWa01XUmxabUUzWlRWbU5ETTRaRFU0TmpKbEluMD06MTAwMA%3D%3D "HTTP/1.1 200 OK"
+[titan] 2026-08-02 12:11:22,226 - httpx - INFO - HTTP Request: GET https://huggingface.co/datasets/allenai/c4/resolve/1588ec454efa1a09f29cd18ddd04fe05fc8653a2/en/c4-train.00000-of-01024.json.gz "HTTP/1.1 302 Found"
+[titan] 2026-08-02 12:11:22,472 - httpx - INFO - HTTP Request: GET https://us.aws.cdn.hf.co/xet-bridge-us/621ffdd236468d709f182a80/6656aac078668b0d5feb1cfb7b04def05bff73e7e375d0a66e252827336ac1a8?response-content-type=application%2Fgzip&X-Xet-Cas-Uid=686086d1d9ff7d702fbeb28d&response-content-disposition=inline%3B+filename*%3DUTF-8%27%27c4-train.00000-of-01024.json.gz%3B+filename%3D%22c4-train.00000-of-01024.json.gz%22%3B&user_id=686086d1d9ff7d702fbeb28d&Expires=1785701482&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly91cy5hd3MuY2RuLmhmLmNvL3hldC1icmlkZ2UtdXMvNjIxZmZkZDIzNjQ2OGQ3MDlmMTgyYTgwLzY2NTZhYWMwNzg2NjhiMGQ1ZmViMWNmYjdiMDRkZWYwNWJmZjczZTdlMzc1ZDBhNjZlMjUyODI3MzM2YWMxYThcXD9yZXNwb25zZS1jb250ZW50LXR5cGU9YXBwbGljYXRpb24lMkZnemlwJlgtWGV0LUNhcy1VaWQ9Njg2MDg2ZDFkOWZmN2Q3MDJmYmViMjhkJnJlc3BvbnNlLWNvbnRlbnQtZGlzcG9zaXRpb249aW5saW5lJTNCK2ZpbGVuYW1lJTJBJTNEVVRGLTglMjclMjdjNC10cmFpbi4wMDAwMC1vZi0wMTAyNC5qc29uLmd6JTNCK2ZpbGVuYW1lJTNEJTIyYzQtdHJhaW4uMDAwMDAtb2YtMDEwMjQuanNvbi5neiUyMiUzQiZ1c2VyX2lkPTY4NjA4NmQxZDlmZjdkNzAyZmJlYjI4ZCIsIkNvbmRpdGlvbiI6eyJEYXRlTGVzc1RoYW4iOnsiRXBvY2hUaW1lIjoxNzg1NzAxNDgyfSwiQnl0ZVJhbmdlIjp7IkV4cGVjdGVkSGVhZGVyIjoiYnl0ZXM9MC01MjQyODgxIn19fV19&Signature=MEUCIQCXlSEcVKk4CGPEQGSih-CeQ8I0sF5cg4tWlvBKamVNPQIgAzw8cttaUcMZxjv2oa%7EgN3IsJqVHaWcOX7j5OlPqleU_&Key-Pair-Id=01KXEF4KZ1B6FV465MAWR4M21F "HTTP/1.1 206 Partial Content"
+[rank0]:W0802 12:11:25.685000 140095 /opt/pytorch/pytorch/torch/_logging/_internal.py:1350] [1/0] 
+[rank0]:W0802 12:11:25.685000 140095 /opt/pytorch/pytorch/torch/_logging/_internal.py:1350] [1/0] Detected that context_fn is passed to torch.utils.checkpoint under torch.compile.
+[rank0]:W0802 12:11:25.685000 140095 /opt/pytorch/pytorch/torch/_logging/_internal.py:1350] [1/0] Please make sure the checkpointed region does not contain in-place ops (e.g. torch.relu_).
+[rank0]:W0802 12:11:25.685000 140095 /opt/pytorch/pytorch/torch/_logging/_internal.py:1350] [1/0] 
+/opt/pytorch/pytorch/torch/_inductor/lowering.py:2712: UserWarning: Torchinductor does not support code generation for complex operators. Performance may be worse than eager.
+  warnings.warn(
+[titan] 2026-08-02 12:12:12,107 - root - INFO - [31mstep:  1  [32mloss:  2.22717  [38;2;180;60;0mgrad_norm:  1.1908  [38;2;54;234;195mmemory: 167.43GiB(90.85%)  [34mtps: 1,193  [36mtflops: 57.55  [35mmfu: N/A[39m
+[titan] 2026-08-02 12:12:12,108 - root - INFO - Synchronizing and adjusting timeout for all ProcessGroups to 0:01:40
+[rank0]:[W802 12:12:12.418683109 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 4202692608 bytes (free: 395771904, total: 197890015232).
+[rank0]:[W802 12:12:13.644024799 CUDACachingAllocator.cpp:3936] memory allocation failed with OOM on device 0 while trying to allocate 220200960 bytes (free: 165085184, total: 197890015232).
+[titan] 2026-08-02 12:12:14,556 - root - WARNING - 2 CUDA memory allocation retries.
+[titan] 2026-08-02 12:12:14,556 - root - INFO - [31mstep:  2  [32mloss:  2.32839  [38;2;180;60;0mgrad_norm:  1.1477  [38;2;54;234;195mmemory: 179.39GiB(97.34%)  [34mtps: 26,768  [36mtflops: 1,291.58  [35mmfu: N/A[39m
+[titan] 2026-08-02 12:12:14,556 - root - INFO - Sleeping 2 seconds for other ranks to complete
+[titan] 2026-08-02 12:12:16,556 - root - INFO - Training completed
+[titan] 2026-08-02 12:12:16,557 - root - INFO - Destroying the purge thread.
+[titan] 2026-08-02 12:12:16,652 - root - INFO - Process group destroyed

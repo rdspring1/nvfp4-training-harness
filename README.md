@@ -42,7 +42,7 @@ different `--gpu` values.
 ### TorchTitan Smoke
 
 ```bash
-python llama3/run_titan.py single --smoke --gpu 0 --nvfp4
+python llama3/run_titan.py single --smoke --gpu 0 --nvfp4-mixed
 python deepseek_v3/run_titan.py --steps 1 --gpu 0
 ```
 

@@ -164,7 +164,7 @@ def _hf_assets_path_for_config(base_config: str) -> str | None:
 
 
 def _precision_flags(mxfp8: bool) -> list[str]:
-    # NVFP4 is selected via the `llama3_8b_nvfp4_mixed` config (converter and
+    # NVFP4 is selected via the `llama3_8b_first_85_pct_layers_nvfp4` config (converter and
     # compile baked in), not an override import. MXFP8 still uses its override.
     if mxfp8:
         return ["--override.imports", MXFP8_OVERRIDE_MODULE]
@@ -234,14 +234,14 @@ def run_single(args):
     if args.nvfp4_mixed and args.graph:
         raise SystemExit(
             "--nvfp4-mixed does not support --graph; "
-            "TorchTitan only provides llama3_8b_nvfp4_mixed"
+            "TorchTitan only provides llama3_8b_first_85_pct_layers_nvfp4"
         )
     base_config = (
         "llama3_8b" if args.nvfp4_mixed or not smoke else "llama3_debugmodel"
     )
     module = _trainer_module(args.graph)
     config = (
-        "llama3_8b_nvfp4_mixed"
+        "llama3_8b_first_85_pct_layers_nvfp4"
         if args.nvfp4_mixed
         else _trainer_config(base_config, args.graph)
     )
@@ -456,14 +456,14 @@ def run_multi(args):
     if args.nvfp4_mixed and args.graph:
         raise SystemExit(
             "--nvfp4-mixed does not support --graph; "
-            "TorchTitan only provides llama3_8b_nvfp4_mixed"
+            "TorchTitan only provides llama3_8b_first_85_pct_layers_nvfp4"
         )
     base_config = (
         "llama3_8b" if args.nvfp4_mixed or not smoke else "llama3_debugmodel"
     )
     module = _trainer_module(args.graph)
     config = (
-        "llama3_8b_nvfp4_mixed"
+        "llama3_8b_first_85_pct_layers_nvfp4"
         if args.nvfp4_mixed
         else _trainer_config(base_config, args.graph)
     )
@@ -679,7 +679,7 @@ def main():
         "--nvfp4-mixed",
         action="store_true",
         help=(
-            "Enable mixed NVFP4 via llama3_8b_nvfp4_mixed "
+            "Enable mixed NVFP4 via llama3_8b_first_85_pct_layers_nvfp4 "
             "(last ~15%% of layers kept in bf16)"
         ),
     )
@@ -750,7 +750,7 @@ def main():
         "--nvfp4-mixed",
         action="store_true",
         help=(
-            "Enable mixed NVFP4 via llama3_8b_nvfp4_mixed "
+            "Enable mixed NVFP4 via llama3_8b_first_85_pct_layers_nvfp4 "
             "(last ~15%% of layers kept in bf16)"
         ),
     )

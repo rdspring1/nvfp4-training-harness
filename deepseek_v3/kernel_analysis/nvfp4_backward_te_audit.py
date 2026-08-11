@@ -707,15 +707,23 @@ def stage_b6c_sr_vs_rtne(device, models, n_groups=4, rows_per_group=256,
     coherently. Comparing single-draw SQNR therefore measures the cost and
     misses the benefit entirely.
 
-    Note wgrad applies SR to only ONE operand: x_col is quantized during
-    forward with SR off (nvfp4_grouped_mm.py:172-187), matching TE's recipe
-    (fp4_quant_fwd_inp has stochastic_rounding=False). So E[wgrad] is
-    dy^T @ x_rtne, and x's RTNE bias remains as a floor that SR on dy cannot
-    remove. That floor is measured here too.
+    grad_output is the ONLY tensor stochastic rounding ever touches -- both its
+    row and col outputs, from the single enable_stochastic_rounding=True call at
+    nvfp4_grouped_mm.py:292. The forward call at :184 passes False, and
+    triton_group_weight_quantize_2d has no SR path at all. So each backward GEMM
+    has exactly one SR operand and one RTNE operand:
+
+        dgrad = dy_row (SR) @ weight_t^T (RTNE)
+        wgrad = dy_col (SR) @ x_col^T    (RTNE)
+
+    Both therefore keep a residual RTNE bias contributed by their *other*
+    operand, which averaging over SR draws can never remove. Both floors are
+    measured: x_col's for wgrad, weight_t's for dgrad.
     """
     from torchao.prototype.moe_training.nvfp4_training.hadamard_utils import get_rht_matrix
 
-    triton_group_rht_amax, _, _, VARYING_FIRST_DIM, from_blocked = ao_mods()
+    (triton_group_rht_amax, _, triton_group_weight_quantize_2d,
+     VARYING_FIRST_DIM, from_blocked) = ao_mods()
 
     for model in models:
         dim, hidden, _ = moe_dims(model)
@@ -764,9 +772,60 @@ def stage_b6c_sr_vs_rtne(device, models, n_groups=4, rows_per_group=256,
         record("B6c-sr", sh, f"SR averaged over {n_draws}", True, 0, 0, 0,
                f"relL2 {rel(acc / n_draws):.5f}  -- unbiased, converges to the floor",
                info=True)
-        record("B6c-sr", sh, "floor: exact dy, RTNE x", True, 0, 0, 0,
+        record("B6c-sr", sh, "wgrad floor: exact dy, RTNE x", True, 0, 0, 0,
                f"relL2 {rel(dy_rht @ xg.t()):.5f}  -- x_col RTNE bias; SR on dy "
                f"cannot remove it", info=True)
+
+        # ---- the same accounting for dgrad, whose RTNE operand is weight_t ----
+        # dgrad = dy_row @ weight_t^T. dy_row carries no RHT (row path), and
+        # weight_t is the 2D-quantized W.T produced during forward with no SR.
+        E = n_groups
+        W = torch.randn(E, N, K, dtype=torch.bfloat16, device=device) * 0.02
+        w_amax = W.float().abs().amax(dim=(1, 2))
+        _, _, wt_codes, wt_sf = triton_group_weight_quantize_2d(W, w_amax, E)
+        wt_dq = ao_dequant(wt_codes[0],
+                           from_blocked(wt_sf[0].reshape(-1), K, N // 16),
+                           w_amax[0])                      # (K, N) ~= W[0].T
+        ref_d = dy[:sz].float() @ W[0].float()             # (sz, K)
+
+        def dgrad(rng):
+            qa, sfa, _, _ = _quantize_group(dy, offs, n_groups, N,
+                                            row_amax=dr, col_amax=dc, rng=rng)
+            dq = ao_dequant(qa[:sz], from_blocked(sfa, M, N // 16)[:sz], dr[0])
+            return dq @ wt_dq.t()
+
+        rel_d = lambda a: float((a - ref_d).norm() / ref_d.norm())
+        rtne_d = dgrad(None)
+        acc_d = torch.zeros_like(rtne_d)
+        first_d = None
+        for d in range(n_draws):
+            a = dgrad(_rng_state(7, 300 + d, 1300 + d, device))
+            acc_d += a
+            if d == 0:
+                first_d = a
+
+        record("B6c-sr", sh, "RTNE dgrad", True, 0, 0, 0,
+               f"relL2 {rel_d(rtne_d):.5f}  -- biased, never averages away", info=True)
+        record("B6c-sr", sh, "single-draw SR dgrad", True, 0, 0, 0,
+               f"relL2 {rel_d(first_d):.5f}  -- worse per draw, by design", info=True)
+        record("B6c-sr", sh, f"SR dgrad averaged over {n_draws}", True, 0, 0, 0,
+               f"relL2 {rel_d(acc_d / n_draws):.5f}  -- unbiased, converges to the floor",
+               info=True)
+        record("B6c-sr", sh, "dgrad floor: exact dy, RTNE weight_t", True, 0, 0, 0,
+               f"relL2 {rel_d(dy[:sz].float() @ wt_dq.t()):.5f}  -- weight_t RTNE bias; "
+               f"SR on dy cannot remove it", info=True)
+
+        # Attribute the dgrad floor. weight_t is the only operand in the whole
+        # step that gets none of the three mitigations: 2D 16x16 blocks (one
+        # scale per 256 elements instead of 16), no RHT, no SR. Re-quantizing
+        # W.T with 1D 1x16 blocks isolates the cost of the 2D blocking alone.
+        t1d = te_quantize(W[0].t().contiguous(), two_d=False, amax=w_amax[0])
+        c1d, s1d = te_extract(t1d, K, N)
+        dq1d = te_dequant(c1d, s1d, w_amax[0])
+        record("B6c-sr", sh, "  dgrad floor if weight_t were 1D", True, 0, 0, 0,
+               f"relL2 {rel_d(dy[:sz].float() @ dq1d.t()):.5f}  -- the 2D-vs-1D "
+               f"blocking cost, isolated (RHT contributes ~nothing on Gaussian W)",
+               info=True)
 
 
 # --------------------------------------------------------------------------

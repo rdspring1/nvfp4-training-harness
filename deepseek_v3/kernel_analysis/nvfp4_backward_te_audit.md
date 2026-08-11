@@ -119,14 +119,58 @@ Averaged SR converges essentially onto the floor (0.097 vs 0.095), while RTNE
 sits at 0.134 with a systematic component that never averages away. SR is the
 correct choice here and the implementation delivers the property it exists for.
 
-**Structural note:** wgrad applies SR to only **one** operand. `x_col` is
-quantized during the forward pass with SR off
-(`nvfp4_grouped_mm.py:172-187`), matching TE's recipe, where
-`fp4_quant_fwd_inp` has `stochastic_rounding=False`. So `E[wgrad]` is
-`dy^T @ x_rtne`, not `dy^T @ x`, and `x_col`'s round-to-nearest bias survives as
-the 0.095 floor no matter how many steps are averaged. This is intended rather
-than a defect, but it means the wgrad estimator is unbiased with respect to the
-gradient and biased with respect to the activation.
+### Each backward GEMM keeps a residual RTNE floor
+
+`grad_output` is the only tensor SR ever touches -- both its row and col
+outputs, from the single `enable_stochastic_rounding=True` call at
+`nvfp4_grouped_mm.py:292`. The forward call at `:184` passes `False`, and
+`triton_group_weight_quantize_2d` has no SR path at all. So the forward GEMM has
+zero SR operands and each backward GEMM has exactly one:
+
+```
+dgrad = dy_row (SR) @ weight_t^T (RTNE)
+wgrad = dy_col (SR) @ x_col^T    (RTNE)
+```
+
+Both therefore keep a bias contributed by their *other* operand, which averaging
+SR draws can never remove. Measured (16B; debugmodel agrees to 4 decimals, so
+this is shape-independent):
+
+| | wgrad | dgrad |
+|---|---|---|
+| RTNE | 0.13470 | 0.14602 |
+| single-draw SR | 0.16710 | 0.17656 |
+| SR averaged over 64 | 0.09725 | 0.11294 |
+| **floor (the RTNE operand)** | **0.09533** (`x_col`) | **0.11131** (`weight_t`) |
+
+Averaged SR converges to within 1.3-1.6% of each floor, which is what
+unbiasedness looks like at the GEMM level.
+
+**The dgrad floor is ~17% higher, and it is entirely the 2D blocking.**
+`weight_t` is the only operand in the step that gets none of the three
+mitigations: 2D 16x16 block scales, no RHT, no SR. Re-quantizing the same `W.T`
+with 1D 1x16 blocks isolates the cause:
+
+| `weight_t` variant | dgrad floor |
+|---|---|
+| as shipped: 2D 16x16, no RHT | 0.11116 |
+| 1D 1x16, no RHT | **0.09511** |
+| TE 2D, cross-check | 0.11115 |
+
+1D lands at 0.09511, essentially identical to the wgrad floor of 0.09533 whose
+operand *does* carry RHT. So on this data RHT buys nothing and the whole gap is
+2D blocking sharing one scale across 256 elements instead of 16.
+
+This matters more than the wgrad number because dgrad propagates backwards
+through every layer, so its bias compounds with depth while wgrad's applies once
+per weight.
+
+Two caveats before acting on it. 2D weight quantization is deliberate -- it lets
+one quantized weight serve both the forward GEMM and dgrad with consistent
+scales, and TE's `fp4_quant_fwd_weight` sets `fp4_2d_quantization=True` for the
+same reason -- so switching to 1D is a real cost/accuracy trade, not a free win.
+And these are random Gaussian weights, which have no outliers for RHT to fix;
+on trained weights RHT would likely contribute more than the ~0 measured here.
 
 ## Two corrections to claims made during the run
 
@@ -203,11 +247,18 @@ audit does not substitute for it.
 Both audits are clean, so the remaining explanations are recipe-level rather than
 kernel-level. In rough order of expected value:
 
-1. **Ablate the three MoE GEMMs.** Keep w2 in bf16 and quantize only w1/w3 (or
+1. **Try 1D block scaling for `weight_t`.** B6c attributes the dgrad bias floor
+   almost entirely to 2D 16x16 weight blocking: 0.111 as shipped versus 0.095
+   with 1D 1x16. dgrad bias compounds with depth, so this is the highest-leverage
+   single knob found in either audit. It costs a second weight quantization and
+   diverges from TE's recipe, so measure the loss curve before adopting it.
+2. **Ablate the three MoE GEMMs.** Keep w2 in bf16 and quantize only w1/w3 (or
    vice versa) and compare loss curves. If the gap collapses, compounding across
    the chain is confirmed as the mechanism and the fix is recipe selection, not
    a kernel patch.
-2. **Measure on a real checkpoint** at step ~50 and ~200, where the divergence
-   starts and where it grows, rather than on random weights.
-3. Fix the cross-rank `_sr_seed` collision by folding the rank into the seed --
+3. **Measure on a real checkpoint** at step ~50 and ~200, where the divergence
+   starts and where it grows, rather than on random weights. This also re-tests
+   the RHT contribution, which is ~0 on Gaussian weights but should be larger
+   where real outliers exist.
+4. Fix the cross-rank `_sr_seed` collision by folding the rank into the seed --
    cheap, correct, and removes a confound from any future measurement.

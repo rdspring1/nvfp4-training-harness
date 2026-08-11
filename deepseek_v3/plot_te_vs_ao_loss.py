@@ -40,16 +40,22 @@ SERIES = [
         "-",
     ),
     (
-        "deepseek_v3_16b_fsdp4_ep4_nvfp4_tail15_compile_200m_gbs128",
-        "NVFP4 TorchAO (15% bf16 tail)",
+        "deepseek_v3_16b_fsdp4_ep4_nvfp4_tail15_scalefix_compile_200m_gbs128",
+        "NVFP4 TorchAO, per-group scale fix",
         AO_COLOR,
         "-",
+    ),
+    (
+        "deepseek_v3_16b_fsdp4_ep4_nvfp4_tail15_compile_200m_gbs128",
+        "NVFP4 TorchAO, before the fix",
+        AO_COLOR,
+        (0, (5, 2)),
     ),
     (
         "deepseek_v3_16b_fsdp4_ep4_nvfp4_compile_200m_gbs128",
         "NVFP4 TorchAO, archived (no bf16 tail)",
         _REF_INK,
-        (0, (5, 2)),
+        (0, (3, 1, 1, 1)),
     ),
     (
         "deepseek_v3_16b_fsdp4_ep4_bf16_compile_200m_gbs128",
@@ -59,7 +65,8 @@ SERIES = [
     ),
 ]
 TE_LABEL = "NVFP4 TransformerEngine (15% bf16 tail)"
-AO_LABEL = "NVFP4 TorchAO (15% bf16 tail)"
+AO_LABEL = "NVFP4 TorchAO, per-group scale fix"
+AO_PREFIX_LABEL = "NVFP4 TorchAO, before the fix"
 
 
 def _series(run_dir: Path) -> tuple[list[int], list[float]]:
@@ -112,8 +119,21 @@ def main() -> None:
     shared = sorted(set(te) & set(ao))
     deltas = [te[s] - ao[s] for s in shared]
     ax_d.axhline(0, color="#9a9a9a", linewidth=1)
-    ax_d.plot(shared, deltas, color=TE_COLOR, linewidth=2)
-    ax_d.fill_between(shared, deltas, 0, color=TE_COLOR, alpha=0.15)
+    # Both deltas share this panel: the fix is only legible as a before/after.
+    pre = curves.get(AO_PREFIX_LABEL)
+    if pre:
+        shared_pre = sorted(set(te) & set(pre))
+        ax_d.plot(
+            shared_pre,
+            [te[s] - pre[s] for s in shared_pre],
+            color=AO_COLOR,
+            linestyle=(0, (5, 2)),
+            linewidth=2,
+        )
+    # Both deltas take the AO hue: they differ only in which AO build is on the
+    # other side of the subtraction, and blue here would read as the TE curve.
+    ax_d.plot(shared, deltas, color=AO_COLOR, linewidth=2)
+    ax_d.fill_between(shared, deltas, 0, color=AO_COLOR, alpha=0.15)
     # Direct-label the endpoint only -- the one number the panel exists to show.
     ax_d.annotate(
         f"{deltas[-1]:+.3f} at step {shared[-1]}",
@@ -128,10 +148,11 @@ def main() -> None:
     ax_d.set_ylabel("TE - TorchAO")
     ax_d.grid(True, alpha=0.25, linewidth=0.6)
     ax_d.text(
-        0.01,
+        0.99,
         0.06,
         "below zero = TransformerEngine lower loss",
         transform=ax_d.transAxes,
+        ha="right",
         fontsize=9,
         color="#6b6b6b",
     )

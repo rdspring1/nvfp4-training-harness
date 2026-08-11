@@ -61,6 +61,14 @@ Two separate effects are visible and should not be conflated:
    clean one-variable comparison -- TorchAO is 0.076 worse at step 380, one-sided
    at every logged step. See the TE run's `.md` for the per-step table.
 
+**Resolved.** Effect 2 was a TorchAO defect: the columnwise NVFP4 block scales
+were blocked over the packed extent instead of per group, corrupting the expert
+weight gradient. Root cause in
+`../../../kernel_analysis/nvfp4_module_te_vs_ao.md`, fix in torchao `b3c77e59`,
+re-run in `../deepseek_v3_16b_fsdp4_ep4_nvfp4_tail15_scalefix_compile_200m_gbs128/`,
+which lands at 4.61775 -- 0.002 *below* TE. This arm is retained as the pre-fix
+reference.
+
 ## Notes
 
 - lbs8/ga4 rather than the archived lbs16/ga2 because the TE arm OOMs at lbs16;

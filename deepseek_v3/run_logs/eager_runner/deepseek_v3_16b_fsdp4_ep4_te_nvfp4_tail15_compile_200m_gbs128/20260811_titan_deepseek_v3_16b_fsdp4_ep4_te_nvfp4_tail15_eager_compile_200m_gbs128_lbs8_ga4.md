@@ -81,6 +81,25 @@ See `../training_loss_te_vs_ao_nvfp4_200m_tokens.png` (lower panel).
 For scale, the archived bf16 run reaches 4.61289 at step 380. TE lands within
 0.007 of bf16; TorchAO sits 0.083 above it.
 
+## Resolution
+
+The -0.070 plateau was a TorchAO defect, not a property of the backend: the
+columnwise NVFP4 block scales were blocked over the packed extent rather than per
+group, so the expert weight gradient reached the optimizer with gain 0.88 against
+bf16 where TE reached 0.97. Root cause in
+`../../../kernel_analysis/nvfp4_module_te_vs_ao.md`; fix in torchao `b3c77e59`.
+
+Re-running the TorchAO arm with the fix
+(`../deepseek_v3_16b_fsdp4_ep4_nvfp4_tail15_scalefix_compile_200m_gbs128/`) moves
+the steps 230-380 plateau from -0.07019 to **+0.00290** and step 380 from -0.07618
+to +0.00227. This arm is unchanged and remains the comparator -- the fix is in a
+kernel the TE path never calls.
+
+That also settles the seed caveat below. The re-run is same-seed, same-command
+against the pre-fix arm, so the collapse is attributable to the one changed
+kernel; a seed sweep would have been a weaker instrument than the A/B that
+replaced it.
+
 ## Notes
 
 - **lbs 8, not 16.** The TE path OOMs at local batch 16 on 184 GiB GB200s: 180.6

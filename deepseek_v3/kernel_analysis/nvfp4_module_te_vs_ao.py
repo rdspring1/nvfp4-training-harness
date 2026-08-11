@@ -373,8 +373,20 @@ def stage_m6_wgrad_consumers(device, models, num_experts, rows_per_group) -> Non
             output_dtype=torch.bfloat16,
         )
 
-        xp = from_blocked(xsf, K, M // 16)
-        dp = from_blocked(dsf, N, M // 16)
+        def unswizzle(sf, rows, start, size):
+            """De-swizzle one group's block scales.
+
+            The columnwise buffer is a concatenation of per-group blocked
+            buffers, so a group's bytes are a contiguous run and must be
+            de-swizzled on their own extent -- de-swizzling the whole packed M
+            and slicing columns reads the wrong tiles.
+            """
+            tile = 32 * 16
+            base = (rows // 128) * (start // 64) * tile
+            span = (rows // 128) * (size // 64) * tile
+            group = sf.reshape(-1)[base:base + span].reshape(rows, size // 16)
+            return from_blocked(group, rows, size // 16)
+
         sh = f"{model} {N}x{K}"
         start = 0
         keys = ["dequant fp32", "scaled_grouped_mm", "kernel vs its own operands"]
@@ -384,9 +396,9 @@ def stage_m6_wgrad_consumers(device, models, num_experts, rows_per_group) -> Non
         for g, sz in enumerate(sizes):
             end = start + sz
             xg = ao_dequant(xcol[:, start // 2:end // 2],
-                            xp[:, start // 16:end // 16], xc[g])
+                            unswizzle(xsf, K, start, sz), xc[g])
             dg = ao_dequant(dcol[:, start // 2:end // 2],
-                            dp[:, start // 16:end // 16], dc[g])
+                            unswizzle(dsf, N, start, sz), dc[g])
             ref = dy[start:end].float().t() @ x[start:end].float()
             dequant = dg @ xg.t()
             for tag, got, base in (("dequant fp32", dequant, ref),

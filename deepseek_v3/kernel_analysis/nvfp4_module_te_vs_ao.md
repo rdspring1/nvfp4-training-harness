@@ -209,14 +209,26 @@ What catches it is checking against `scaled_grouped_mm` itself, which is what
 
 Two things to carry into any upstream PR:
 
-- **A behavior change on spare capacity rows.** When `logical_packed_length <
-  packed_sequence_length`, the old layout wrote zeros into the columnwise scale
-  tiles past the last group; the new one leaves that region unwritten
-  (`sfd_storage` is `torch.empty`). It is unreferenced -- the GEMM consumes only
-  the concatenated per-group prefix -- and unreachable from the MoE seam, which
-  sets `offs[-1] = A.shape[0]`. `test_group_rht_padded_capacity_masks_spare_rows`
-  lost that one assertion; the alternative is zero-initializing the buffer, at
-  the cost of a memset on every call for a case the training path never hits.
+- **A behavior change on spare capacity rows -- resolved, no action.** When
+  `logical_packed_length < packed_sequence_length`, the old layout wrote zeros
+  into the columnwise scale tiles past the last group; the new one leaves that
+  region unwritten (`sfd_storage` is `torch.empty`), and
+  `test_group_rht_padded_capacity_masks_spare_rows` lost that one assertion.
+
+  Measured directly rather than argued: with three 256-row groups in a
+  1024-column buffer, filling the 256 spare columns with NaN and with 448.0
+  (e4m3 max) both give output bit-identical to filling them with zeros. The GEMM
+  addresses exactly the concatenated per-group prefix.
+
+  The one condition that would expose the tail is a final group whose extent is
+  not a multiple of 64: the reader consumes `round_up(K_g/16, 4)` scale columns
+  per group and that padding is live, not masked -- a group of 208 rows (13
+  columns padded to 16) propagates NaN from those 3 columns into the output.
+  That cannot arise here, because the TorchAO token dispatcher pads every group,
+  including empty ones, to the configured multiple, so extents are always
+  128-multiples. Zero-initializing would buy nothing: in the out-of-contract case
+  the whole per-group layout is already wrong, and the kernel does not reject it
+  -- it returns silently wrong numbers either way.
 - **`test_nvfp4_grouped_mm.py` had a loosened bound hiding this bug.** It failed
   to collect at all on a dead import of `_to_nvfp4_then_scaled_grouped_mm` --
   pre-existing, first noted in the forward audit's coverage gaps, and a pure

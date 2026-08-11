@@ -16,7 +16,6 @@ import sys
 import torch
 
 from torchtitan.models.common.moe import GroupedExperts
-from torchtitan.models.common.token_dispatcher import LocalTokenDispatcher
 
 DIM = 7168
 HIDDEN = 2048
@@ -29,30 +28,33 @@ TOKENS = [512, 1024, 2048, 4096, 8192, 16384, 32768]
 
 
 def build(backend, num_experts):
-    disp = LocalTokenDispatcher.Config(num_experts=num_experts, top_k=TOP_K)
-    kw = dict(dim=DIM, hidden_dim=HIDDEN, num_experts=num_experts, token_dispatcher=disp)
+    kw = dict(dim=DIM, hidden_dim=HIDDEN, num_experts=num_experts)
     if backend == "bf16":
         return GroupedExperts.Config(**kw).build().cuda()
     if backend == "torchao":
-        from torchtitan.overrides.nvfp4_grouped_experts import NVFP4GroupedExperts
+        from torchtitan.components.quantization.nvfp4 import (
+            _get_nvfp4_grouped_experts_cls,
+        )
 
-        m = NVFP4GroupedExperts.Config(**kw).build().cuda()
-        m._init_self_buffers(buffer_device=torch.device("cuda"))
-        return m
-    if backend == "te":
-        from te_moe_overrides.te_grouped_experts import TEGroupedExperts
+        cls = _get_nvfp4_grouped_experts_cls(GroupedExperts)
+    elif backend == "te":
+        from te_moe_overrides.te_nvfp4 import _get_te_grouped_experts_cls
 
-        m = TEGroupedExperts.Config(**kw).build().cuda()
-        m._ensure_te_state()
-        return m
-    if backend == "mxfp8":
+        cls = _get_te_grouped_experts_cls(GroupedExperts)
+    elif backend == "mxfp8":
         from torchtitan.components.quantization.mx import (
             _get_mxfp8_grouped_experts_cls,
         )
 
         cls = _get_mxfp8_grouped_experts_cls(GroupedExperts)
-        return cls.Config(**kw).build().cuda()
-    raise SystemExit(f"unknown backend {backend}")
+    else:
+        raise SystemExit(f"unknown backend {backend}")
+
+    m = cls.Config(**kw).build().cuda()
+    # Materializes the per-backend runtime state (TorchAO's _sr_seed /
+    # _rht_sign_vector, TE's quantizers) that the _grouped_mm seam reads.
+    m._init_self_buffers(buffer_device=torch.device("cuda"))
+    return m
 
 
 def bench(m, num_experts, tpe):
@@ -63,7 +65,7 @@ def bench(m, num_experts, tpe):
     def step():
         m.zero_grad(set_to_none=True)
         x.grad = None
-        out = m._experts_forward(x, num_tokens)
+        out = m(x, num_tokens)
         out.backward(torch.ones_like(out))
 
     for _ in range(WARMUP):

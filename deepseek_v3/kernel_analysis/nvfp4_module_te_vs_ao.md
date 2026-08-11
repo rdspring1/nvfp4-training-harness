@@ -16,9 +16,9 @@ sign one-sided at 39/39 logged steps.
 
 ## Conclusion
 
-**TorchAO's NVFP4 weight gradient is wrong, and the defect is in the grouped
-GEMM, not in the quantization.** Feeding one set of TorchAO-quantized wgrad
-operands to two consumers:
+**TorchAO's NVFP4 weight gradient is wrong, and the defect is in the block-scale
+layout it hands the grouped GEMM, not in the quantization.** Feeding one set of
+TorchAO-quantized wgrad operands to two consumers:
 
 | consumer of the same codes + scales | relL2 vs bf16 wgrad |
 | --- | ---: |
@@ -59,9 +59,32 @@ scale buffer once over the full packed M -- `sfd_storage` is
 `(hidden//128, M//64, 32, 16)`
 (`group_rht_quantize_row_col_triton.py:305-313`) -- and hands the whole thing to
 `F.scaled_grouped_mm` with `offs` partitioning M
-(`nvfp4_grouped_mm.py:310-321`). Those two agree only when there is a single
-group, so the grouped GEMM is reading each group's block scales from a layout
-that was not written for it.
+(`nvfp4_grouped_mm.py:310-321`).
+
+`scaled_grouped_mm_kgrouped_repro.py` settles which side is at fault, in torch
+alone with no quantizer in the loop. The kernel is correct; the layout is wrong.
+It requires each group's block scales swizzled *independently* and the flattened
+blocked buffers concatenated -- which is what
+`aten/src/ATen/native/cuda/GroupedBlas.cpp:401-403` documents as
+`rounded_up_per_group(K/blocksize, 4)`. On operands that dequantize exactly:
+
+| groups | torchao's whole-M swizzle | per-group swizzle |
+| ---: | ---: | ---: |
+| 1 | 0.00166 | 0.00166 |
+| 2 | 1.00284 | 0.00166 |
+| 4 | 1.14787 | 0.00166 |
+| 8 | 1.21221 | 0.00165 |
+
+0.0017 is bf16 output rounding, i.e. exact. Two controls make this an
+attribution rather than a guess: every layout is exact at one group, so the
+packing and swizzle in the repro are right; and with all block scales set equal,
+every group count is exact under torchao's own layout, so the codes, the `offs`
+handling and the accumulation are all fine and only scale *addressing* is
+implicated.
+
+The forward and dgrad GEMMs escape this because they group the output rows and
+read the *rowwise* scale buffer, whose blocked axis is the ungrouped hidden dim;
+their 128-row tiling already coincides with the per-group one.
 
 The wgrad is the only GEMM in the recipe whose *contraction* dimension is the
 grouped one. The forward and dgrad group the output rows instead, use the
@@ -147,20 +170,22 @@ the cross-rank seed collision from the backward audit as real-but-not-the-cause.
   expert dims, 4 experts x 256 rows. The group-count sweep is the load-bearing
   evidence and it is shape-independent in mechanism, but the specific relL2
   values are not.
-- Which side of the `F.scaled_grouped_mm` contract is at fault -- TorchAO's
-  whole-M swizzle or the kernel's per-group scale addressing -- is not
-  established here. Only the disagreement is, and that it is exact at one group.
 - The training runs used `pad_multiple=128` groups from the dispatcher; this
   probe uses 256-row groups, both multiples of the 64-element swizzle stride, so
-  neither is a misalignment case.
+  neither is a misalignment case. Alignment is not the issue -- per-group
+  swizzling is.
 
 ## Next step
 
-Reproduce the M6 group-count sweep as a standalone `F.scaled_grouped_mm` repro
-without torchao in the loop -- quantize a known matrix, run it at 1 and 4 groups,
-diff against the dequantized reference -- and take it to whichever of torchao or
-pytorch owns the columnwise grouped scale layout. Everything downstream (the
-0.070 loss gap, the 0.88 gain, the three-GEMM compounding) follows from that one
-disagreement, so there is nothing else to chase until it is resolved.
+Fix the layout in torchao: the columnwise scale buffers feeding the wgrad GEMM
+(`sfa_storage` / `sfd_storage` in `group_rht_quantize_row_col_triton.py`) must be
+swizzled per expert group rather than once over the packed M, or the wgrad call
+must be given per-group-blocked views. Then re-run
+`scaled_grouped_mm_kgrouped_repro.py` (expects exit 0 once the shipped layout
+matches), `nvfp4_module_te_vs_ao.py` (M6 should collapse to ~0.167 for both
+consumers and M2's wgrad gain should move from 0.88 toward TE's 0.97), and only
+then the 200M-token pair.
 
-Do not re-run the 200M-token comparison to confirm; it already agrees.
+Everything downstream -- the 0.070 loss gap, the 0.88 gain, the compounding
+across three chained GEMMs -- follows from this one layout mismatch. Nothing else
+is worth chasing until it is fixed.

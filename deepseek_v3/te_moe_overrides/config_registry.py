@@ -20,9 +20,13 @@ two arms, which is what makes a TE-vs-TorchAO loss-curve comparison meaningful.
 
 from __future__ import annotations
 
+from torchtitan.components.quantization import NVFP4LinearConverter
 from torchtitan.components.quantization.nvfp4 import nvfp4_bf16_tail_fqns
 from torchtitan.models.deepseek_v3 import model_registry
 from torchtitan.models.deepseek_v3.config_registry import (
+    _NVFP4_FFN_SUBMODULES,
+    _NVFP4_FFN_SUBMODULES_NO_DENSE,
+    _nvfp4_ffn_linear_fqns,
     deepseek_v3_16b,
     deepseek_v3_debugmodel,
 )
@@ -35,24 +39,39 @@ from .te_nvfp4 import TEGroupedExpertsConverter
 _NVFP4_BF16_TAIL_FRACTION = 0.15
 
 
-def _te_converter(config: Trainer.Config) -> TEGroupedExpertsConverter.Config:
+def _converters(
+    config: Trainer.Config, ffn_submodules: tuple[str, ...]
+) -> list[object]:
+    """The TorchAO flavor's converter list with TE swapped in for the experts.
+
+    The FFN Linears use TorchAO's NVFP4Linear on both arms -- TE supplies no
+    NVFP4 Linear here, and keeping them identical is what leaves the grouped
+    GEMM as the only difference between the two arms.
+    """
     assert config.model_spec is not None
     model_compile_enabled = (
         config.compile.enable and "model" in config.compile.components
     )
     n_layers = len(config.model_spec.model.layers)
-    return TEGroupedExpertsConverter.Config(
-        model_compile_enabled=model_compile_enabled,
-        fqns=nvfp4_bf16_tail_fqns(n_layers, _NVFP4_BF16_TAIL_FRACTION),
-        pad_multiple=128,
-    )
+    fqns = nvfp4_bf16_tail_fqns(n_layers, _NVFP4_BF16_TAIL_FRACTION)
+    return [
+        NVFP4LinearConverter.Config(
+            model_compile_enabled=model_compile_enabled,
+            fqns=_nvfp4_ffn_linear_fqns(fqns, ffn_submodules),
+        ),
+        TEGroupedExpertsConverter.Config(
+            model_compile_enabled=model_compile_enabled,
+            fqns=fqns,
+            pad_multiple=128,
+        ),
+    ]
 
 
 def deepseek_v3_debugmodel_te_nvfp4() -> Trainer.Config:
     config = deepseek_v3_debugmodel()
     config.model_spec = model_registry(
         "debugmodel",
-        converters=[_te_converter(config)],
+        converters=_converters(config, _NVFP4_FFN_SUBMODULES),
     )
     return config
 
@@ -62,6 +81,6 @@ def deepseek_v3_16b_te_nvfp4() -> Trainer.Config:
     config.model_spec = model_registry(
         "16B",
         attn_backend="flex",
-        converters=[_te_converter(config)],
+        converters=_converters(config, _NVFP4_FFN_SUBMODULES_NO_DENSE),
     )
     return config

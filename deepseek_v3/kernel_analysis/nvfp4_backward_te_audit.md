@@ -47,10 +47,12 @@ rank, and really does add coherently in the all-reduced wgrad.
 the all-reduced wgrad error from 0.701604 to 0.702724 -- a ratio of 0.9984 where
 the hypothesis predicted sqrt(4) = 2.0.
 
-The reason is visible in B6b: turning SR off entirely only improves wgrad SQNR
-from 15.5 dB to 17.4 dB. SR noise is a small fraction of the total wgrad error,
-so decorrelating it across 4 ranks is invisible against the deterministic
-quantization error, which is identical on all ranks regardless of seed.
+The reason is visible in B6c: the wgrad error is dominated by a deterministic
+term that no amount of SR decorrelation touches. The floor set by `x_col`'s
+round-to-nearest quantization is relL2 0.095, against a single-draw SR error of
+0.167 -- so even perfectly decorrelated, zero-mean SR noise averaged over four
+ranks cannot get below 0.095. That floor is identical on every rank regardless
+of seed.
 
 Still worth fixing as a latent correctness issue -- it would matter at larger DP
 degree or if SR noise ever became dominant -- but it is not the cause here.
@@ -67,7 +69,8 @@ degree or if SR noise ever became dominant -- but it is not the cause here.
 | B4 | SR P(up) vs position, 7 intervals | **unbiased**: mean deviation 5e-6..7e-5, all within +-1.4 sigma |
 | B4 | SR on the RHT col path | max deviation -9.3e-4 (1.2 sigma), weighted mean -8.2e-5 |
 | B5 | SR decorrelation | all correlations ~2 sigma; `seed` vs `seed^1` streams independent |
-| B6b | isolated wgrad primitive | SQNR 15.5-17.4 dB (SR on/off), **magnitude ratio 1.00** |
+| B6b | isolated wgrad primitive | SQNR 15.5-17.4 dB, **magnitude ratio 1.00** |
+| B6c | RTNE vs SR vs averaged SR | averaged SR **beats** RTNE and converges to the floor |
 | B6 | full module backward | grad_input SQNR ~10-11 dB; w1/w3 SQNR 0.6-2.6 dB (see caveat) |
 
 ### B2 is the first test of the RHT/columnwise path in this repo
@@ -93,6 +96,38 @@ given fractional position regardless of which interval they are in -- the
 hardware `cvt.rs` decision depends on position, not on absolute spacing. The
 stages use per-interval offsets so the seven rows are independent evidence.
 
+### B6c: stochastic rounding is doing its job
+
+SR trades variance for bias. Per draw it is strictly **worse** than
+round-to-nearest, because RTNE always picks the nearer grid point. The payoff is
+that `E[SR(x)] = x`, so SR error averages away across training steps while RTNE
+error is a fixed function of the value and accumulates coherently. Comparing
+single-draw SQNR therefore measures the cost of SR and misses its benefit
+entirely.
+
+Measured on the isolated wgrad (16B, 1408x2048), relative L2 against the exact
+bf16 contraction:
+
+| | relL2 |
+|---|---|
+| RTNE wgrad | 0.13424 |
+| single-draw SR | 0.16696 |
+| SR averaged over 64 draws | **0.09700** |
+| floor: exact `dy`, RTNE-quantized `x` | 0.09509 |
+
+Averaged SR converges essentially onto the floor (0.097 vs 0.095), while RTNE
+sits at 0.134 with a systematic component that never averages away. SR is the
+correct choice here and the implementation delivers the property it exists for.
+
+**Structural note:** wgrad applies SR to only **one** operand. `x_col` is
+quantized during the forward pass with SR off
+(`nvfp4_grouped_mm.py:172-187`), matching TE's recipe, where
+`fp4_quant_fwd_inp` has `stochastic_rounding=False`. So `E[wgrad]` is
+`dy^T @ x_rtne`, not `dy^T @ x`, and `x_col`'s round-to-nearest bias survives as
+the 0.095 floor no matter how many steps are averaged. This is intended rather
+than a defect, but it means the wgrad estimator is unbiased with respect to the
+gradient and biased with respect to the activation.
+
 ## Two corrections to claims made during the run
 
 **1. "The wgrad is deterministically attenuated to 39% of its magnitude."** This
@@ -112,6 +147,11 @@ is deterministic forward divergence, not zero-mean SR noise. B6b, which fixes
 Both are recorded because the B6 numbers are still meaningful as an end-to-end
 measure of accumulated error -- they are just not evidence about the backward
 kernels.
+
+**3. "Turning SR off improves wgrad SQNR from 15.5 to 17.4 dB."** True as
+arithmetic, wrong as framing: it presents SR's expected and intended cost as a
+degradation. Per-draw error is the axis SR deliberately gives up. B6c was added
+to measure the axis it wins on, and on that axis SR beats RTNE by a wide margin.
 
 ## Where the error actually accumulates
 

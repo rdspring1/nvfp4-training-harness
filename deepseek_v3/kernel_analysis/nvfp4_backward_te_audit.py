@@ -40,7 +40,8 @@ B2  wgrad operands (dy_col, x_col), SR off, bitwise vs TE. First test of the
 B3  RHT cancellation in wgrad: does RHT(dy^T) @ RHT(x^T)^T recover dy^T x?
 B4  SR round-up probability as a function of position within each FP4 interval.
 B5  SR decorrelation (row vs col, tile vs tile).
-B6  Full GroupedExperts backward vs bf16: SQNR, signed mean, magnitude ratio.
+B6  Full GroupedExperts backward vs bf16; B6b the isolated wgrad primitive;
+    B6c RTNE vs single-draw SR vs averaged SR -- the axis SR actually wins on.
 
 Usage
 -----
@@ -690,8 +691,82 @@ def stage_b6b_wgrad_isolated(device, models, n_groups=4, rows_per_group=256) -> 
                     start = end
                 record("B6b-wgrad", f"{model} {N}x{K}",
                        f"{dist}, SR {'on' if sr else 'off'}", True, 0, 0, 0,
-                       f"mean SQNR {sq / n_groups:.2f} dB; mean |g| ratio {ra / n_groups:.4f}",
+                       f"mean SQNR {sq / n_groups:.2f} dB; mean |g| ratio {ra / n_groups:.4f}"
+                       f"{'  (per-draw; SR is expected to be worse here)' if sr else ''}",
                        info=True)
+
+
+def stage_b6c_sr_vs_rtne(device, models, n_groups=4, rows_per_group=256,
+                         n_draws=64) -> None:
+    """The axis on which stochastic rounding is supposed to win.
+
+    SR trades variance for bias. Per draw it is strictly WORSE than
+    round-to-nearest, because RTNE always picks the nearer grid point. The
+    payoff is that E[SR(x)] = x, so SR error averages away over training steps
+    while RTNE error is a fixed function of the value and accumulates
+    coherently. Comparing single-draw SQNR therefore measures the cost and
+    misses the benefit entirely.
+
+    Note wgrad applies SR to only ONE operand: x_col is quantized during
+    forward with SR off (nvfp4_grouped_mm.py:172-187), matching TE's recipe
+    (fp4_quant_fwd_inp has stochastic_rounding=False). So E[wgrad] is
+    dy^T @ x_rtne, and x's RTNE bias remains as a floor that SR on dy cannot
+    remove. That floor is measured here too.
+    """
+    from torchao.prototype.moe_training.nvfp4_training.hadamard_utils import get_rht_matrix
+
+    triton_group_rht_amax, _, _, VARYING_FIRST_DIM, from_blocked = ao_mods()
+
+    for model in models:
+        dim, hidden, _ = moe_dims(model)
+        K, N = dim, hidden
+        sizes, offs = make_groups(n_groups, rows_per_group, device)
+        M = sum(sizes)
+        sz = sizes[0]
+        x = torch.randn(M, K, dtype=torch.bfloat16, device=device)
+        dy = torch.randn(M, N, dtype=torch.bfloat16, device=device)
+
+        xc, xr = triton_group_rht_amax(x, sign_vector(), offs, n_groups, M, K,
+                                       VARYING_FIRST_DIM, logical_packed_length=offs[-1:])
+        dc, dr = triton_group_rht_amax(dy, sign_vector(), offs, n_groups, M, N,
+                                       VARYING_FIRST_DIM, logical_packed_length=offs[-1:])
+        _, _, xcol, xsf = _quantize_group(x, offs, n_groups, K, row_amax=xr, col_amax=xc)
+        xp = from_blocked(xsf, K, M // 16)
+        xg = ao_dequant(xcol[:, :sz // 2], xp[:, :sz // 16], xc[0])
+        ref = dy[:sz].float().t() @ x[:sz].float()
+
+        def wgrad(rng):
+            _, _, dcol, dsf = _quantize_group(dy, offs, n_groups, N,
+                                              row_amax=dr, col_amax=dc, rng=rng)
+            dp = from_blocked(dsf, N, M // 16)
+            dg = ao_dequant(dcol[:, :sz // 2], dp[:, :sz // 16], dc[0])
+            return dg @ xg.t()
+
+        rel = lambda a: float((a - ref).norm() / ref.norm())
+        rtne = wgrad(None)
+        acc = torch.zeros_like(rtne)
+        first = None
+        for d in range(n_draws):
+            a = wgrad(_rng_state(7, 100 + d, 900 + d, device))
+            acc += a
+            if d == 0:
+                first = a
+
+        # Floor: exact (unquantized) RHT(dy^T) against the RTNE-quantized x.
+        B = get_rht_matrix(tuple(sign_vector()), device, torch.bfloat16, 16)
+        dy_rht = (dy[:sz].t().reshape(-1, 16).to(torch.bfloat16) @ B).reshape(N, sz).float()
+
+        sh = f"{model} {N}x{K}"
+        record("B6c-sr", sh, "RTNE wgrad", True, 0, 0, 0,
+               f"relL2 {rel(rtne):.5f}  -- biased, never averages away", info=True)
+        record("B6c-sr", sh, "single-draw SR", True, 0, 0, 0,
+               f"relL2 {rel(first):.5f}  -- worse per draw, by design", info=True)
+        record("B6c-sr", sh, f"SR averaged over {n_draws}", True, 0, 0, 0,
+               f"relL2 {rel(acc / n_draws):.5f}  -- unbiased, converges to the floor",
+               info=True)
+        record("B6c-sr", sh, "floor: exact dy, RTNE x", True, 0, 0, 0,
+               f"relL2 {rel(dy_rht @ xg.t()):.5f}  -- x_col RTNE bias; SR on dy "
+               f"cannot remove it", info=True)
 
 
 # --------------------------------------------------------------------------
@@ -710,6 +785,7 @@ STAGES = {
     "B6": lambda dev, models: (
         stage_b6_backward(dev, models),
         stage_b6b_wgrad_isolated(dev, models),
+        stage_b6c_sr_vs_rtne(dev, models),
     ),
 }
 

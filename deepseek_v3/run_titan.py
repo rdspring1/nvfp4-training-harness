@@ -16,31 +16,30 @@ ROOT_DIR = PLUGIN_DIR.parent
 TORCHTITAN_DIR = ROOT_DIR / "third_party" / "torchtitan"
 DEEPSEEK_MODEL_DIR = TORCHTITAN_DIR / "torchtitan" / "models" / "deepseek_v3"
 RESULTS_DIR = ROOT_DIR / "deepseek_v3_results"
-NVFP4_LINEAR_MODULE = "torchtitan.overrides.nvfp4_linear"
-NVFP4_GROUPED_EXPERTS_MODULE = "torchtitan.overrides.nvfp4_grouped_experts"
-TE_GROUPED_EXPERTS_MODULE = "te_moe_overrides.te_grouped_experts"
-NVFP4_TARGET_MODULES = {
-    "linear": [NVFP4_LINEAR_MODULE],
-    "grouped-experts": [NVFP4_GROUPED_EXPERTS_MODULE],
-    "te-grouped-experts": [TE_GROUPED_EXPERTS_MODULE],
-    "both": [NVFP4_LINEAR_MODULE, NVFP4_GROUPED_EXPERTS_MODULE],
-}
-# MXFP8 MoE grouped-experts via torchtitan's first-class converter, bridged into
-# the override registry (mxfp8_overrides/). Needs the CUDA-built torchao (the
-# _C_mxfp8 extension); the editable USE_CPP=0 build lacks the MXFP8 quant kernel.
-MXFP8_GROUPED_EXPERTS_MODULE = "mxfp8_overrides.mxfp8_grouped_experts"
-MXFP8_TORCHAO_BUILD = Path("/opt/pytorch/ao/build/lib.linux-aarch64-cpython-312")
-
 TRAINER_MODULES = {
     "eager": "deepseek_v3",
     "graph": "graph_trainer.deepseek_v3",
 }
+# NVFP4 MoE quantization is selected by config flavor, not by --override.imports:
+# torchtitan replaced the nvfp4 overrides with first-class converters. "nvfp4" is
+# torchtitan's TorchAO converter; "te-nvfp4" is this repo's TransformerEngine
+# converter, registered through te_moe_overrides/config_registry.py and selected
+# with --module te_moe_overrides. Both use the same 15% bf16 tail recipe.
+TE_MODULE = "te_moe_overrides"
 FLAVOR_CONFIGS = {
-    "eager": {
+    ("eager", "bf16"): {
         "debugmodel": "deepseek_v3_debugmodel",
         "16b": "deepseek_v3_16b",
     },
-    "graph": {
+    ("eager", "nvfp4"): {
+        "debugmodel": "deepseek_v3_debugmodel_nvfp4",
+        "16b": "deepseek_v3_16b_nvfp4",
+    },
+    ("eager", "te-nvfp4"): {
+        "debugmodel": "deepseek_v3_debugmodel_te_nvfp4",
+        "16b": "deepseek_v3_16b_te_nvfp4",
+    },
+    ("graph", "bf16"): {
         "debugmodel": "graph_trainer_deepseek_v3_debugmodel",
         "16b": "graph_trainer_deepseek_v3_16b",
     },
@@ -125,7 +124,7 @@ def _ensure_assets(flavor: str) -> None:
 def _parse_gpus(args: argparse.Namespace) -> list[str]:
     if args.gpus is None:
         if args.flavor == "debugmodel":
-            return ["0", "1"] if (args.nvfp4 or args.mxfp8) else [str(args.gpu)]
+            return ["0", "1"] if args.precision != "bf16" else [str(args.gpu)]
         return ["0", "1", "2", "3"]
 
     gpus = [gpu.strip() for gpu in args.gpus.split(",") if gpu.strip()]
@@ -143,9 +142,9 @@ def _cmd(args: argparse.Namespace) -> list[str]:
         "-m",
         "torchtitan.train",
         "--module",
-        TRAINER_MODULES[args.trainer],
+        TE_MODULE if args.precision == "te-nvfp4" else TRAINER_MODULES[args.trainer],
         "--config",
-        FLAVOR_CONFIGS[args.trainer][args.flavor],
+        FLAVOR_CONFIGS[(args.trainer, args.precision)][args.flavor],
         "--training.local_batch_size",
         str(args.batch_size),
         "--training.seq_len",
@@ -164,17 +163,13 @@ def _cmd(args: argparse.Namespace) -> list[str]:
             "--parallelism.expert_parallel_degree",
             str(args.expert_parallel_degree or 2),
         ]
-    elif args.nvfp4 or args.mxfp8:
+    elif args.precision != "bf16":
         cmd += [
             "--parallelism.data_parallel_shard_degree",
             str(args.nproc_per_node),
             "--parallelism.expert_parallel_degree",
             str(args.expert_parallel_degree or 2),
         ]
-    if args.nvfp4:
-        cmd += ["--override.imports", ",".join(NVFP4_TARGET_MODULES[args.nvfp4_target])]
-    elif args.mxfp8:
-        cmd += ["--override.imports", MXFP8_GROUPED_EXPERTS_MODULE]
     if args.global_batch_size is not None:
         cmd += ["--training.global_batch_size", str(args.global_batch_size)]
     if args.trainer == "graph":
@@ -275,47 +270,48 @@ def run(args: argparse.Namespace) -> None:
         raise SystemExit("--global-batch-size must be positive")
     if args.expert_parallel_degree is not None and args.expert_parallel_degree <= 0:
         raise SystemExit("--expert-parallel-degree must be positive")
-    if args.nvfp4 and args.mxfp8:
-        raise SystemExit("--nvfp4 and --mxfp8 are mutually exclusive")
-    if args.mxfp8 and not MXFP8_TORCHAO_BUILD.exists():
+    if (args.trainer, args.precision) not in FLAVOR_CONFIGS:
         raise SystemExit(
-            f"--mxfp8 requires the CUDA-built torchao at {MXFP8_TORCHAO_BUILD} "
-            "(the _C_mxfp8 extension); the editable USE_CPP=0 build lacks it."
+            f"--trainer {args.trainer} has no --precision {args.precision} config; "
+            "the graph trainer is bf16-only."
         )
 
     gpus = _parse_gpus(args)
     args.nproc_per_node = len(gpus)
     if args.flavor == "16b" and args.nproc_per_node != 4:
         raise SystemExit("--flavor 16b requires exactly 4 GPUs via --gpus")
-    if args.flavor == "debugmodel" and (args.nvfp4 or args.mxfp8) and args.nproc_per_node != 2:
+    if (
+        args.flavor == "debugmodel"
+        and args.precision != "bf16"
+        and args.nproc_per_node != 2
+    ):
         raise SystemExit(
-            "--nvfp4/--mxfp8 debugmodel requires exactly 2 GPUs via --gpus"
+            "quantized debugmodel runs require exactly 2 GPUs via --gpus"
         )
 
     _ensure_assets(args.flavor)
 
     RESULTS_DIR.mkdir(exist_ok=True)
     ts = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    precision = "mxfp8" if args.mxfp8 else "nvfp4" if args.nvfp4 else "bf16"
+    precision = args.precision.replace("-", "_")
     compile_suffix = "_compile" if args.trainer == "graph" or args.compile else ""
     log_path = RESULTS_DIR / (
         f"{ts}_titan_deepseek_v3_{args.flavor}_{args.trainer}_{precision}"
         f"{compile_suffix}.txt"
     )
     cmd = _cmd(args)
-    env = {**os.environ, "CUDA_VISIBLE_DEVICES": ",".join(gpus)}
-    if args.mxfp8:
-        # CUDA-built torchao first (MXFP8 _C_mxfp8 kernel), then plugin dir for the override.
-        env["PYTHONPATH"] = (
-            f"{MXFP8_TORCHAO_BUILD}:{PLUGIN_DIR}:{os.environ.get('PYTHONPATH', '')}"
-        )
-    elif args.nvfp4:
-        env["PYTHONPATH"] = f"{PLUGIN_DIR}:{os.environ.get('PYTHONPATH', '')}"
+    # PLUGIN_DIR on PYTHONPATH so torchtitan can import te_moe_overrides.
+    env = {
+        **os.environ,
+        "CUDA_VISIBLE_DEVICES": ",".join(gpus),
+        "PYTHONPATH": f"{PLUGIN_DIR}:{os.environ.get('PYTHONPATH', '')}",
+    }
 
     print()
     print("=" * 72)
     print(f"TorchTitan DeepSeek V3 {args.flavor}")
     print(f"Trainer: {args.trainer}")
+    print(f"Precision: {args.precision}")
     print(f"Compile: {'yes' if args.trainer == 'graph' or args.compile else 'no'}")
     print(f"GPUs: {','.join(gpus)}")
     print(f"Processes: {args.nproc_per_node}")
@@ -432,21 +428,12 @@ def main() -> None:
     )
     parser.add_argument("--log-freq", type=int, default=1, help="Metrics log frequency")
     parser.add_argument(
-        "--nvfp4",
-        action="store_true",
-        help="Enable torchao NVFP4 overrides (select which with --nvfp4-target)",
-    )
-    parser.add_argument(
-        "--nvfp4-target",
-        choices=sorted(NVFP4_TARGET_MODULES),
-        default="both",
-        help="Which NVFP4 override(s) to import when --nvfp4 is set (default: both)",
-    )
-    parser.add_argument(
-        "--mxfp8",
-        action="store_true",
-        help="Enable MXFP8 MoE grouped-experts quantization (torchtitan MXFP8 converter; "
-        "requires the CUDA-built torchao). Mutually exclusive with --nvfp4",
+        "--precision",
+        choices=["bf16", "nvfp4", "te-nvfp4"],
+        default="bf16",
+        help="MoE expert precision: bf16, NVFP4 via torchao (nvfp4), or NVFP4 via "
+        "TransformerEngine (te-nvfp4). Both NVFP4 paths use the same converter "
+        "recipe with a 15%% bf16 layer tail",
     )
     parser.add_argument(
         "--compile",

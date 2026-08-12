@@ -2,20 +2,21 @@
 
 Thin adapter that exposes torchtitan's first-class ``MXFP8GroupedExpertsConverter``
 (``torchtitan.components.quantization.mx``) through the ``--override.imports``
-mechanism, so ``run_titan.py --mxfp8`` selects MXFP8 the same way it selects the
-NVFP4 / TE grouped-experts overrides. All quantization semantics live in the
-converter (recipe ``mxfp8_rceil``: e4m3 data + e8m0 block-32 scales); the grouped
-GEMMs dispatch to ``torch._scaled_grouped_mm``. This module only bridges the
-converter into the override registry.
+mechanism. All quantization semantics live in the converter (recipe
+``mxfp8_rceil``: e4m3 data + e8m0 block-32 scales); the grouped GEMMs dispatch to
+``torch._scaled_grouped_mm``. This module only bridges the converter into the
+override registry.
 
-Usage:
+``run_titan.py`` no longer launches this path: its ``--mxfp8`` flag went away when
+NVFP4 moved from ``--override.imports`` to config-flavor selection
+(``--precision``). Invoke torchtitan directly, or reinstate an MXFP8 config flavor
+alongside ``te_moe_overrides/config_registry.py``:
 
     torchtitan_train --module deepseek_v3 --config deepseek_v3_16b \\
         --override.imports mxfp8_overrides.mxfp8_grouped_experts
 
 Requires a CUDA-built torchao (the ``_C_mxfp8`` extension) on ``PYTHONPATH``; the
-editable ``USE_CPP=0`` build lacks the MXFP8 quant kernel. ``run_titan.py --mxfp8``
-prepends it.
+editable ``USE_CPP=0`` build lacks the MXFP8 quant kernel.
 """
 
 from __future__ import annotations

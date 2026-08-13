@@ -6,13 +6,23 @@ a single **NVIDIA GB200**. Uniform tokens/expert. Shape: `K=7168`, `N=2048`,
 
 - **`nvfp4_pure`** — the 4-bit tensor-core grouped matmul on **pre-quantized**
   inputs (quantize once, outside the timed loop). Isolates raw compute.
-- **`nvfp4_full`** — `nvfp4_pure` + on-the-fly OpenAI-Triton quantization of the
-  activations and weights every call (RHT amax + row/col quantize + weight
-  quantize). This is what the TorchAO training override actually runs.
+- **`nvfp4_full`** — `nvfp4_pure` + on-the-fly quantization of the activations and
+  weights every call (RHT amax + row/col quantize + weight quantize). This is what
+  the TorchAO training override actually runs.
 - **`te_full`** — TransformerEngine's fused NVFP4 grouped GEMM (`_GroupedLinear`),
   which always quantizes activations + weights inside the call (graph-safe RHT
   cast-fusion kernel). TE's forward is inherently "full"; there is no pre-quantized
   split to isolate.
+
+> **TorchAO now has two quantize backends.** The three grouped quantize ops each
+> have a Triton and a CuteDSL implementation, and `_resolve_backends` picks CuteDSL
+> per op under the default `kernel_preference=AUTO`; `TRITON` forces the old path.
+> Every TorchAO row below is therefore split into **`cutedsl`** (today's default)
+> and **`triton`**. The CuteDSL backend is 1.6–1.9× on the two activation RHT ops
+> and 1.15× on the weight quantize (Table 2b), which moves both crossovers
+> substantially. Tables 2 and 4 were re-measured from scratch for this; Tables 1,
+> 3 and 5 carry forward from the prior run (same GPU and shapes; the shared bf16
+> reference reproduces within ~5%, so the columns remain comparable).
 
 ## Table 1 — Pure compute crossover (bf16 vs NVFP4, no quantization)
 
@@ -32,47 +42,101 @@ a single **NVIDIA GB200**. Uniform tokens/expert. Shape: `K=7168`, `N=2048`,
 kernel is launch-overhead-bound (flat ~0.107 ms floor) and bf16 wins; above it the
 4-bit tensor cores saturate at **~3–3.6× faster** than bf16 (ratio ~0.28–0.35).
 
-## Table 2 — OpenAI-Triton quantization overhead
+## Table 2 — Quantization overhead, per backend
 
-Overhead = `nvfp4_full − nvfp4_pure` (the RHT/amax/quantize Triton kernels).
+`nvfp4_full` re-measured on both TorchAO quantize backends against a fresh bf16
+reference (which reproduces Table 1's bf16 within ~5%, confirming the two runs are
+comparable). Overhead = `nvfp4_full − nvfp4_pure`, with `nvfp4_pure` from Table 1.
+Repro: `nvfp4_grouped_gemm_fwd.py <bf16|cutedsl|triton>`.
 
-| tok/exp | M (rows) | nvfp4_pure (ms) | nvfp4_full (ms) | quant overhead (ms) | overhead ÷ pure GEMM | full/bf16 |
-|--------:|---------:|----------------:|----------------:|--------------------:|---------------------:|----------:|
-|     128 |    1,024 |           0.107 |           0.982 |               0.875 |                 8.2× |      17.6 |
-|     256 |    2,048 |           0.108 |           1.005 |               0.897 |                 8.3× |      18.2 |
-|     512 |    4,096 |           0.107 |           1.055 |               0.948 |                 8.9× |      11.3 |
-|   1,024 |    8,192 |           0.108 |           1.169 |               1.061 |                 9.8× |       6.6 |
-|   2,048 |   16,384 |           0.111 |           1.391 |               1.280 |                11.5× |       4.6 |
-|   4,096 |   32,768 |           0.190 |           2.047 |               1.857 |                 9.8× |       3.3 |
-|   8,192 |   65,536 |           0.338 |           2.880 |               2.542 |                 7.5× |       2.4 |
-|  16,384 |  131,072 |           0.967 |           4.420 |               3.453 |                 3.6× |       1.6 |
-|  32,768 |  262,144 |           1.824 |           7.657 |               5.833 |                 3.2× |       1.2 |
+| tok/exp | M (rows) | bf16 (ms) | full **cutedsl** (ms) | full **triton** (ms) | cutedsl/bf16 | triton/bf16 |
+|--------:|---------:|----------:|----------------------:|---------------------:|-------------:|------------:|
+|     128 |    1,024 |     0.061 |                 0.727 |                0.660 |         11.9 |        10.8 |
+|     256 |    2,048 |     0.057 |                 0.719 |                0.647 |         12.6 |        11.4 |
+|     512 |    4,096 |     0.095 |                 0.712 |                0.650 |          7.5 |         6.8 |
+|   1,024 |    8,192 |     0.179 |                 0.695 |                0.664 |          3.9 |         3.7 |
+|   2,048 |   16,384 |     0.307 |                 0.686 |                0.660 |          2.2 |         2.1 |
+|   4,096 |   32,768 |     0.610 |                 0.700 |                0.854 |         1.15 |        1.40 |
+|   8,192 |   65,536 |     1.257 |             **1.037** |                1.418 |     **0.82** |        1.13 |
+|  16,384 |  131,072 |     3.029 |                 1.789 |            **2.552** |         0.59 |    **0.84** |
+|  32,768 |  262,144 |     6.174 |                 3.375 |                4.827 |         0.55 |        0.78 |
 
-Quantization costs **~8–11× the matmul itself** across the mid-range and only
-falls to ~3× at the largest sizes. It grows with M (activation quant scales with
-row count; weight quant is fixed), so it never becomes negligible.
+Quant overhead per call (`full − pure`, ms) and as a multiple of the pure GEMM:
+
+| tok/exp | pure (ms) | overhead cutedsl | ÷ pure | overhead triton | ÷ pure |
+|--------:|----------:|-----------------:|-------:|----------------:|-------:|
+|     512 |     0.107 |            0.605 |   5.7× |           0.543 |   5.1× |
+|   2,048 |     0.111 |            0.575 |   5.2× |           0.549 |   4.9× |
+|   8,192 |     0.338 |            0.699 |   2.1× |           1.080 |   3.2× |
+|  32,768 |     1.824 |            1.551 |   0.9× |           3.003 |   1.6× |
+
+**The forward crossover moved from ~50K to ~5K tokens/expert.** Both backends are
+far cheaper than the number this doc previously carried (0.98→0.73 ms at the small
+end, 7.66→3.38 at 32K), and the quant tax is no longer 8–11× the matmul — it is
+~5× at small M and falls *below* the GEMM at 32K on CuteDSL. `nvfp4_full` crosses
+bf16 at **~5K tok/expert on CuteDSL** and **~10K on Triton**.
+
+**Below ~4K tok/expert Triton is the faster eager path** (~0.65 vs ~0.71 ms flat),
+even though CuteDSL wins on device time at every size (Table 2b). Both are
+launch-bound down there — the flat floor is host dispatch, not kernels — and
+CuteDSL's custom-op dispatch is the more expensive of the two. The ordering flips
+at 4K, where device time starts to dominate, and CuteDSL then widens to 1.43× at
+32K. Under CUDA graphs the host term is captured away and the device-time ordering
+should hold throughout; the eager floor here is the untraced worst case.
+
+## Table 2b — CuteDSL vs Triton, per grouped quantize kernel
+
+Device kernel time (profiler CUDA self-time, host dispatch excluded) for the three
+grouped quantize ops at the DSV3-671B activation dim `N=7168`, `E=8`. Both backends'
+public ops take identical arguments, so the same call site drives both.
+Repro: `nvfp4_grouped_quant_backends.py`.
+
+| kernel | tok/exp | triton µs | cutedsl µs | speedup |
+|:-------|--------:|----------:|-----------:|--------:|
+| **rht_amax** (act) |    512 |  39.7 |  15.4 | **2.59** |
+| rht_amax           |  1,024 |  40.5 |  23.0 | 1.76 |
+| rht_amax           |  2,048 |  65.7 |  40.7 | 1.61 |
+| rht_amax           |  4,096 | 115.5 |  69.6 | 1.66 |
+| rht_amax           |  8,192 | 216.3 | 129.6 | 1.67 |
+| **rht_quantize_row_col** (act) |    512 |  42.3 |  33.0 | 1.28 |
+| rht_quantize_row_col           |  1,024 |  84.3 |  48.9 | 1.73 |
+| rht_quantize_row_col           |  2,048 | 163.9 |  90.8 | 1.81 |
+| rht_quantize_row_col           |  4,096 | 322.8 | 174.0 | 1.86 |
+| rht_quantize_row_col           |  8,192 | 640.8 | 336.2 | **1.91** |
+| **weight_quantize_2d** (gate/up 2048×7168) | — | 180.4 | 156.2 | 1.15 |
+| weight_quantize_2d (down 7168×2048)        | — | 178.6 | 155.7 | 1.15 |
+
+CuteDSL wins on device time at **every** size and op: **1.6–1.9×** on the two
+activation RHT kernels (the M-scaling term, and the one that sets the crossover)
+and a steady **1.15×** on the token-independent weight quantize. `rht_amax`'s 2.59×
+at 512 is the small-M outlier — the Triton persistent kernel has not amortized its
+prologue there yet. The per-expert weight *amax* stays Triton on every path (no
+CuteDSL twin) and is unchanged.
 
 ## Table 3 — TransformerEngine forward (fused quantize+GEMM)
 
 Same shape (K=7168, N=2048, E=8), forward only. `te_full` is TE's fused NVFP4
-grouped GEMM; compared against the same bf16 reference and TorchAO's `full/bf16`.
+grouped GEMM. TE is untouched by the TorchAO work, so this column carries forward
+unchanged; the `torchao` column is the new Table 2 CuteDSL measurement.
 
-| tok/exp | M (rows) | bf16 (ms) | te_full (ms) | te/bf16 | torchao full/bf16 |
-|--------:|---------:|----------:|-------------:|--------:|------------------:|
-|     128 |    1,024 |     0.056 |        0.911 |    16.2 |              17.6 |
-|     256 |    2,048 |     0.056 |        0.903 |    16.3 |              18.2 |
-|     512 |    4,096 |     0.096 |        0.849 |     8.9 |              11.3 |
-|   1,024 |    8,192 |     0.178 |        0.867 |     4.9 |               6.6 |
-|   2,048 |   16,384 |     0.301 |        0.866 |     2.9 |               4.6 |
-|   4,096 |   32,768 |     0.605 |        0.872 |     1.4 |               3.3 |
-|   8,192 |   65,536 |     1.210 |        1.195 | **0.99**|               2.4 |
-|  16,384 |  131,072 |     2.897 |        1.988 |    0.69 |               1.6 |
-|  32,768 |  262,144 |     6.297 |        3.639 |    0.58 |               1.2 |
+| tok/exp | M (rows) | bf16 (ms) | te_full (ms) | te/bf16 | torchao cutedsl (ms) | AO vs TE |
+|--------:|---------:|----------:|-------------:|--------:|---------------------:|---------:|
+|     128 |    1,024 |     0.056 |        0.911 |    16.2 |                0.727 | **1.25×** |
+|     256 |    2,048 |     0.056 |        0.903 |    16.3 |                0.719 | 1.26× |
+|     512 |    4,096 |     0.096 |        0.849 |     8.9 |                0.712 | 1.19× |
+|   1,024 |    8,192 |     0.178 |        0.867 |     4.9 |                0.695 | 1.25× |
+|   2,048 |   16,384 |     0.301 |        0.866 |     2.9 |                0.686 | 1.26× |
+|   4,096 |   32,768 |     0.605 |        0.872 |     1.4 |                0.700 | 1.25× |
+|   8,192 |   65,536 |     1.210 |        1.195 | **0.99**|                1.037 | 1.15× |
+|  16,384 |  131,072 |     2.897 |        1.988 |    0.69 |                1.789 | 1.11× |
+|  32,768 |  262,144 |     6.297 |        3.639 |    0.58 |                3.375 | 1.08× |
 
-**TE's forward crosses bf16 at ~8K tokens/expert** — much earlier than TorchAO's
-`nvfp4_full` (~50K). TE's fused quantize is nearly flat (~0.85 ms floor to M≈65K),
-so it amortizes faster and beats TorchAO's forward at every point. On the forward
-path **TE is the stronger backend.**
+**TE's forward crosses bf16 at ~8K tokens/expert; TorchAO-CuteDSL now crosses at
+~5K and is faster than TE at every point** (1.1–1.26×). This reverses the previous
+reading — TE's flat ~0.85 ms fused-quantize floor used to be well under TorchAO's
+~1.0–1.4 ms, and CuteDSL has taken TorchAO's floor to ~0.70 ms. On the forward path
+**TorchAO-CuteDSL is now the stronger backend**, and TE's remaining advantage is
+confined to the backward (Table 3b, Table 4).
 
 ## Table 3b — TE backward (single grouped GEMM)
 
@@ -85,87 +149,121 @@ carries the activation RHT quantize):
 | E=64, TPE=512  | 3.61 | 2.44 | 0.7× |
 | E=64, TPE=2048 | 3.38 | 2.55 | 0.8× |
 
-End-to-end 3-GEMM expert MLP fwd+bwd (E=64, 512 tok/exp): **26 ms**, faster than
-TorchAO's 36 ms.
+**E=64 end-to-end, re-measured** (3-GEMM expert MLP fwd+bwd, ms/iter, same session
+and harness as Table 4). The previous reading here — TE 26 ms vs TorchAO 36 ms at
+E=64/512 — has inverted:
 
-Note: TE's graph-safe RHT quant kernel caps at 64 experts/launch
-(`kMaxTensorsPerKernel=64`, hard assert from the <4 KB launch-args struct, no
-chunking), but that is moot at realistic training EP (~4 experts/GPU). Expert count
-did not affect the forward crossover — TE forward at E=64 is as good as E=8.
+| E=64 | bf16 | AO-cutedsl | AO-triton | TE |
+|:--|---:|---:|---:|---:|
+| 512 tok/exp (32,768 rows) | 16.00 | **19.13** | 21.36 | 35.94 |
+| 2,048 tok/exp (131,072 rows) | 34.37 | **27.26** | 32.94 | 39.43 |
+
+At E=64 TorchAO is **1.9× faster than TE** at 512 tok/exp and 1.45× at 2,048, and
+TE no longer beats bf16 at either point. Compare the same *total* rows at E=8
+(Table 4, 4K tok/exp: bf16 7.51, AO 5.76, TE 7.34): high expert counts cost every
+backend 2–5×, and cost TE the most. Two caveats — the TE build has moved since the
+26 ms figure was taken, so part of this is a TE-side change rather than a TorchAO
+gain; and E=64 is exactly TE's `kMaxTensorsPerKernel=64` cap (hard assert from the
+<4 KB launch-args struct, no chunking) and exactly CuteDSL's `MAX_GROUPS=64`, so
+both are at their group limit here. All of this is moot at realistic training EP
+(~4 experts/GPU), which is the E=8 regime of Table 4.
 
 ## Table 4 — Training fwd+bwd sweep (bf16 vs TorchAO vs TE vs MXFP8)
 
 3-GEMM expert MLP, forward+backward, E=8. ms/iter; ratio to bf16 (<1 = beats bf16).
-Re-measured with **both** TorchAO quant-kernel fixes live: persistent `rht_amax`
-dispatch and autotuned grouped quantize launches (see Table 5).
+**All five columns re-measured in one session** on the same GB200 and the same
+harness, so every ratio is like-for-like. TorchAO appears twice: `AO-cutedsl` is
+today's `AUTO` default, `AO-triton` forces the old backend.
 
 MXFP8 uses torchtitan's first-class `MXFP8GroupedExpertsConverter` (recipe `mxfp8_rceil`,
 e4m3 data + e8m0 block-32 scales), measured on the **CUDA-built** torchao (the `_C_mxfp8`
-extension; the editable `USE_CPP=0` build lacks it). Same harness, same GB200; bf16 column
-is the shared ratio reference.
+extension; the editable `USE_CPP=0` build lacks it).
+Repro: `nvfp4_grouped_gemm_crossover.py <bf16|torchao|torchao_triton|te|mxfp8>`.
+Numerics cross-check at E=8/512 against the bf16 module with identical weights:
+TorchAO and TE land on the same SQNR to 0.1 dB (fwd 12.0, dgrad 11.5, wgrad 11.4),
+so these are speed differences between two backends computing the same thing.
 
-| tok/exp | rows | bf16 | TorchAO | TE | MXFP8 | TorchAO/bf16 | TE/bf16 | MXFP8/bf16 |
-|--------:|--------:|------:|--------:|------:|------:|-------------:|--------:|-----------:|
-|     512 |   4,096 |  2.13 |    8.45 |  6.44 |  4.72 |         3.96 |    3.02 |       2.22 |
-|   1,024 |   8,192 |  2.80 |    8.18 |  6.23 |  4.75 |         2.92 |    2.23 |       1.70 |
-|   2,048 |  16,384 |  4.16 |    8.33 |  6.27 |  4.73 |         2.00 |    1.51 |       1.14 |
-|   4,096 |  32,768 |  7.18 |    9.28 |  6.75 |  6.13 |         1.29 | **0.94** ← TE | **0.85** ← MXFP8 |
-|   8,192 |  65,536 | 13.57 |   13.25 |  8.97 | 10.36 | **0.98** ← AO | 0.66 |       0.76 |
-|  16,384 | 131,072 | 28.55 |   21.46 | 14.93 | 19.00 |         0.75 |    0.52 |       0.67 |
-|  32,768 | 262,144 | 57.62 |   37.99 | 27.21 | 36.72 |         0.66 |    0.47 |       0.64 |
+| tok/exp | rows | bf16 | AO-cutedsl | AO-triton | TE | MXFP8 |
+|--------:|--------:|------:|------:|------:|------:|------:|
+|     512 |   4,096 |  2.15 |  5.75 |  4.89 |  7.16 |  4.11 |
+|   1,024 |   8,192 |  2.87 |  5.79 |  5.10 |  7.17 |  4.05 |
+|   2,048 |  16,384 |  4.31 |  5.78 |  5.03 |  7.15 |  4.21 |
+|   4,096 |  32,768 |  7.51 |  5.76 |  6.57 |  7.34 |  6.38 |
+|   8,192 |  65,536 | 14.31 |  8.34 | 10.69 |  9.30 | 10.85 |
+|  16,384 | 131,072 | 30.92 | **14.31** | 19.12 | 14.57 | 20.37 |
+|  32,768 | 262,144 | 60.97 | 26.56 | 35.91 | **25.79** | 39.59 |
 
-**TE crosses bf16 at ~4K tok/expert; TorchAO now at ~8K** (was ~16K before the quant
-fixes). TE still beats TorchAO at every point and the lead widens with scale — at 32K
-tok/expert TE is **1.4× faster than TorchAO and 2.1× faster than bf16** (9.6 vs 6.9 vs
-4.6 Mtok/s). Memory is a tie (~21–24 GiB). So for training, TE wins above ~4K
-tok/expert; below ~4K bf16 wins; TorchAO now overtakes bf16 at ~8K.
+Ratio to bf16:
 
-**MXFP8 also crosses bf16 at ~4K and beats TorchAO-NVFP4 at every M ≥ 4K.** Its MX 8-bit
-quant is a single cheap block-scale cast (flat ~4.7 ms floor to 2K, like TE's fused quant),
-so it amortizes far earlier than TorchAO's 4-bit RHT + amax + row/col Triton stack — MXFP8
-is the lowest-overhead backend below ~4K and at 4K even edges TE (6.13 vs 6.75 ms). But
-8-bit compute tops out at ~2× bf16, so above ~8K TE-NVFP4's 4-bit tensor cores pull ahead
-and TorchAO-NVFP4 catches up (at 32K: TE 27.2 < MXFP8 36.7 ≈ TorchAO 38.0 < bf16 57.6 ms).
-**Ordering at scale: TE < MXFP8 ≈ TorchAO < bf16** — MXFP8 is the safe early-crossover
-middle ground (higher precision, earliest amortization); the 4-bit backends only win the
-top end once their quant tax is paid off.
+| tok/exp | AO-cutedsl | AO-triton | TE | MXFP8 |
+|--------:|-----------:|----------:|-------:|------:|
+|     512 |       2.67 |      2.27 |   3.33 |  1.91 |
+|   1,024 |       2.02 |      1.78 |   2.50 |  1.41 |
+|   2,048 |       1.34 |      1.17 |   1.66 | **0.98** ← MXFP8 |
+|   4,096 |   **0.77** |  **0.87** | **0.98** |  0.85 |
+|   8,192 |       0.58 |      0.75 |   0.65 |  0.76 |
+|  16,384 |       0.46 |      0.62 |   0.47 |  0.66 |
+|  32,768 |       0.44 |      0.59 |   0.42 |  0.65 |
 
-**TE-NVFP4 vs MXFP8 crossover (~6K tok/expert).** These two swap which is faster where
-4-bit compute overtakes 8-bit's lower quant floor. Below ~4K MXFP8 wins on its cheaper cast
-(at 512: MXFP8 4.72 vs TE 6.44 ms — **MXFP8 1.36×**); the lines cross between 4K and 8K;
-above that TE-NVFP4 pulls ahead and widens — **TE 1.15× at 8K, 1.27× at 16K, 1.35× at 32K**
-(27.2 vs 36.7 ms). So at production M (≥16K) **TE-NVFP4 is ~1.3× faster than MXFP8**, while
-below ~6K MXFP8 is the faster (and higher-precision) choice — pick MXFP8 for small/short-context
-per-expert loads, TE-NVFP4 for large.
+**TorchAO-CuteDSL has closed the gap to TE.** The two are now within 2–3% at
+production M (16K: AO 14.31 vs TE 14.57 — AO ahead; 32K: 26.56 vs 25.79 — TE
+ahead), against a 1.4× TE lead in the previous sweep. Peak memory is a tie
+(bf16 21.1, AO 22.6 both backends, TE 23.6, MXFP8 23.5 GiB at 32K).
 
-Two TorchAO quant-kernel fixes compound to **~15% faster AO at scale** and pull its bf16
-crossover in from ~16K to ~8K: (1) the persistent `rht_amax` dispatch (Table 5, ~7–10%),
-and (2) autotuning the grouped quantize launches (`num_warps` 8→4, ~1.4× on the dominant
-`rht_quantize_row_col`, ~8% end-to-end). Both are pure launch/kernel changes — no algorithm
-change, memory unchanged. TE is untouched (matches the prior sweep within noise).
+**Every NVFP4 backend now crosses bf16 at ~3–4K tok/expert** — AO-CuteDSL 0.77 and
+AO-triton 0.87 at 4K, TE 0.98 (log-interpolated crossings: AO-CuteDSL 2.9K,
+AO-triton 3.0K, TE 4.0K). TorchAO's training crossover has moved ~16K → ~8K →
+**~3K** across the two rounds of kernel work; it is no longer the late-crossing
+backend. Below ~2K bf16 still wins for all three.
+
+**MXFP8 is the earliest crossover (~2K) but no longer the mid-range winner.** Its
+single cheap block-scale cast still gives the lowest floor (~4.1 ms flat to 2K, vs
+AO-CuteDSL's 5.75), so it is the fastest backend below ~3.5K. Above that the 4-bit
+backends pass it and keep pulling away: at 32K, TE 25.8 ≈ AO-CuteDSL 26.6 < AO-triton
+35.9 < MXFP8 39.6 < bf16 61.0 ms. **Ordering at scale: TE ≈ AO-cutedsl < AO-triton <
+MXFP8 < bf16.** The AO-cutedsl-vs-MXFP8 crossover is ~3.5K, and by 16K AO-CuteDSL is
+**1.42× faster than MXFP8**; the previous conclusion that MXFP8 beats TorchAO-NVFP4
+at every M ≥ 4K no longer holds.
+
+**The CuteDSL default is worth 1.35× at scale** (35.91 → 26.56 ms at 32K; 1.34× at
+16K, 1.28× at 8K), tracking the 1.6–1.9× per-kernel device-time win in Table 2b
+diluted by the GEMMs and the backward. Memory is unchanged. Below ~4K the sign
+flips — AO-triton is 1.14–1.18× faster there (4.89 vs 5.75 at 512) for the eager
+host-dispatch reason in Table 2: those sizes are launch-bound, not kernel-bound.
+**If you run eager at ≤2K tok/expert, `kernel_preference=TRITON` is the faster
+choice; everywhere else, and under CUDA graphs, take the default.**
 
 ## How the crossover point moves
 
 | Regime | Crossover (tokens/expert) | Why |
 |:-------|:--------------------------|:----|
 | **Pure 4-bit GEMM** | **~1K** | raw tensor-core compute; only kernel launch overhead to amortize |
-| **TE forward (quant + GEMM)** | **~8K** (measured) | TE's fused quantize is nearly flat (~0.85 ms floor), so it amortizes ~6× earlier than TorchAO's forward |
-| **TorchAO full fwd GEMM (quant + GEMM)** | **~50K** (extrapolated; full/bf16 still 1.2 at 32K) | Triton quantization tax is ~8–11× the matmul, pushing the break-even out ~40–60× |
+| **TE forward (quant + GEMM)** | **~8K** (measured) | TE's fused quantize is nearly flat (~0.85 ms floor) |
+| **TorchAO fwd GEMM — CuteDSL** | **~5K** (measured; was ~50K) | CuteDSL quant floor ~0.70 ms, below TE's; quant tax down to ~5× the matmul at small M and <1× at 32K |
+| **TorchAO fwd GEMM — Triton** | **~10K** (measured) | same structure at 1.6–1.9× the device time on the two activation RHT ops |
 | **Training fwd+bwd — TE (3-GEMM MLP)** | **~4K** (measured) | TE's low, flat fused-quant floor + a cheap grouped backward amortize over the fwd + 2 bwd GEMMs |
-| **Training fwd+bwd — TorchAO (3-GEMM MLP)** | **~8K** (measured; was ~16K) | Triton quant tax, cut ~15% by the persistent `rht_amax` dispatch + autotuned grouped quantize launches |
-| **Training fwd+bwd — MXFP8 (3-GEMM MLP)** | **~4K** (measured) | MX 8-bit single block-scale cast → flat ~4.7 ms quant floor (like TE), amortizes early; beats TorchAO-NVFP4 at all M≥4K, but 8-bit compute (~2× bf16) yields to TE-NVFP4's 4-bit above ~8K |
+| **Training fwd+bwd — TorchAO CuteDSL** | **~3K** (measured; was ~8K, ~16K before that) | CuteDSL grouped quantize kernels; now at TE parity from 8K up |
+| **Training fwd+bwd — TorchAO Triton** | **~3K** (measured) | crosses at the same point but on a flatter slope — 0.59 vs 0.44 of bf16 at 32K |
+| **Training fwd+bwd — MXFP8 (3-GEMM MLP)** | **~2K** (measured) | MX 8-bit single block-scale cast → flat ~4.1 ms quant floor, the earliest crossover; but 8-bit compute (~1.5× bf16 at scale) yields to both NVFP4 backends above ~5K |
 
-The 4-bit kernels pay off early (~1K tok/expert), but the backends diverge on the
-per-call quantization tax. **TE** is the stronger training backend: fused, flat
-quant → crossover ~4K tok/expert, beating both bf16 (above ~4K) and TorchAO
-(everywhere). **TorchAO**'s per-call Triton re-quantization grows with M and pushed
-its training crossover out to ~16K; two kernel-level fixes (persistent `rht_amax`
-dispatch + autotuned grouped quantize launches) have since cut ~15% and pulled it in
-to ~8K. `torch.compile` gives only a constant-factor win (best ~25% mid-range, ~5% at
-large M) and does **not** shift it — the cost lives inside opaque hand-written Triton
-kernels dynamo cannot fuse into. The remaining high-leverage TorchAO optimizations are
-algorithmic: caching quantized weights across microbatches and a cheaper activation
-transform.
+The 4-bit kernels pay off early (~1K tok/expert), and the backends have converged on
+the per-call quantization tax that used to separate them. **TorchAO-CuteDSL** and
+**TE** are now equivalent training backends at E=8 (within 3% at M ≥ 16K — AO ahead
+at 16K, TE ahead at 32K), both crossing bf16 at ~3–4K. TorchAO is the faster of the
+two on the forward at every M (Table 3), and **decisively faster at E=64**
+(1.45–1.9×, Table 3b); TE's edge is confined to the E=8 backward at the very top end.
+TorchAO's training crossover has moved ~16K → ~8K → **~3K** over three rounds of
+kernel work: first the persistent `rht_amax` dispatch and autotuned grouped quantize
+launches (Table 5, ~15%), then porting all three grouped quantize ops to CuteDSL
+(Table 2b, a further 1.35× at scale). `torch.compile` gives only a constant-factor
+win (best ~25% mid-range, ~5% at large M) and does **not** shift the crossover — the
+cost lives inside opaque hand-written kernels dynamo cannot fuse into.
+
+What is left is no longer kernel-level. With the quantize ops at ~1.15–1.9× of their
+Triton twins and TE parity reached, the remaining TorchAO headroom is algorithmic
+(caching quantized weights across microbatches, a cheaper activation transform) plus
+the eager host-dispatch floor that dominates below ~4K tok/expert — which CUDA graphs,
+not a faster kernel, is the fix for.
 
 ## Which operating point is realistic? (2025 default vs 2026 frontier)
 
@@ -178,7 +276,7 @@ total routed rows/GPU = local_tokens × top_k   (EP-invariant)
 
 **The torchtitan DSV3-671B default is *not* a representative operating point.** It ships
 `local_batch=4, seq_len=4096, EP=2` → M = 2·4·4096·8/256 = **1,024 tok/expert** — the
-bottom of the table, where bf16 *beats* NVFP4 (AO 2.9×, TE 2.2× at 1K). That's an
+bottom of the table, where bf16 *beats* NVFP4 (AO 2.0×, TE 2.5× at 1K). That's an
 `EP=2` small-scale/template artifact (128 experts/GPU, tiny per-expert GEMMs), not the
 production layout. DeepSeek's actual training used EP=64 → M ≈ 8K–32K at `local_batch`
 1–4, and **131K at `local_batch=16`** (M scales with `local_batch`; verified below).
@@ -188,20 +286,22 @@ production layout. DeepSeek's actual training used EP=64 → M ≈ 8K–32K at `
 
 | Model (routed experts, top-k) | EP | E_local | M/expert | rows/GPU | ~AO/bf16 | ~TE/bf16 |
 |:------|---:|---:|---:|---:|---:|---:|
-| DeepSeek V4-Pro (384, top-6) | 64 | 6 | 16,384 | 98,304 | 0.75 | 0.52 |
-| GLM-5.2 (256, top-8) | 32 | 8 | 16,384 | 131,072 | 0.75 | 0.52 |
-| GLM-5.2 | 64 | 4 | 32,768 | 131,072 | 0.66 | 0.47 |
-| Kimi K3 (896, top-16) | 64 | 14 | 18,725 | 262,144 | 0.74 | 0.51 |
-| Kimi K3 | 128 | 7 | 37,449 | 262,144 | ~0.65 | ~0.46 |
+| DeepSeek V4-Pro (384, top-6) | 64 | 6 | 16,384 | 98,304 | 0.46 | 0.47 |
+| GLM-5.2 (256, top-8) | 32 | 8 | 16,384 | 131,072 | 0.46 | 0.47 |
+| GLM-5.2 | 64 | 4 | 32,768 | 131,072 | 0.44 | 0.42 |
+| Kimi K3 (896, top-16) | 64 | 14 | 18,725 | 262,144 | 0.46 | 0.46 |
+| Kimi K3 | 128 | 7 | 37,449 | 262,144 | ~0.44 | ~0.42 |
 
-Every config sits at **M ≥ 16K tok/expert** — 2–9× past the crossover — so NVFP4 is
-**~1.3–1.5× faster than bf16 (TorchAO) and ~2× (TE)** across the board. Long context +
-high top-k (6/8/16) keep per-expert M large *even with heavy expert sharding*: token
-parallelism cuts local_tokens but top_k multiplies routed rows back up. **EP is the
-knob** — it trades E_local for M/expert at constant total work, so raising EP pushes
-*deeper* into the NVFP4 win (GLM: EP 32→64 moves M 16K→32K, AO 0.75→0.66), paying only
-more all-to-all. All five have avg rows/group ≫ the 1K persistent-`rht_amax` threshold
-and E_local ≪ 152 SMs, so the persistent + autotune fixes are always active here.
+Every config sits at **M ≥ 16K tok/expert** — 5–12× past the ~3K crossover — so NVFP4 is
+**~2.2× faster than bf16** across the board, on either backend (AO-CuteDSL and TE are
+within 3% of each other at every one of these M). Long context + high top-k (6/8/16)
+keep per-expert M large *even with heavy expert sharding*: token parallelism cuts
+local_tokens but top_k multiplies routed rows back up. **EP is the knob** — it trades
+E_local for M/expert at constant total work, so raising EP pushes *deeper* into the
+NVFP4 win (GLM: EP 32→64 moves M 16K→32K, AO 0.46→0.44), paying only more all-to-all.
+All five have avg rows/group ≫ the 1K persistent-`rht_amax` threshold and
+E_local ≪ 152 SMs (and ≪ the CuteDSL `MAX_GROUPS=64` cap), so every kernel fix and
+the CuteDSL default are active here.
 
 (Ratios interpolated from Table 4's E=8, DSV3 dims — regime holds regardless of exact
 expert dims since the crossover is governed by M.)
@@ -250,22 +350,22 @@ a per-GPU or per-expert quantity. Raising `EP` gives each GPU *fewer* experts, s
 *concentrates* rows per expert (pushes deeper into NVFP4), at constant aggregate/GPU.
 
 **The stated DSV3 recipe (`local_batch=16, seq=4096, top-8, 256 experts, EP=64`) lands
-at M ≈ 131K — 16× past the ~8K AO crossover, deep in the NVFP4 win:**
+at M ≈ 131K — 44× past the ~3K AO crossover, deep in the NVFP4 win:**
 
 ```
 ∑Mᵢ per GPU = 65,536 × 8              = 524,288 rows   (E_local = 256/64 = 4)
 per-expert M = 65,536 × 8 × 64 / 256  = 131,072 rows
 ```
 
-It is skew-robust: even a cold expert at ~0.4× mean ≈ 52K is ~6× past crossover, and
+It is skew-robust: even a cold expert at ~0.4× mean ≈ 52K is ~17× past crossover, and
 the 128-row group padding wastes ≤ 128/131072 ≈ **0.1%** at this scale (vs ~1–3% near
 the crossover). `M` scales linearly with `local_batch` — the only knob that moves it:
 
-| local_batch (seq=4096, EP=64) | per-expert M | ∑Mᵢ/GPU | vs AO crossover ~8K |
+| local_batch (seq=4096, EP=64) | per-expert M | ∑Mᵢ/GPU | vs AO crossover ~3K |
 |--:|--:|--:|:--|
-| 16 (stated recipe) | 131,072 | 524,288 | 16× — deep NVFP4 |
-| 4 (torchtitan `deepseek_v3_671b` default) | 32,768 | 131,072 | 4× — solid NVFP4 |
-| 1 | 8,192 | 32,768 | ~1× — at the crossover |
+| 16 (stated recipe) | 131,072 | 524,288 | 44× — deep NVFP4 |
+| 4 (torchtitan `deepseek_v3_671b` default) | 32,768 | 131,072 | 11× — deep NVFP4 |
+| 1 | 8,192 | 32,768 | 3× — solid NVFP4 (was at the crossover pre-CuteDSL) |
 
 **Grouped-GEMM launches per optimizer step.** Each MoE layer issues **3
 `torch._grouped_mm`** (w1, w3, w2; `moe.py:97-108`); profiler count on one layer's
@@ -280,7 +380,18 @@ fwd+bwd is **9 `aten::_grouped_mm`** (3 fwd + 6 bwd). DSV3-671B has **58 MoE lay
 (SelectiveAC re-runs the 3 forward GEMMs in backward — the instrumented run showed the
 forward path executing twice per step, matching 12/layer.)
 
-## Table 5 — Are TorchAO's grouped quant kernels worth grouping?
+## Table 5 — Are TorchAO's grouped quant kernels worth grouping? (Triton path)
+
+> Scope: everything below concerns the **Triton** backend, which is now the fallback
+> rather than the default (Table 2b). It is kept because it is what settled the
+> grouping question and motivated the persistent `rht_amax` kernel — and because the
+> Triton path is still what runs under `kernel_preference=TRITON`, on the TP path,
+> and wherever CuteDSL's `MAX_GROUPS=64` / `N % 256` limits bite. The CuteDSL
+> kernels group by construction (one launch over `offsets`), so the grouped-vs-
+> per-expert question does not re-arise for them. The `rht_quantize_row_col` and
+> `weight_quantize_2d` rows are **pre-autotune** launches (fixed `num_warps=8`);
+> the tuned figures are the `triton` column of Table 2b (641 vs 878 µs at 8K).
+> Ratios are unaffected in sign — both grouped kernels only got faster.
 
 Each of TorchAO's three forward NVFP4 quant kernels has a single-expert twin. This
 compares one **grouped** launch over `E=8` experts against `E ×` the **single**
@@ -359,7 +470,7 @@ training path. (The standalone prototype instead clamps `max(1, #SMs // E)`, kee
 one CTA per group and oversubscribing when `E > #SMs` — correct, but a different
 choice than the upstreamed fallback.)
 
-`rht_quantize_row_col` is now the largest remaining **absolute** per-launch cost
+`rht_quantize_row_col` is the largest **absolute** per-launch cost on this path
 (878 µs at 8K, 2× the IO — row+col codes and scales) and groups fine. The persistent
 strategy does **not** transfer to it: a bitwise-validated per-group-CTA persistent
 prototype is **~15% slower** than the tiled kernel (0.85× at 8K). Unlike the launch-bound amax reduction, the
@@ -369,12 +480,13 @@ persistent+autotuned yet the plain tiled grouped kernel still matches them per r
 there is no launch overhead for persistence to recover. The same holds for
 `weight_quantize_2d` (already 0.82, token-independent).
 
-The real lever for these kernels is **autotuning**, not persistence. The grouped
-quantize kernels ship with a fixed `num_warps=8/num_stages=3` launch while their
-single-tensor twins are `@triton.autotune`d. Sweeping that config space
-(all configs bitwise-validated) shows a
-**~1.4× speedup** on `rht_quantize_row_col` (882→618 µs at 8K), entirely from
-`num_warps=4` (the 128×128 tile is already optimal; 8 warps over-subscribes registers
-on this quantize-heavy body). This is the largest remaining quant kernel, so it's a
-near-free, high-leverage fix — add `@triton.autotune` (or just drop to `num_warps=4`)
-to `_group_rht_quantize_row_col_kernel` and `_group_weight_quantize_2d_kernel`.
+The real lever for these kernels was **autotuning**, not persistence. They shipped
+with a fixed `num_warps=8/num_stages=3` launch while their single-tensor twins were
+`@triton.autotune`d. Sweeping that config space (all configs bitwise-validated)
+showed a **~1.4× speedup** on `rht_quantize_row_col` (882→618 µs at 8K), entirely
+from `num_warps=4` (the 128×128 tile was already optimal; 8 warps over-subscribed
+registers on this quantize-heavy body). **Done** —
+`_group_rht_quantize_row_col_kernel` and `_group_weight_quantize_2d_kernel` both
+carry `@triton.autotune` now, and the Table 2b Triton column is the tuned path.
+CuteDSL then took the same kernel a further 1.9× (336 vs 641 µs at 8K), which is
+where the remaining device-time win came from.

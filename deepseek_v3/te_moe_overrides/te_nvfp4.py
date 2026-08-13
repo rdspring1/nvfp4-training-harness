@@ -188,7 +188,12 @@ def _get_te_grouped_experts_cls(parent_cls: type) -> type:
                 False,  # cache_weight
                 None,  # skip_fp8_weight_update
                 False,  # save_original_input
+                None,  # delayed_scaling_input_quantizer
+                None,  # unsafe_requantization_input_quantizer
                 False,  # debug
+                False,  # single_grouped_weight (weights are unbound per expert)
+                False,  # single_grouped_bias
+                False,  # use_grouped_tensor
             )
             linear_fn = _GroupedLinear.apply if is_grad else _GroupedLinear.forward
             autograd_ctx = () if is_grad else (None,)

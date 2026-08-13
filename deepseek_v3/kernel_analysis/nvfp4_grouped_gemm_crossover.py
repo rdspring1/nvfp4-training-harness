@@ -16,11 +16,9 @@ import sys
 import torch
 
 from torchtitan.models.common.moe import GroupedExperts
-from torchtitan.models.common.token_dispatcher import LocalTokenDispatcher
 
 DIM = 7168
 HIDDEN = 2048
-TOP_K = 8
 WARMUP = 3
 ITERS = 10
 
@@ -29,21 +27,32 @@ TOKENS = [512, 1024, 2048, 4096, 8192, 16384, 32768]
 
 
 def build(backend, num_experts):
-    disp = LocalTokenDispatcher.Config(num_experts=num_experts, top_k=TOP_K)
-    kw = dict(dim=DIM, hidden_dim=HIDDEN, num_experts=num_experts, token_dispatcher=disp)
+    kw = dict(dim=DIM, hidden_dim=HIDDEN, num_experts=num_experts)
     if backend == "bf16":
         return GroupedExperts.Config(**kw).build().cuda()
-    if backend == "torchao":
-        from torchtitan.overrides.nvfp4_grouped_experts import NVFP4GroupedExperts
+    if backend in ("torchao", "torchao_triton"):
+        from torchtitan.components.quantization.nvfp4 import (
+            _get_nvfp4_grouped_experts_cls,
+        )
 
-        m = NVFP4GroupedExperts.Config(**kw).build().cuda()
+        if backend == "torchao_triton":
+            # AUTO degrades to Triton when the CuteDSL runtime is unavailable; forcing
+            # that predicate false is how the tests pin the Triton path, and it reaches
+            # all three quant ops without threading kernel_preference through torchtitan.
+            from torchao.prototype.moe_training.nvfp4_training import nvfp4_grouped_mm
+
+            nvfp4_grouped_mm.cutedsl_nvfp4_kernels_available = lambda: False
+
+        cls = _get_nvfp4_grouped_experts_cls(GroupedExperts)
+        m = cls.Config(**kw).build().cuda()
         m._init_self_buffers(buffer_device=torch.device("cuda"))
         return m
     if backend == "te":
-        from te_moe_overrides.te_grouped_experts import TEGroupedExperts
+        from te_moe_overrides.te_nvfp4 import _get_te_grouped_experts_cls
 
-        m = TEGroupedExperts.Config(**kw).build().cuda()
-        m._ensure_te_state()
+        cls = _get_te_grouped_experts_cls(GroupedExperts)
+        m = cls.Config(**kw).build().cuda()
+        m._init_self_buffers(buffer_device=torch.device("cuda"))
         return m
     if backend == "mxfp8":
         from torchtitan.components.quantization.mx import (
@@ -63,7 +72,7 @@ def bench(m, num_experts, tpe):
     def step():
         m.zero_grad(set_to_none=True)
         x.grad = None
-        out = m._experts_forward(x, num_tokens)
+        out = m(x, num_tokens)
         out.backward(torch.ones_like(out))
 
     for _ in range(WARMUP):

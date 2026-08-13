@@ -257,7 +257,7 @@ fallbacks to Triton are the TP path (`nvfp4_training.py` keeps `use_cutedsl =
 `N % 256 != 0` for the weight quantize. In those configurations the NVFP4 quant tax
 eats nearly all of the 4-bit compute advantage over MX 8-bit.
 
-## Known issue — CuteDSL grouped quantize faults at 524,288 rows
+## Known issue — CuteDSL grouped quantize faults at 524,288 rows/rank (2× above the live run)
 
 `cutedsl_group_rht_quantize_row_col` raises `cudaErrorIllegalAddress` in the MoE
 forward at **E=8 × 65,536 tok/expert (524,288 rows × 7168)**. The Triton and MXFP8
@@ -267,7 +267,7 @@ The CUDA context goes sticky, so it takes down the whole sweep rather than one r
 
 Two verified repros, both via `nvfp4_grouped_gemm_crossover.py`'s `build`/`bench`:
 add `65536` to `TOKENS` and run the `torchao` backend (E=8); or build the `torchao`
-backend at `num_experts=4` and call it at `tpe=131072` — the production shape below.
+backend at `num_experts=4` and call it at `tpe=131072` — same 524,288 rows, split 4 ways.
 A single `no_grad` forward is enough; neither needs the backward.
 
 Root cause **not** isolated. What is ruled out:
@@ -284,29 +284,45 @@ It only appears inside the full MoE forward and flips on allocator/RNG history, 
 trigger is context-dependent rather than shape-dependent — the same shapes and dtypes
 pass in isolation.
 
-**This is not a benchmark-only shape — the DSV3-671B production configuration hits
-it.** The stated recipe (`local_batch=16`, `seq=4096`, top-8, 256 experts, EP=64) is
-M = 131,072/expert with `E_local = 4` — 524,288 rows. Measured directly at that exact
-shape (`E=4`, `tpe=131072`):
+**The trigger tracks total rows per rank, not per-expert M or E.** `E=4 × 131,072`
+faults exactly like `E=8 × 65,536` — same 524,288 rows, different group split — and
+`E=8 × 32,768` (262,144 rows) passes. That is consistent with the EP-invariance
+derived above: rows/rank = `local_tokens × top_k`, independent of EP.
 
-| backend | E=4 × 131,072 (524,288 rows) | peak |
+At the 524,288-row point the other backends are fine:
+
+| backend | 524,288 rows (E=4 × 131,072) | peak |
 |:--|--:|--:|
 | **AO-cutedsl (default)** | **faults** | — |
 | AO-triton | 68.48 ms | 41.4 GiB |
 | MXFP8 | 76.62 ms | 43.1 GiB |
 | bf16 | 122.61 ms | 38.3 GiB |
 
-So the default backend **cannot currently run the production DSV3-671B MoE shape**,
-while the Triton fallback runs it at 1.79× bf16. (At this shape the error surfaces
-from a later Triton launch — the per-expert weight amax, which stays Triton on every
-path — because the context is already poisoned; under `CUDA_LAUNCH_BLOCKING=1` at the
-E=8 shape it localizes to `cutedsl_group_rht_quantize_row_col`.)
+(At `E=4` the error surfaces from a later Triton launch — the per-expert weight amax,
+which stays Triton on every path — because the context is already poisoned; under
+`CUDA_LAUNCH_BLOCKING=1` at the E=8 shape it localizes to
+`cutedsl_group_rht_quantize_row_col`.)
 
-Until this is fixed, **anything running at M ≳ 65K/expert should pass
-`kernel_preference=TRITON` explicitly.** Note that Table 4b's rule points the other
-way on speed alone (MXFP8 over Triton-NVFP4 when CuteDSL is unavailable) — but here
-Triton-NVFP4 is 1.12× faster than MXFP8, the largest Triton-vs-MXFP8 margin measured,
-so at this shape specifically the Triton fallback is the better of the two.
+**Real DSV3-671B runs are below this and are unaffected.** A live 64-GPU GB300 run at
+`local_batch_size=8`, `seq=4096`, top-8, 256 experts, EP=32 trains without problems,
+and the arithmetic agrees: rows/rank = `local_tokens × top_k` = 32,768 × 8 =
+**262,144** — the largest size measured here that passes, and exactly half the fault
+point. An earlier revision of this note claimed production hit the fault; that was
+derived from a `local_batch=16` figure quoted elsewhere in this doc rather than from
+a real run, and is wrong.
+
+Headroom is therefore **2×**, and `EP` is not the knob that spends it — only
+`local_batch_size`, `seq_len`, or `top_k` are, since rows/rank is EP-invariant.
+`local_batch_size=16` at seq 4096, or seq 8192 at batch 8, would land on 524,288.
+Anything at or above that should pass `kernel_preference=TRITON` explicitly until the
+fault is understood. Two caveats on scope: the exact threshold between 262,144 and
+524,288 has not been bisected, so the true margin may be under 2×; and all of this is
+GB200 — the GB300 run above is a different chip and torchao build, and CuteDSL was not
+isolated as the backend there.
+
+Where the Triton fallback is taken, note it beats MXFP8 by 1.12× at this size — the
+largest such margin measured, and the one place Table 4b's MXFP8-over-Triton rule
+inverts.
 
 ## How the crossover point moves
 
@@ -353,8 +369,8 @@ total routed rows/GPU = local_tokens × top_k   (EP-invariant)
 `local_batch=4, seq_len=4096, EP=2` → M = 2·4·4096·8/256 = **1,024 tok/expert** — the
 bottom of the table, where bf16 *beats* NVFP4 (AO 2.0×, TE 2.5× at 1K). That's an
 `EP=2` small-scale/template artifact (128 experts/GPU, tiny per-expert GEMMs), not the
-production layout. DeepSeek's actual training used EP=64 → M ≈ 8K–32K at `local_batch`
-1–4, and **131K at `local_batch=16`** (M scales with `local_batch`; verified below).
+production layout. The run actually being trained here uses **EP=32 at
+`local_batch_size=8`** → M = 32,768 tok/expert over 8 local experts (verified below).
 
 **Summer-2026 frontier MoE configs land deep in the NVFP4-winning regime.** Assuming a
 1M-context packed sequence sharded across 64 token-parallel ranks (16,384 local tokens/GPU):
@@ -424,23 +440,30 @@ Dividing the aggregate by `EP` gives the per-(source-rank → destination-GPU) s
 a per-GPU or per-expert quantity. Raising `EP` gives each GPU *fewer* experts, so it
 *concentrates* rows per expert (pushes deeper into NVFP4), at constant aggregate/GPU.
 
-**The stated DSV3 recipe (`local_batch=16, seq=4096, top-8, 256 experts, EP=64`) lands
-at M ≈ 131K — 44× past the ~3K AO crossover, deep in the NVFP4 win:**
+**The configuration actually being trained** is `local_batch_size=8, seq=4096, top-8,
+256 experts, EP=32` on 64 GB300s — 32,768 tokens/GPU/step, 2.1M tokens/step globally:
 
 ```
-∑Mᵢ per GPU = 65,536 × 8              = 524,288 rows   (E_local = 256/64 = 4)
-per-expert M = 65,536 × 8 × 64 / 256  = 131,072 rows
+EP group tokens   = 32 ranks × 32,768        = 1,048,576
+token-expert pairs= 1,048,576 × 8            = 8,388,608
+per-expert M      = 8,388,608 / 256          =    32,768 rows   (E_local = 256/32 = 8)
+∑Mᵢ per GPU       = 32,768 × 8               =   262,144 rows
 ```
 
-It is skew-robust: even a cold expert at ~0.4× mean ≈ 52K is ~17× past crossover, and
-the 128-row group padding wastes ≤ 128/131072 ≈ **0.1%** at this scale (vs ~1–3% near
-the crossover). `M` scales linearly with `local_batch` — the only knob that moves it:
+That is ~11× past the ~3K AO crossover, deep in the NVFP4 win. It is skew-robust: even
+a cold expert at ~0.4× mean ≈ 13K is ~4× past crossover, and the 128-row group padding
+wastes ≤ 128/32768 ≈ **0.4%** at this scale (vs ~1–3% near the crossover).
 
-| local_batch (seq=4096, EP=64) | per-expert M | ∑Mᵢ/GPU | vs AO crossover ~3K |
+`∑Mᵢ/GPU = local_tokens × top_k` is **EP-invariant** (derived above), so `EP` only
+re-splits those rows across `E_local` experts; `local_batch_size` and `seq_len` are the
+knobs that move the total:
+
+| local_batch (seq=4096) | ∑Mᵢ/GPU | per-expert M @EP=32 | vs AO crossover ~3K |
 |--:|--:|--:|:--|
-| 16 (stated recipe) | 131,072 | 524,288 | 44× — deep NVFP4 |
-| 4 (torchtitan `deepseek_v3_671b` default) | 32,768 | 131,072 | 11× — deep NVFP4 |
-| 1 | 8,192 | 32,768 | 3× — solid NVFP4 (was at the crossover pre-CuteDSL) |
+| 16 | 524,288 | 65,536 | 22× — but see the CuteDSL fault above |
+| **8 (the live run)** | **262,144** | **32,768** | 11× — deep NVFP4 |
+| 4 (torchtitan `deepseek_v3_671b` default) | 131,072 | 16,384 | 5× — deep NVFP4 |
+| 1 | 32,768 | 4,096 | ~1× — at the crossover |
 
 **Grouped-GEMM launches per optimizer step.** Each MoE layer issues **3
 `torch._grouped_mm`** (w1, w3, w2; `moe.py:97-108`); profiler count on one layer's

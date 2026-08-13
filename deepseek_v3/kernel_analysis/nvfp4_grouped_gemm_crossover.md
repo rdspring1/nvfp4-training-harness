@@ -242,10 +242,10 @@ run-to-run spread is **≤0.4% for Triton and ≤2.4% for MXFP8**, so the orderi
 | tok/exp | AO-triton | MXFP8 | triton win | *AO-cutedsl* | *cutedsl win vs MXFP8* |
 |--------:|----------:|------:|-----------:|-------------:|-----------------------:|
 |   8,192 |     10.70 | 10.90 |      1.02× |         8.32 |                  1.31× |
-|  16,384 |     19.13 | 19.98 |      1.04× |        14.32 |                  1.40× |
-|  32,768 |     35.92 | 38.51 |      1.07× |        26.42 |                  1.46× |
-|  65,536 |     69.39 | 76.28 |      1.10× |    *(faults — see below)* | |
-| *E=4 × 131,072* |     68.48 | 76.62 |  **1.12×** |    *(faults)* | |
+|  16,384 |     19.13 | 19.98 |      1.04× |        14.30 |                  1.40× |
+|  32,768 |     35.92 | 38.51 |      1.07× |        26.30 |                  1.46× |
+|  65,536 |     69.39 | 76.28 |      1.10× |        50.58 |              **1.51×** |
+| *E=4 × 131,072* |     68.48 | 76.62 |  **1.12×** |    **50.29** |              **1.52×** |
 
 **Triton-NVFP4 does beat MXFP8 at every realistic M, but only by 2–10%** — it crosses
 at ~6K and the gap widens slowly. That is a poor trade for dropping from 8-bit to
@@ -257,122 +257,72 @@ fallbacks to Triton are the TP path (`nvfp4_training.py` keeps `use_cutedsl =
 `N % 256 != 0` for the weight quantize. In those configurations the NVFP4 quant tax
 eats nearly all of the 4-bit compute advantage over MX 8-bit.
 
-## Known issue — CuteDSL grouped quantize writes out of bounds above ~442K rows/rank
+## Fixed — CuteDSL columnwise scale prefix overflowed Int32 (torchao `ca485bcc`)
 
-`cutedsl_group_rht_quantize_row_col` raises `cudaErrorIllegalAddress` in the MoE
-forward at **E=8 × 65,536 tok/expert (524,288 rows × 7168)**. The Triton and MXFP8
-backends both run that size fine, which is why Table 4b has no CuteDSL entry at 65K.
-The CUDA context goes sticky, so it takes down the whole sweep rather than one row —
-`bench`'s per-point `except` does not contain it.
+`cutedsl_group_rht_quantize_row_col` wrote out of bounds, silently corrupting the
+columnwise scales, once rows/rank grew past ~342K. **Root-caused and fixed**; this
+section is kept because the failure mode is instructive and because anyone on a torchao
+before `ca485bcc` still has it.
 
-Two verified repros, both via `nvfp4_grouped_gemm_crossover.py`'s `build`/`bench`:
-add `65536` to `TOKENS` and run the `torchao` backend (E=8); or build the `torchao`
-backend at `num_experts=4` and call it at `tpe=131072` — same 524,288 rows, split 4 ways.
-A single `no_grad` forward is enough; neither needs the backward.
+### Root cause
 
-### What it is: a negative-index write in the columnwise FP4 epilogue
+`_store_grouped_col_sf_u32` addresses a group's swizzled columnwise scale tile by the
+span of the preceding groups:
 
-`compute-sanitizer --tool memcheck` names it exactly:
-
-```
-Invalid __global__ write of size 4 bytes
-  at kernel_cutlass_kernel_..._Tcgen05GroupRowColFused_object_at_...+0x64f0
-  by thread (160,0,0) in block (4,0,0)
-  Access to 0xeb7779450004 is out of bounds
-  and is 112918524 bytes BEFORE the nearest allocation at 0xeb7780000000
-  Host Frame: _cutedsl_group_rht_quantize_row_col_impl in _cutedsl_group_kernels_impl.py:1000
+```python
+prefix_words = hidden * group_start // cutlass.Int32(64)   # both operands Int32
 ```
 
-**The write lands *before* the allocation — a negative offset.** A 4-byte global write
-from `Tcgen05GroupRowColFused` is the columnwise FP4 store; `col_fp4` is the one
-`torch.uint32` output (`(hidden, tokens // 8)`). So an index feeding that store wraps
-negative, which is the signature of a signed-32-bit overflow in the epilogue's offset
-arithmetic rather than anything about group count or the RHT itself.
+Both operands are `Int32`, so the **product** wraps past 2^31. At 671B `hidden=7168`
+that happens the moment `group_start` reaches `2^31 / 7168 =` **299,593 rows**: the
+multiply goes negative, the quotient with it, and the scale word is stored far below
+the buffer. The quotient itself is harmless (≤ `hidden × tokens / 64`, ~59M words), so
+only the multiply needed widening — the index arithmetic after it stays 32-bit.
 
-### Threshold, sanitizer-verified
+`compute-sanitizer` named it directly: an invalid **4-byte** `__global__` write from
+`Tcgen05GroupRowColFused` (the 4-byte store is the *scale* write; the FP4 store is a
+16-byte `STG.E.128`), at an address **112,918,524 bytes _before_** the nearest
+allocation. The negative displacement was the tell.
 
-Rows are E × tok/expert; each point is a fresh process, default allocator, memcheck
-counting invalid accesses:
+### The damage is silent, and starts well below any visible failure
 
-| rows | invalid accesses | |
-|--:|--:|:--|
-| 262,144 | **0** | ← the live production size |
-| 393,216 | 0 | |
-| 425,984 | 0 | |
-| 442,368 | **0** | last clean point |
-| 458,752 | 80+ | first faulting point |
+Past the overflow the kernel stores scales at a negative offset and carries on: the
+wrapped address usually still lands inside another live allocation, so training
+continues on wrong scales with no signal at all. Columnwise scale output vs the Triton
+backend, per group, E=8, hidden 7168 — the ~1.5% baseline is the pre-existing difference
+between the two backends, present at every size:
 
-The bug switches on between **442,368 and 458,752 rows**, so the wrapping quantity is
-roughly `C × tokens` with `C = 2^31 / tokens_crit` ∈ **[4682, 4855)**. That is the clue
-for whoever reads the epilogue: it rules out the obvious candidates, since
-`tokens × hidden` (the element count of `A`) crosses 2^31 all the way down at 299,593
-rows — well inside the clean range — and `col_fp4`'s own byte extent
-(`tokens × hidden / 2`) does not cross until 599,186 rows.
+| rows | max(`hidden × group_start`) | | sfd differing, **before** | **after** |
+|--:|--:|:--|--:|--:|
+| 32,768 | 205,520,896 | | 1.6% | 1.6% |
+| 262,144 | 1,644,167,168 | ← live production size | 1.5% | 1.5% |
+| 360,448 | 2,260,729,856 | past 2^31 | **12.7%** | 1.8% |
+| 458,752 | 2,877,292,544 | past 2^31 | **unusable** | 1.7% |
 
-**Production is clean, not silently corrupting.** 262,144 rows reports zero invalid
-accesses, so the live run is below the bug, not riding it.
+**Corruption begins at ~342K rows/rank.** Above ~459K the bad address additionally falls
+outside a mapped segment and the process dies, but that is the tail of the bug rather
+than its boundary — the correctness threshold is the overflow, ~117K rows earlier. An
+earlier revision of this note took the visible failure for the threshold and treated
+everything under it as clean; that was wrong for the whole 342K–459K band.
 
-### What is ruled out
+**The live production run at 262,144 rows/rank was unaffected** — it sits below the
+overflow itself, not merely below the point where the overflow becomes visible. Confirmed
+by both the numerics above and zero sanitizer findings.
 
-- **Not the element count of `A` crossing 2^31** — clean at 442,368 rows, which is
-  1.48× that boundary.
-- **Not `logical_packed_length`** — passing the real `[tokens]` tensor standalone at
-  524,288 rows is clean; the MoE passes exactly that.
-- **Not JIT-cache priming.** The impl compiles once and reuses the binary for all
-  shapes, but calling it first at `(8192, 7168)` or `(8192, 2048)` and then at 458,752
-  is clean.
-- **Not the other CuteDSL ops.** Swapping *only* `rht_quantize_row_col` to Triton fixes
-  it; swapping only `rht_amax` or only `weight_quantize_2d` does not.
-- **Not memory pressure, pointer range, or misalignment** — passes standalone with 40
-  and 80 GiB of ballast; `A` is 256-byte aligned when it faults.
-- **Not autograd** — reproduces under `no_grad`.
+### After the fix
 
-**It needs the MoE's allocator state.** Standalone `rht_quantize_row_col` at the same
-shape is clean even at 524,288 rows, and `PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True`
-makes the MoE case stop crashing. Do **not** read that as a fix: memcheck's allocation
-bounds are far weaker under expandable segments (one large VA reservation), so a write
-112 MB adrift would land inside the reservation and go unreported. The honest reading is
-that the allocator changes whether the wrapped address is mapped, converting a hard
-fault into a possible silent corruption.
+- `compute-sanitizer`: zero invalid accesses at the shape that previously wrote adrift.
+- The 3-GEMM MoE forward at 524,288 rows runs in **50.3 ms** vs the Triton backend's
+  68.5 ms; it was previously unusable. This fills in the CuteDSL entries in Table 4b at
+  65,536 tok/expert and at E=4 × 131,072.
+- No measurable cost — the multiply is once per work item. Grouped
+  `rht_quantize_row_col` over 512–8192 tok/expert is unchanged at 1.29×, 1.74×, 1.81×,
+  1.87×, 1.92× over Triton (was 1.28×, 1.73×, 1.81×, 1.86×, 1.91×).
+- `test_group_rht_quantize_row_col.py` + `test_nvfp4_grouped_mm.py`: 85 passed.
 
-**The trigger tracks total rows per rank, not per-expert M or E.** `E=4 × 131,072`
-faults exactly like `E=8 × 65,536` — same 524,288 rows, different group split — and
-`E=8 × 32,768` (262,144 rows) passes. That is consistent with the EP-invariance
-derived above: rows/rank = `local_tokens × top_k`, independent of EP.
-
-At the 524,288-row point the other backends are fine:
-
-| backend | 524,288 rows (E=4 × 131,072) | peak |
-|:--|--:|--:|
-| **AO-cutedsl (default)** | **faults** | — |
-| AO-triton | 68.48 ms | 41.4 GiB |
-| MXFP8 | 76.62 ms | 43.1 GiB |
-| bf16 | 122.61 ms | 38.3 GiB |
-
-(At `E=4` the error surfaces from a later Triton launch — the per-expert weight amax,
-which stays Triton on every path — because the context is already poisoned; under
-`CUDA_LAUNCH_BLOCKING=1` at the E=8 shape it localizes to
-`cutedsl_group_rht_quantize_row_col`.)
-
-**Real DSV3-671B runs are below this and are unaffected.** A live 64-GPU GB300 run at
-`local_batch_size=8`, `seq=4096`, top-8, 256 experts, EP=32 trains without problems,
-and the arithmetic agrees: rows/rank = `local_tokens × top_k` = 32,768 × 8 =
-**262,144** — the largest size measured here that passes, and exactly half the fault
-point. An earlier revision of this note claimed production hit the fault; that was
-derived from a `local_batch=16` figure quoted elsewhere in this doc rather than from
-a real run, and is wrong.
-
-Headroom is therefore **~1.7×** (262,144 → 442,368 clean), and `EP` is not the knob that spends it — only
-`local_batch_size`, `seq_len`, or `top_k` are, since rows/rank is EP-invariant.
-`local_batch_size=16` at seq 4096, or seq 8192 at batch 8, gives 524,288 — past it.
-Anything at or above that should pass `kernel_preference=TRITON` explicitly until the
-fault is understood. One caveat on scope: all of this is
-GB200 — the GB300 run above is a different chip and torchao build, and CuteDSL was not
-isolated as the backend there.
-
-Where the Triton fallback is taken, note it beats MXFP8 by 1.12× at this size — the
-largest such margin measured, and the one place Table 4b's MXFP8-over-Triton rule
-inverts.
+**Not covered by a regression test.** Every existing test shape is far below 299,593
+rows; reaching the overflow needs ~6 GB of activations, so nothing in CI would have
+caught this and nothing guards it now.
 
 ## How the crossover point moves
 

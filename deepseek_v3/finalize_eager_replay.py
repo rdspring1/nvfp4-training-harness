@@ -35,6 +35,7 @@ def main():
     parser.add_argument("--torchtitan-sha", required=True)
     parser.add_argument("--mslk-sha", required=True)
     parser.add_argument("--elapsed-seconds", type=int, required=True)
+    parser.add_argument("--label", default="TorchAO NVFP4 Triton replay")
     args = parser.parse_args()
     parsed = metrics(args.raw_log)
     if 380 not in parsed or "Training completed" not in args.raw_log.read_text(errors="replace"):
@@ -54,7 +55,7 @@ def main():
     overlay = args.output_dir / "training_loss_four_series_overlay.png"
     subprocess.run([sys.executable, str(ROOT / "deepseek_v3" / "plot_eager_runner_loss.py"), "--replay-log", str(log_copy), "--output", str(overlay)], check=True)
     minutes, seconds = divmod(args.elapsed_seconds, 60)
-    report = f"""# DeepSeek V3 16B TorchAO NVFP4 Triton replay
+    report = f"""# DeepSeek V3 16B {args.label}
 
 ## Command
 

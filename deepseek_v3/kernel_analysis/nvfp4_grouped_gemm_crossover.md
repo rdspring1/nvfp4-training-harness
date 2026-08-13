@@ -233,29 +233,66 @@ host-dispatch reason in Table 2: those sizes are launch-bound, not kernel-bound.
 **If you run eager at ≤2K tok/expert, `kernel_preference=TRITON` is the faster
 choice; everywhere else, and under CUDA graphs, take the default.**
 
-### Table 4b — Is the Triton fallback worth taking over MXFP8?
+### Table 4b — All five backends at scale, repeated
 
-Table 4's single-shot columns put AO-triton ahead of MXFP8 above ~5K, but by a small
-enough margin to be worth separating from noise. Repeated 3× per point, min reported;
-run-to-run spread is **≤0.4% for Triton and ≤2.4% for MXFP8**, so the ordering is real.
+Table 4 is single-shot and stops at 32K. This repeats every point **3× and reports the
+min**, and extends to 65,536 tok/expert — a size the CuteDSL backend could not run
+before the Int32 fix below. Same harness, same GB200. Run-to-run spread is ≤0.6%
+everywhere except bf16 at 16,384, which came in at 7.4%.
 
-| tok/exp | AO-triton | MXFP8 | triton win | *AO-cutedsl* | *cutedsl win vs MXFP8* |
-|--------:|----------:|------:|-----------:|-------------:|-----------------------:|
-|   8,192 |     10.70 | 10.90 |      1.02× |         8.32 |                  1.31× |
-|  16,384 |     19.13 | 19.98 |      1.04× |        14.30 |                  1.40× |
-|  32,768 |     35.92 | 38.51 |      1.07× |        26.30 |                  1.46× |
-|  65,536 |     69.39 | 76.28 |      1.10× |        50.58 |              **1.51×** |
-| *E=4 × 131,072* |     68.48 | 76.62 |  **1.12×** |    **50.29** |              **1.52×** |
+| tok/exp | rows | bf16 | **AO-cutedsl** | AO-triton | TE | MXFP8 |
+|--------:|--------:|-------:|-----------:|----------:|------:|------:|
+|   8,192 |  65,536 |  14.02 |  **8.32** | 10.70 |  9.35 | 10.90 |
+|  16,384 | 131,072 |  28.75 | **14.30** | 19.13 | 14.57 | 19.98 |
+|  32,768 | 262,144 |  59.68 |     26.30 | 35.92 | **25.70** | 38.51 |
+|  65,536 | 524,288 | 121.27 |     50.58 | 69.39 | **48.51** | 76.28 |
 
-**Triton-NVFP4 does beat MXFP8 at every realistic M, but only by 2–10%** — it crosses
-at ~6K and the gap widens slowly. That is a poor trade for dropping from 8-bit to
-4-bit precision. The 4-bit path is only decisively worth it on CuteDSL (1.3–1.5×).
+Ratio to bf16:
+
+| tok/exp | AO-cutedsl | AO-triton | TE | MXFP8 |
+|--------:|-----------:|----------:|------:|------:|
+|   8,192 | **0.59** | 0.76 | 0.67 | 0.78 |
+|  16,384 | **0.50** | 0.67 | 0.51 | 0.70 |
+|  32,768 |     0.44 | 0.60 | **0.43** | 0.65 |
+|  65,536 |     0.42 | 0.57 | **0.40** | 0.63 |
+
+**The AO-vs-TE lead changes hands at ~22K tok/expert.** AO-CuteDSL is ahead at 8K
+(1.12×) and 16K (1.02×); TE takes it at 32K (1.02×) and 65K (1.04×), widening slowly.
+The two are within 4% at every point — effectively co-equal, against the 1.4× TE lead
+this doc carried before the CuteDSL backend landed. At 65,536 tok/expert that is 10.4
+Mtok/s (AO-CuteDSL) and 10.8 (TE) against bf16's 4.3.
+
+**CuteDSL's margin over the other TorchAO path and over MXFP8 widens with M**, which is
+what amortizing a quant tax looks like:
+
+| CuteDSL vs | 8,192 | 16,384 | 32,768 | 65,536 |
+|:--|--:|--:|--:|--:|
+| AO-triton | 1.29× | 1.34× | 1.37× | 1.37× |
+| MXFP8 | 1.31× | 1.40× | 1.46× | **1.51×** |
+
+**The Triton fallback beats MXFP8 too, but only by 2–10%** (1.02×, 1.04×, 1.07×, 1.10×
+across the sweep, rising to 1.12× at the `E=4` split below). That is a poor trade for
+dropping from 8-bit to 4-bit precision, and it is the one comparison where the ordering
+is close enough that the 3× repetition matters. The 4-bit path is only decisively worth
+it on CuteDSL.
 
 **Practical rule: where CuteDSL cannot run, prefer MXFP8 over TorchAO-NVFP4.** The
 fallbacks to Triton are the TP path (`nvfp4_training.py` keeps `use_cutedsl =
 (preference == CUTEDSL)`, so AUTO runs TP on Triton), `E > MAX_GROUPS=64`, and
-`N % 256 != 0` for the weight quantize. In those configurations the NVFP4 quant tax
-eats nearly all of the 4-bit compute advantage over MX 8-bit.
+`N % 256 != 0` for the weight quantize. In those configurations the NVFP4 quant tax eats
+nearly all of the 4-bit compute advantage over MX 8-bit.
+
+**Cross-check at the production group split.** The same 524,288 rows as `E=4 × 131,072`
+(the DSV3-671B EP=64 layout) rather than `E=8 × 65,536`:
+
+| | bf16 | AO-cutedsl | AO-triton | MXFP8 |
+|:--|--:|--:|--:|--:|
+| E=4 × 131,072 | 122.61 | **50.29** | 68.48 | 76.62 |
+| E=8 × 65,536 | 121.27 | 50.58 | 69.39 | 76.28 |
+
+Every backend lands within ~1.3%, so cost tracks **total rows per rank**, not how they
+are split across experts — the same invariance the M/expert derivation predicts. TE was
+not measured at `E=4`.
 
 ## Fixed — CuteDSL columnwise scale prefix overflowed Int32 (torchao `ca485bcc`)
 

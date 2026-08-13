@@ -257,7 +257,7 @@ fallbacks to Triton are the TP path (`nvfp4_training.py` keeps `use_cutedsl =
 `N % 256 != 0` for the weight quantize. In those configurations the NVFP4 quant tax
 eats nearly all of the 4-bit compute advantage over MX 8-bit.
 
-## Known issue — CuteDSL grouped quantize faults at 524,288 rows/rank (2× above the live run)
+## Known issue — CuteDSL grouped quantize writes out of bounds above ~442K rows/rank
 
 `cutedsl_group_rht_quantize_row_col` raises `cudaErrorIllegalAddress` in the MoE
 forward at **E=8 × 65,536 tok/expert (524,288 rows × 7168)**. The Triton and MXFP8
@@ -270,19 +270,70 @@ add `65536` to `TOKENS` and run the `torchao` backend (E=8); or build the `torch
 backend at `num_experts=4` and call it at `tpe=131072` — same 524,288 rows, split 4 ways.
 A single `no_grad` forward is enough; neither needs the backward.
 
-Root cause **not** isolated. What is ruled out:
+### What it is: a negative-index write in the columnwise FP4 epilogue
 
-- **Not an element-count overflow past 2^31.** The op handles 524,288 × 7168
-  (1.75× 2^31) called standalone, and crossing the boundary at 294,912 → 303,104 rows
-  is clean on both backends.
-- **Not memory pressure or high pointer values.** Passes standalone with 40 and 80 GiB
-  of ballast allocated first.
-- **Not pointer misalignment.** `A` is 256-byte aligned in the failing call.
-- **Not autograd.** Reproduces under `no_grad` once the allocator history matches.
+`compute-sanitizer --tool memcheck` names it exactly:
 
-It only appears inside the full MoE forward and flips on allocator/RNG history, so the
-trigger is context-dependent rather than shape-dependent — the same shapes and dtypes
-pass in isolation.
+```
+Invalid __global__ write of size 4 bytes
+  at kernel_cutlass_kernel_..._Tcgen05GroupRowColFused_object_at_...+0x64f0
+  by thread (160,0,0) in block (4,0,0)
+  Access to 0xeb7779450004 is out of bounds
+  and is 112918524 bytes BEFORE the nearest allocation at 0xeb7780000000
+  Host Frame: _cutedsl_group_rht_quantize_row_col_impl in _cutedsl_group_kernels_impl.py:1000
+```
+
+**The write lands *before* the allocation — a negative offset.** A 4-byte global write
+from `Tcgen05GroupRowColFused` is the columnwise FP4 store; `col_fp4` is the one
+`torch.uint32` output (`(hidden, tokens // 8)`). So an index feeding that store wraps
+negative, which is the signature of a signed-32-bit overflow in the epilogue's offset
+arithmetic rather than anything about group count or the RHT itself.
+
+### Threshold, sanitizer-verified
+
+Rows are E × tok/expert; each point is a fresh process, default allocator, memcheck
+counting invalid accesses:
+
+| rows | invalid accesses | |
+|--:|--:|:--|
+| 262,144 | **0** | ← the live production size |
+| 393,216 | 0 | |
+| 425,984 | 0 | |
+| 442,368 | **0** | last clean point |
+| 458,752 | 80+ | first faulting point |
+
+The bug switches on between **442,368 and 458,752 rows**, so the wrapping quantity is
+roughly `C × tokens` with `C = 2^31 / tokens_crit` ∈ **[4682, 4855)**. That is the clue
+for whoever reads the epilogue: it rules out the obvious candidates, since
+`tokens × hidden` (the element count of `A`) crosses 2^31 all the way down at 299,593
+rows — well inside the clean range — and `col_fp4`'s own byte extent
+(`tokens × hidden / 2`) does not cross until 599,186 rows.
+
+**Production is clean, not silently corrupting.** 262,144 rows reports zero invalid
+accesses, so the live run is below the bug, not riding it.
+
+### What is ruled out
+
+- **Not the element count of `A` crossing 2^31** — clean at 442,368 rows, which is
+  1.48× that boundary.
+- **Not `logical_packed_length`** — passing the real `[tokens]` tensor standalone at
+  524,288 rows is clean; the MoE passes exactly that.
+- **Not JIT-cache priming.** The impl compiles once and reuses the binary for all
+  shapes, but calling it first at `(8192, 7168)` or `(8192, 2048)` and then at 458,752
+  is clean.
+- **Not the other CuteDSL ops.** Swapping *only* `rht_quantize_row_col` to Triton fixes
+  it; swapping only `rht_amax` or only `weight_quantize_2d` does not.
+- **Not memory pressure, pointer range, or misalignment** — passes standalone with 40
+  and 80 GiB of ballast; `A` is 256-byte aligned when it faults.
+- **Not autograd** — reproduces under `no_grad`.
+
+**It needs the MoE's allocator state.** Standalone `rht_quantize_row_col` at the same
+shape is clean even at 524,288 rows, and `PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True`
+makes the MoE case stop crashing. Do **not** read that as a fix: memcheck's allocation
+bounds are far weaker under expandable segments (one large VA reservation), so a write
+112 MB adrift would land inside the reservation and go unreported. The honest reading is
+that the allocator changes whether the wrapped address is mapped, converting a hard
+fault into a possible silent corruption.
 
 **The trigger tracks total rows per rank, not per-expert M or E.** `E=4 × 131,072`
 faults exactly like `E=8 × 65,536` — same 524,288 rows, different group split — and
@@ -311,12 +362,11 @@ point. An earlier revision of this note claimed production hit the fault; that w
 derived from a `local_batch=16` figure quoted elsewhere in this doc rather than from
 a real run, and is wrong.
 
-Headroom is therefore **2×**, and `EP` is not the knob that spends it — only
+Headroom is therefore **~1.7×** (262,144 → 442,368 clean), and `EP` is not the knob that spends it — only
 `local_batch_size`, `seq_len`, or `top_k` are, since rows/rank is EP-invariant.
-`local_batch_size=16` at seq 4096, or seq 8192 at batch 8, would land on 524,288.
+`local_batch_size=16` at seq 4096, or seq 8192 at batch 8, gives 524,288 — past it.
 Anything at or above that should pass `kernel_preference=TRITON` explicitly until the
-fault is understood. Two caveats on scope: the exact threshold between 262,144 and
-524,288 has not been bisected, so the true margin may be under 2×; and all of this is
+fault is understood. One caveat on scope: all of this is
 GB200 — the GB300 run above is a different chip and torchao build, and CuteDSL was not
 isolated as the backend there.
 

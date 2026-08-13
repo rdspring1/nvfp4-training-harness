@@ -233,6 +233,81 @@ host-dispatch reason in Table 2: those sizes are launch-bound, not kernel-bound.
 **If you run eager at ≤2K tok/expert, `kernel_preference=TRITON` is the faster
 choice; everywhere else, and under CUDA graphs, take the default.**
 
+### Table 4b — Is the Triton fallback worth taking over MXFP8?
+
+Table 4's single-shot columns put AO-triton ahead of MXFP8 above ~5K, but by a small
+enough margin to be worth separating from noise. Repeated 3× per point, min reported;
+run-to-run spread is **≤0.4% for Triton and ≤2.4% for MXFP8**, so the ordering is real.
+
+| tok/exp | AO-triton | MXFP8 | triton win | *AO-cutedsl* | *cutedsl win vs MXFP8* |
+|--------:|----------:|------:|-----------:|-------------:|-----------------------:|
+|   8,192 |     10.70 | 10.90 |      1.02× |         8.32 |                  1.31× |
+|  16,384 |     19.13 | 19.98 |      1.04× |        14.32 |                  1.40× |
+|  32,768 |     35.92 | 38.51 |      1.07× |        26.42 |                  1.46× |
+|  65,536 |     69.39 | 76.28 |      1.10× |    *(faults — see below)* | |
+| *E=4 × 131,072* |     68.48 | 76.62 |  **1.12×** |    *(faults)* | |
+
+**Triton-NVFP4 does beat MXFP8 at every realistic M, but only by 2–10%** — it crosses
+at ~6K and the gap widens slowly. That is a poor trade for dropping from 8-bit to
+4-bit precision. The 4-bit path is only decisively worth it on CuteDSL (1.3–1.5×).
+
+**Practical rule: where CuteDSL cannot run, prefer MXFP8 over TorchAO-NVFP4.** The
+fallbacks to Triton are the TP path (`nvfp4_training.py` keeps `use_cutedsl =
+(preference == CUTEDSL)`, so AUTO runs TP on Triton), `E > MAX_GROUPS=64`, and
+`N % 256 != 0` for the weight quantize. In those configurations the NVFP4 quant tax
+eats nearly all of the 4-bit compute advantage over MX 8-bit.
+
+## Known issue — CuteDSL grouped quantize faults at 524,288 rows
+
+`cutedsl_group_rht_quantize_row_col` raises `cudaErrorIllegalAddress` in the MoE
+forward at **E=8 × 65,536 tok/expert (524,288 rows × 7168)**. The Triton and MXFP8
+backends both run that size fine, which is why Table 4b has no CuteDSL entry at 65K.
+The CUDA context goes sticky, so it takes down the whole sweep rather than one row —
+`bench`'s per-point `except` does not contain it.
+
+Two verified repros, both via `nvfp4_grouped_gemm_crossover.py`'s `build`/`bench`:
+add `65536` to `TOKENS` and run the `torchao` backend (E=8); or build the `torchao`
+backend at `num_experts=4` and call it at `tpe=131072` — the production shape below.
+A single `no_grad` forward is enough; neither needs the backward.
+
+Root cause **not** isolated. What is ruled out:
+
+- **Not an element-count overflow past 2^31.** The op handles 524,288 × 7168
+  (1.75× 2^31) called standalone, and crossing the boundary at 294,912 → 303,104 rows
+  is clean on both backends.
+- **Not memory pressure or high pointer values.** Passes standalone with 40 and 80 GiB
+  of ballast allocated first.
+- **Not pointer misalignment.** `A` is 256-byte aligned in the failing call.
+- **Not autograd.** Reproduces under `no_grad` once the allocator history matches.
+
+It only appears inside the full MoE forward and flips on allocator/RNG history, so the
+trigger is context-dependent rather than shape-dependent — the same shapes and dtypes
+pass in isolation.
+
+**This is not a benchmark-only shape — the DSV3-671B production configuration hits
+it.** The stated recipe (`local_batch=16`, `seq=4096`, top-8, 256 experts, EP=64) is
+M = 131,072/expert with `E_local = 4` — 524,288 rows. Measured directly at that exact
+shape (`E=4`, `tpe=131072`):
+
+| backend | E=4 × 131,072 (524,288 rows) | peak |
+|:--|--:|--:|
+| **AO-cutedsl (default)** | **faults** | — |
+| AO-triton | 68.48 ms | 41.4 GiB |
+| MXFP8 | 76.62 ms | 43.1 GiB |
+| bf16 | 122.61 ms | 38.3 GiB |
+
+So the default backend **cannot currently run the production DSV3-671B MoE shape**,
+while the Triton fallback runs it at 1.79× bf16. (At this shape the error surfaces
+from a later Triton launch — the per-expert weight amax, which stays Triton on every
+path — because the context is already poisoned; under `CUDA_LAUNCH_BLOCKING=1` at the
+E=8 shape it localizes to `cutedsl_group_rht_quantize_row_col`.)
+
+Until this is fixed, **anything running at M ≳ 65K/expert should pass
+`kernel_preference=TRITON` explicitly.** Note that Table 4b's rule points the other
+way on speed alone (MXFP8 over Triton-NVFP4 when CuteDSL is unavailable) — but here
+Triton-NVFP4 is 1.12× faster than MXFP8, the largest Triton-vs-MXFP8 margin measured,
+so at this shape specifically the Triton fallback is the better of the two.
+
 ## How the crossover point moves
 
 | Regime | Crossover (tokens/expert) | Why |

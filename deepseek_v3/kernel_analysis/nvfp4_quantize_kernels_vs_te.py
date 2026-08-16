@@ -3,12 +3,9 @@
 TorchAO's CuteDSL NVFP4 kernels are a port of TE's; this answers whether the port is
 correct and whether it is competitive. Two passes over the same shapes:
 
-  conformance -- per-tensor byte-difference percentages, torchao vs TE, for the FP4
-    codes and the FP8 scale factors. Run under both NVTE_USE_FAST_MATH settings: TE's
-    default inserts an IEEE divide and a bf16 accumulator round-trip "for bit-wise
-    compatibility with unfused kernels", while its fast-math path uses
-    reciprocal_approximate_ftz, which is the rcp.approx torchao emits. Expect all zeros
-    under NVTE_USE_FAST_MATH=1.
+  conformance -- per-tensor byte-difference percentages, torchao vs TE default, for the
+    FP4 codes and FP8 scale factors. Both use correctly rounded division and the bf16 RHT
+    accumulator round-trip, so every percentage should be zero.
 
   timing -- device kernel time via torchao's own bench_utils.kernel_time_us, so the
     numbers are directly comparable to the tables in torchao's benchmark README.
@@ -16,13 +13,13 @@ correct and whether it is competitive. Two passes over the same shapes:
 TE's amax entry points have no Python binding (nvte_hadamard_transform_amax is reachable
 only inside a quantizer that also casts), so the amax kernels are attributed from the
 profiler by name rather than compared head to head. TE 2.19 has no grouped 2D weight
-quantize at all (extensions/cast.cpp:154), so that row has no TE column.
+quantize at all (extensions/cast.cpp:154), so that row uses four validated single-tensor
+calls as a same-work E=4 baseline.
 
 Lives here rather than in third_party/torchao because torchao must gain no TE dependency.
 
 Run from the repo root (torchao is editable-installed):
     python deepseek_v3/kernel_analysis/nvfp4_quantize_kernels_vs_te.py
-    NVTE_USE_FAST_MATH=1 python deepseek_v3/kernel_analysis/nvfp4_quantize_kernels_vs_te.py
 Produces the tables in nvfp4_quantize_kernels_vs_te.md.
 """
 
@@ -58,6 +55,9 @@ from torchao.prototype.moe_training.nvfp4_training.group_hadamard_utils import (
 )
 from torchao.prototype.moe_training.nvfp4_training.group_quantize_2d_cutedsl import (
     cutedsl_group_weight_quantize_2d,
+)
+from torchao.prototype.moe_training.nvfp4_training.group_quantize_2d_triton import (
+    triton_group_weight_quantize_2d,
 )
 from torchao.prototype.moe_training.nvfp4_training.group_rht_quantize_row_col_cutedsl import (
     cutedsl_group_rht_quantize_row_col,
@@ -181,16 +181,16 @@ def compare_linear(M: int, N: int, seed: int = 0):
 # ---------------------------------------------------------------------------
 
 
-def grouped_metadata(offsets: torch.Tensor):
+def grouped_metadata(offsets: torch.Tensor, logical_last_dim: int):
     """torchao's cumulative int32 row-ends -> TE's int64 device metadata.
 
     Both are passed: supplying tensor_offsets short-circuits TE's
     build_grouped_tensor_offsets, which otherwise launches an extra kernel inside the
-    timed region on every call.
+    timed region on every call. TE offsets count elements, not rows.
     """
     ends = offsets.to(torch.int64)
-    tensor_offsets = torch.cat([ends.new_zeros(1), ends])
-    return torch.diff(tensor_offsets), tensor_offsets
+    first_dims = torch.diff(torch.cat([ends.new_zeros(1), ends]))
+    return first_dims, tex.splits_to_offsets(first_dims, logical_last_dim)
 
 
 def compare_grouped(E: int, M: int, N: int, seed: int = 0):
@@ -200,7 +200,7 @@ def compare_grouped(E: int, M: int, N: int, seed: int = 0):
     A = torch.randn((psl, N), dtype=torch.bfloat16, device=DEVICE)
     offsets = torch.arange(1, E + 1, dtype=torch.int32, device=DEVICE) * M
     lpl = offsets[-1:]
-    first_dims, tensor_offsets = grouped_metadata(offsets)
+    first_dims, tensor_offsets = grouped_metadata(offsets, N)
 
     args = (A, SV, offsets, E, psl, N, VARYING_FIRST_DIM)
     col_amax, row_amax = triton_group_rht_amax(*args, logical_packed_length=lpl)
@@ -288,13 +288,10 @@ def time_grouped_rht(E: int, M: int, N: int):
     A = torch.randn((psl, N), dtype=torch.bfloat16, device=DEVICE)
     offsets = torch.arange(1, E + 1, dtype=torch.int32, device=DEVICE) * M
     lpl = offsets[-1:]
-    first_dims, tensor_offsets = grouped_metadata(offsets)
+    first_dims, tensor_offsets = grouped_metadata(offsets, N)
     args = (A, SV, offsets, E, psl, N, VARYING_FIRST_DIM)
     col_amax, row_amax = triton_group_rht_amax(*args, logical_packed_length=lpl)
-    # No TE column: the grouped TE invocation here is unvalidated (see main()), and an
-    # unvalidated configuration can be fast for the wrong reason. Timing it would be
-    # worse than not timing it.
-    del first_dims, tensor_offsets
+    q = make_quantizer(with_rht=True)
     return {
         "triton": kernel_time_us(
             lambda: triton_group_rht_quantize_row_col(
@@ -306,7 +303,17 @@ def time_grouped_rht(E: int, M: int, N: int):
                 *args, row_amax, col_amax, None, False, logical_packed_length=lpl
             )
         ),
-        "te": None,
+        "te": kernel_time_us(
+            lambda: tex.nvfp4_group_quantize_with_amax(
+                A,
+                q,
+                E,
+                first_dims,
+                rowwise_amax=row_amax,
+                columnwise_amax=col_amax,
+                tensor_offsets=tensor_offsets,
+            )
+        ),
         "fused": rht_fusion_eligible(M, N, grouped=True),
     }
 
@@ -339,9 +346,20 @@ def time_grouped_weight_2d(E: int, M: int, N: int):
     torch.manual_seed(0)
     W = torch.randn((E, M, N), dtype=torch.bfloat16, device=DEVICE)
     amax = W.float().abs().amax(dim=(1, 2)).contiguous()
+    q = make_quantizer(with_rht=False, with_2d=True)
     return {
+        "triton": kernel_time_us(lambda: triton_group_weight_quantize_2d(W, amax, E)),
         "cutedsl": kernel_time_us(lambda: cutedsl_group_weight_quantize_2d(W, amax, E)),
-        "te": None,
+        # TE 2.19 has no grouped 2D kernel. Sum four validated single-expert calls so
+        # this column covers the same E=4 work while remaining explicitly unfused.
+        "te": kernel_time_us(
+            lambda: tuple(
+                tex.nvfp4_quantize_with_amax(
+                    W[e], q, amax[e : e + 1], amax[e : e + 1]
+                )
+                for e in range(E)
+            )
+        ),
         "fused": True,
     }
 
@@ -356,20 +374,23 @@ def fmt(x, width=9, prec=3):
 def main():
     if not torch.cuda.is_available():
         sys.exit("CUDA required")
+    if FAST_MATH:
+        sys.exit("This harness targets TE default; unset NVTE_USE_FAST_MATH")
     print(f"NVTE_USE_FAST_MATH={'1' if FAST_MATH else '<unset>'}   "
           f"device={torch.cuda.get_device_name(0)}")
 
     shapes = get_deepseek_v3_weight_shapes(factorized_experts=LOCAL_EXPERTS)
 
-    print("\n=== conformance: % of bytes differing from TE (single-tensor ops only) ===")
-    print("grouped ops are omitted: TE's grouped path at E=1 does not reproduce TE's own")
-    print("single-tensor output under this invocation, so the grouped TE configuration")
-    print("here is unvalidated and any number it produced would be meaningless.")
+    print("\n=== conformance: % of bytes differing from TE ===")
     hdr = f"{'model':<11} {'projection':<16} {'kernel':<26} " \
           f"{'row codes':>10} {'col codes':>10} {'row sf':>8} {'col sf':>8}"
     print(hdr)
     for s in shapes:
         for r in compare_linear(s.m, s.n):
+            print(f"{s.model:<11} {s.projection:<16} {r['kernel']:<26} "
+                  f"{r['row codes']:>10.4f} {r['col codes']:>10.4f} "
+                  f"{r['row sf']:>8.4f} {r['col sf']:>8.4f}")
+        for r in compare_grouped(s.experts, s.m, s.n):
             print(f"{s.model:<11} {s.projection:<16} {r['kernel']:<26} "
                   f"{r['row codes']:>10.4f} {r['col codes']:>10.4f} "
                   f"{r['row sf']:>8.4f} {r['col sf']:>8.4f}")

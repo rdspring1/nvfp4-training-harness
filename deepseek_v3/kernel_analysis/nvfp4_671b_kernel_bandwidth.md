@@ -102,6 +102,65 @@ single-expert `quantize_transpose_nvfp4_2D_kernel` time — an estimate, drawn a
 dashed bar in the chart. It is also optimistic: it charges nothing for the four separate
 launches a real per-expert loop would pay.
 
+## Token sweep
+
+The six charts above put *shape* on the x-axis, which is a label rather than a scale:
+two shapes can differ in both M and N, so no ordering of them carries physical meaning.
+The sweep below puts a scalar that actually drives the kernel on x instead — the token
+count — at a fixed model hidden dim N. That is apples-to-apples by construction: N is a
+model constant, and the token count is exactly what the parallel layout varies. The three
+cells of the 671B EP grid become three annotated points on one curve:
+
+| layout | bs / ep | tokens/rank | tokens/expert |
+|---|---|---:|---:|
+| 671B 12-layer | 4 / 16 | 16,384 | 8,192 |
+| 671B 16n | 8 / 32 | 32,768 | 32,768 |
+| 671B 64n | 8 / 64 | 32,768 | 65,536 |
+
+Only the four token-dependent kernels are swept — the 2D weight kernels quantize expert
+weights and have no token dependence at all.
+
+| | N = 7,168 | second N |
+|---|---|---|
+| Linear amax | [chart](nvfp4_671b_sweep_linear_amax_n7168.png) | [N=18,432](nvfp4_671b_sweep_linear_amax_n18432.png) |
+| Linear 1D quantize | [chart](nvfp4_671b_sweep_linear_quantize_1d_n7168.png) | [N=18,432](nvfp4_671b_sweep_linear_quantize_1d_n18432.png) |
+| Grouped amax | [chart](nvfp4_671b_sweep_grouped_amax_n7168.png) | [N=2,048](nvfp4_671b_sweep_grouped_amax_n2048.png) |
+| Grouped 1D quantize | [chart](nvfp4_671b_sweep_grouped_quantize_1d_n7168.png) | [N=2,048](nvfp4_671b_sweep_grouped_quantize_1d_n2048.png) |
+
+![grouped 1D quantize sweep](nvfp4_671b_sweep_grouped_quantize_1d_n7168.png)
+![grouped amax sweep](nvfp4_671b_sweep_grouped_amax_n7168.png)
+
+### What the sweep shows that the bars cannot
+
+1. **All three deployment cells sit past the knee.** At 8k / 32k / 64k tokens every
+   quantize kernel is within a few percent of its asymptote, so the ranking at the
+   operating points *is* the asymptotic ranking — small-batch behaviour does not matter
+   for these layouts. Only the amax kernels are still climbing there.
+
+2. **CuTeDSL's standard-math 1D quantize never becomes bandwidth-bound.** It plateaus at
+   ~2,900 GB/s linear and ~3,800 grouped *regardless of size*, while its fast path
+   reaches 5,854 / 5,678 on the same shapes. Fast math is not merely faster here — it
+   changes what limits the kernel. A flat curve well below peak is the signature of an
+   instruction-bound kernel, and no batch size will fix it.
+
+3. **Triton's grouped quantize at N=7,168 is flat from the smallest size measured** —
+   1,996 GB/s at 512 tokens/expert, 2,090 at 131,072, a 1.05x ramp across a 256x size
+   range. It is hard instruction-bound at 26% of peak.
+
+4. **The amax kernels have not saturated even at 131,072 tokens.** CuTeDSL's grouped amax
+   reaches 7,761 GB/s there — 98% of peak, the closest anything in this study gets to the
+   hardware.
+
+5. **CuTeDSL overtakes TE on grouped amax between 1k and 2k tokens/expert** and stays
+   ahead from there. This is the one real crossover in the data; every other ranking is
+   stable across the whole sweep. TE's grouped amax also shows a reproducible
+   discontinuity at 1k tokens/expert (6,349 GB/s, dropping to 4,483 at 2k) — a tile /
+   occupancy artifact, well below any deployment point.
+
+Sweep data: [`nvfp4_671b_token_sweep.csv`](nvfp4_671b_token_sweep.csv) (432 rows), from
+`nvfp4_671b_token_sweep.py`. One TE profile per size feeds both that family's charts,
+since TE fuses amax and quantize into a single call.
+
 ## Methodology
 
 ### TE per-kernel attribution
@@ -167,8 +226,13 @@ PYTHONPATH=. python ../../deepseek_v3/kernel_analysis/nvfp4_671b_te_kernel_probe
 PYTHONPATH=. python ../../deepseek_v3/kernel_analysis/nvfp4_671b_kernel_bandwidth.py \
     --chart all --csv ../../deepseek_v3/kernel_analysis/nvfp4_671b_64n_bandwidth.csv
 
+# Token sweep (~25 min; the largest points allocate several GB per backend).
+PYTHONPATH=. python ../../deepseek_v3/kernel_analysis/nvfp4_671b_token_sweep.py \
+    --csv ../../deepseek_v3/kernel_analysis/nvfp4_671b_token_sweep.csv
+
 # Plot (no GPU needed).
-cd ../.. && python deepseek_v3/kernel_analysis/plot_nvfp4_671b_kernel_bandwidth.py
+cd ../.. && python deepseek_v3/kernel_analysis/plot_nvfp4_671b_kernel_bandwidth.py \
+    && python deepseek_v3/kernel_analysis/plot_nvfp4_671b_token_sweep.py
 ```
 
 `PYTHONPATH=.` from the submodule root is required, not cosmetic: site-packages holds a

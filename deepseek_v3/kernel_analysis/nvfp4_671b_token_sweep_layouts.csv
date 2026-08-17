@@ -1,0 +1,7 @@
+family,layout,tokens
+linear,671B 12-layer,16384
+linear,671B 16n,32768
+linear,671B 64n,32768
+grouped,671B 12-layer,8192
+grouped,671B 16n,32768
+grouped,671B 64n,65536

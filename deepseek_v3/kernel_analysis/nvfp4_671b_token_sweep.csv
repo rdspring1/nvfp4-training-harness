@@ -1,0 +1,433 @@
+chart,family,bucket,x_name,shape,E,tokens,N,backend,math,us,bytes,gbps,peak_gbps
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,512,7168,te,standard,4.448019999999904,7340032,1650.1796304873087,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,512,7168,te,standard,7.5763400000000045,11468800,1513.7652217297525,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,512,7168,cutedsl,standard,7.288320000000117,7340032,1007.0951879170896,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,512,7168,triton,standard,14.382780000000116,7340032,510.33471971343096,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,512,7168,cutedsl,standard,8.397480000000078,11468800,1365.7430562501954,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,512,7168,triton,standard,16.588279999999983,11468800,691.3796969908882,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,512,7168,te,fast,4.440340000000017,7340032,1653.0337766927694,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,512,7168,te,fast,6.120280000000009,11468800,1873.9011940630137,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,512,7168,cutedsl,fast,7.293460000000068,7340032,1006.3854466878452,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,512,7168,triton,fast,14.355879999999924,7340032,511.29098320688377,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,512,7168,cutedsl,fast,6.488320000000052,11468800,1767.6070230814612,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,512,7168,triton,fast,15.156519999999905,11468800,756.6908498784729,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,1024,7168,te,standard,4.789780000000027,14680064,3064.872290585354,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,1024,7168,te,standard,11.73566000000002,22937600,1954.5215181762217,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,1024,7168,cutedsl,standard,8.441639999999833,14680064,1739.0061646789356,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,1024,7168,triton,standard,15.873359999999785,14680064,924.8239818160866,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,1024,7168,cutedsl,standard,14.118439999999982,22937600,1624.6554151875155,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,1024,7168,triton,standard,21.09764000000001,22937600,1087.211650213009,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,1024,7168,te,fast,4.784000000000008,14680064,3068.575250836115,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,1024,7168,te,fast,9.07464000000005,22937600,2527.6594994401844,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,1024,7168,cutedsl,fast,8.449360000000034,14680064,1737.4172718407006,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,1024,7168,triton,fast,15.880399999999977,14680064,924.4139946097089,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,1024,7168,cutedsl,fast,9.053380000000022,22937600,2533.5951876536656,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,1024,7168,triton,fast,18.501139999999978,22937600,1239.7938721613925,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,2048,7168,te,standard,6.037180000000051,29360128,4863.21892009179,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,2048,7168,te,standard,12.750779999999981,45875200,3597.8347991260193,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,2048,7168,cutedsl,standard,9.781160000000026,29360128,3001.702047609887,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,2048,7168,triton,standard,19.448479999999964,29360128,1509.636125805207,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,2048,7168,cutedsl,standard,19.57829999999997,45875200,2343.165647681365,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,2048,7168,triton,standard,34.0321,45875200,1347.9979196111904,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,2048,7168,te,fast,6.038399999999971,29360128,4862.236354001083,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,2048,7168,te,fast,10.243919999999978,45875200,4478.285656272218,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,2048,7168,cutedsl,fast,9.781839999999972,29360128,3001.4933795686784,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,2048,7168,triton,fast,19.471420000000034,29360128,1507.8575676555665,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,2048,7168,cutedsl,fast,11.718380000000007,45875200,3914.8073368503133,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,2048,7168,triton,fast,29.12841999999992,45875200,1574.9292271946135,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,4096,7168,te,standard,9.326740000000001,58720256,6295.903606190373,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,4096,7168,te,standard,22.36115999999999,91750400,4103.114507476357,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,4096,7168,cutedsl,standard,13.215319999999958,58720256,4443.347266657197,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,4096,7168,triton,standard,25.911119999999954,58720256,2266.2183649336694,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,4096,7168,cutedsl,standard,35.52725999999997,91750400,2582.535213804838,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,4096,7168,triton,standard,61.10925999999999,91750400,1501.4156610634789,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,4096,7168,te,fast,9.227600000000006,58720256,6363.545884086865,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,4096,7168,te,fast,17.449039999999922,91750400,5258.191854680854,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,4096,7168,cutedsl,fast,13.205119999999965,58720256,4446.77943100859,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,4096,7168,triton,fast,25.884180000000086,58720256,2268.5770227219796,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,4096,7168,cutedsl,fast,18.98237999999999,91750400,4833.450810699188,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,4096,7168,triton,fast,50.82433999999996,91750400,1805.2452820833498,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,8192,7168,te,standard,26.372020000000056,117440512,4453.223985117551,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,8192,7168,te,standard,33.07024000000004,183500800,5548.819724320106,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,8192,7168,cutedsl,standard,24.380320000000175,117440512,4817.020941480635,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,8192,7168,triton,standard,39.82555999999986,117440512,2948.8728344309634,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,8192,7168,cutedsl,standard,70.41673999999998,183500800,2605.9258068464974,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,8192,7168,triton,standard,113.22634000000005,183500800,1620.6546992510746,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,8192,7168,te,fast,26.403399999999962,117440512,4447.931402773892,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,8192,7168,te,fast,29.102900000000037,183500800,6305.241058451212,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,8192,7168,cutedsl,fast,24.297819999999838,117440512,4833.376492212091,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,8192,7168,triton,fast,39.82797999999999,117440512,2948.6936570722396,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,8192,7168,cutedsl,fast,36.007759999999955,183500800,5096.145941874758,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,8192,7168,triton,fast,93.2221000000001,183500800,1968.4259419172042,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,16384,7168,te,standard,45.67384000000001,234881024,5142.572290834314,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,16384,7168,te,standard,58.94176000000005,367001600,6226.512408180544,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,16384,7168,cutedsl,standard,41.48492000000023,234881024,5661.84107381667,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,16384,7168,triton,standard,65.03694000000004,234881024,3611.501771147287,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,16384,7168,cutedsl,standard,134.22011999999998,367001600,2734.3262694147497,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,16384,7168,triton,standard,215.6709799999999,367001600,1701.673539944967,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,16384,7168,te,fast,45.54368000000002,234881024,5157.269329136334,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,16384,7168,te,fast,57.06752000000004,367001600,6431.0066391530545,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,16384,7168,cutedsl,fast,41.536019999999986,234881024,5654.875551388893,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,16384,7168,triton,fast,64.95877999999999,234881024,3615.8472188055266,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,16384,7168,cutedsl,fast,64.61206000000003,367001600,5680.078920251109,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,16384,7168,triton,fast,175.83730000000003,367001600,2087.1658061173594,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,32768,7168,te,standard,78.37834000000002,469762048,5993.518719585026,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,32768,7168,te,standard,111.02475999999992,734003200,6611.166734339264,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,32768,7168,cutedsl,standard,74.63881999999994,469762048,6293.803251444763,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,32768,7168,triton,standard,114.61784000000013,469762048,4098.507248086332,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,32768,7168,cutedsl,standard,256.93766000000005,734003200,2856.7365329006257,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,32768,7168,triton,standard,415.62805999999995,734003200,1766.0097347614117,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,32768,7168,te,fast,78.48533999999985,469762048,5985.347684038839,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,32768,7168,te,fast,110.38176000000007,734003200,6649.678352655362,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,32768,7168,cutedsl,fast,74.98051999999993,469762048,6265.121234155224,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,32768,7168,triton,fast,114.67541999999995,469762048,4096.449335001347,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,32768,7168,cutedsl,fast,120.26758000000004,734003200,6103.084472141202,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,32768,7168,triton,fast,337.9119400000002,734003200,2172.17302235606,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,65536,7168,te,standard,138.96678000000003,939524096,6760.781936517488,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,65536,7168,te,standard,227.06430000000012,1468006400,6465.157226389173,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,65536,7168,cutedsl,standard,140.43254000000007,939524096,6690.216498256027,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,65536,7168,triton,standard,214.61599999999987,939524096,4377.698289037166,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,65536,7168,cutedsl,standard,507.38502000000005,1468006400,2893.27895411654,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,65536,7168,triton,standard,815.3986799999999,1468006400,1800.3541531364756,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,65536,7168,te,fast,139.10571999999993,939524096,6754.029208863592,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,65536,7168,te,fast,221.69876,1468006400,6621.626571118395,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,65536,7168,cutedsl,fast,141.51267999999988,939524096,6639.1513184542955,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,65536,7168,triton,fast,214.56151999999994,939524096,4378.809844374705,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,65536,7168,cutedsl,fast,238.63875999999996,1468006400,6151.5840930450695,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,65536,7168,triton,fast,661.6782999999999,1468006400,2218.610463725348,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,131072,7168,te,standard,259.7799200000002,1879048192,7233.231082679518,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,131072,7168,te,standard,444.65783999999985,2936012800,6602.858503518123,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,131072,7168,cutedsl,standard,269.9635799999999,1879048192,6960.376625617428,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,131072,7168,triton,standard,412.92747999999995,1879048192,4550.552537699841,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,131072,7168,cutedsl,standard,1012.0942600000002,2936012800,2900.9282198675837,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,131072,7168,triton,standard,1618.0351599999997,2936012800,1814.554388298954,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,131072,7168,te,fast,259.54119999999966,1879048192,7239.884041531759,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,131072,7168,te,fast,447.13274000000024,2936012800,6566.311382163602,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,131072,7168,cutedsl,fast,270.48298,1879048192,6947.010832252736,7928.1
+linear_amax,linear,amax,tokens/rank,hidden-state input,0,131072,7168,triton,fast,412.85232,1879048192,4551.380968381139,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,131072,7168,cutedsl,fast,501.5801999999999,2936012800,5853.526116062796,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,hidden-state input,0,131072,7168,triton,fast,1312.4794,2936012800,2236.997243537689,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,512,18432,te,standard,5.219199999999981,18874368,3616.333537706941,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,512,18432,te,standard,8.923579999999953,29491200,3304.861950024559,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,512,18432,cutedsl,standard,8.550999999999965,18874368,2207.270260788221,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,512,18432,triton,standard,17.189200000000067,18874368,1098.0364414865105,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,512,18432,cutedsl,standard,14.251040000000097,29491200,2069.4068643411147,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,512,18432,triton,standard,25.37613999999996,29491200,1162.1625668836964,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,512,18432,te,fast,5.2083999999999975,18874368,3623.8322709469335,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,512,18432,te,fast,7.59298,29491200,3884.0086500952198,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,512,18432,cutedsl,fast,8.567719999999902,18874368,2202.9627485492306,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,512,18432,triton,fast,17.161060000000003,18874368,1099.8369564584004,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,512,18432,cutedsl,fast,9.17828000000002,29491200,3213.151047908751,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,512,18432,triton,fast,21.83626000000005,29491200,1350.5609477080752,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,1024,18432,te,standard,6.995219999999949,37748736,5396.3615154348645,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,1024,18432,te,standard,13.424700000000053,58982400,4393.573040738323,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,1024,18432,cutedsl,standard,10.928679999999911,37748736,3454.098390656539,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,1024,18432,triton,standard,21.314620000000197,37748736,1771.0255214495803,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,1024,18432,cutedsl,standard,24.70929999999993,58982400,2387.052648193197,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,1024,18432,triton,standard,42.94938000000006,58982400,1373.3003829158865,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,1024,18432,te,fast,6.985619999999975,37748736,5403.777474297219,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,1024,18432,te,fast,10.76733999999998,58982400,5477.898905393543,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,1024,18432,cutedsl,fast,10.925460000000182,37748736,3455.116397844976,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,1024,18432,triton,fast,21.31274000000003,37748736,1771.1817438771338,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,1024,18432,cutedsl,fast,14.028859999999977,58982400,4204.3615803422435,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,1024,18432,triton,fast,36.58378000000006,58982400,1612.2554859011261,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,2048,18432,te,standard,15.921280000000026,75497472,4741.922257506926,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,2048,18432,te,standard,23.489919999999994,117964800,5021.932812031715,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,2048,18432,cutedsl,standard,15.465639999999924,75497472,4881.626107939947,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,2048,18432,triton,standard,29.50408000000017,75497472,2558.8824325313503,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,2048,18432,cutedsl,standard,48.47049999999997,117964800,2433.744236184897,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,2048,18432,triton,standard,78.66304000000002,117964800,1499.6216774739441,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,2048,18432,te,fast,15.49833999999999,75497472,4871.326348499261,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,2048,18432,te,fast,18.21647999999998,117964800,6475.718689889602,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,2048,18432,cutedsl,fast,15.443240000000078,75497472,4888.706773967096,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,2048,18432,triton,fast,29.528240000000178,75497472,2556.7887554422323,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,2048,18432,cutedsl,fast,26.20678000000008,117964800,4501.3084400296275,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,2048,18432,triton,fast,65.29490000000004,117964800,1806.6464609027646,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,4096,18432,te,standard,30.93588000000004,150994944,4880.900236230545,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,4096,18432,te,standard,41.768039999999985,235929600,5648.567660823924,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,4096,18432,cutedsl,standard,30.332900000000063,150994944,4977.926409937714,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,4096,18432,triton,standard,47.023979999999995,150994944,3211.0200795423953,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,4096,18432,cutedsl,standard,86.53883999999991,235929600,2726.285677043975,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,4096,18432,triton,standard,143.72449999999998,235929600,1641.540586330097,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,4096,18432,te,fast,31.02414000000005,150994944,4867.014653750265,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,4096,18432,te,fast,37.410100000000014,235929600,6306.574962376468,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,4096,18432,cutedsl,fast,30.31693999999996,150994944,4980.546981324639,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,4096,18432,triton,fast,47.07920000000021,150994944,3207.253819096317,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,4096,18432,cutedsl,fast,45.24177999999996,235929600,5214.8611305744425,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,4096,18432,triton,fast,117.25749999999996,235929600,2012.0640470758806,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,8192,18432,te,standard,55.43945999999994,301989888,5447.2011091017175,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,8192,18432,te,standard,75.48052000000003,471859200,6251.403673424611,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,8192,18432,cutedsl,standard,52.85455999999992,301989888,5713.601399765705,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,8192,18432,triton,standard,79.19279999999996,301989888,3813.350304573145,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,8192,18432,cutedsl,standard,165.89767999999995,471859200,2844.278473333685,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,8192,18432,triton,standard,271.29787999999996,471859200,1739.2660790419743,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,8192,18432,te,fast,55.35997999999993,301989888,5455.0216239240035,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,8192,18432,te,fast,71.10018,471859200,6636.540160657822,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,8192,18432,cutedsl,fast,52.49614000000006,301989888,5752.611296754382,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,8192,18432,triton,fast,79.12502,301989888,3816.6168931142133,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,8192,18432,cutedsl,fast,81.29441999999996,471859200,5804.324577258811,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,8192,18432,triton,fast,220.72108000000003,471859200,2137.8075895605434,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,16384,18432,te,standard,96.01816000000014,603979776,6290.266091331047,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,16384,18432,te,standard,147.57406000000006,943718400,6394.879967387219,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,16384,18432,cutedsl,standard,97.47179999999997,603979776,6196.456575132501,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,16384,18432,triton,standard,143.5403200000001,603979776,4207.736028455277,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,16384,18432,cutedsl,standard,331.3812000000001,943718400,2847.8332506491006,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,16384,18432,triton,standard,530.20696,943718400,1779.9057183255386,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,16384,18432,te,fast,95.73028000000006,603979776,6309.182173080446,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,16384,18432,te,fast,141.65292000000005,943718400,6662.188114441973,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,16384,18432,cutedsl,fast,96.7588799999999,603979776,6242.112103819314,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,16384,18432,triton,fast,143.4191,603979776,4211.292470807584,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,16384,18432,cutedsl,fast,152.92130000000006,943718400,6171.26848908556,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,16384,18432,triton,fast,430.76542,943718400,2190.794237847597,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,32768,18432,te,standard,173.46278000000032,1207959552,6963.796798367914,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,32768,18432,te,standard,287.25985999999995,1887436800,6570.48569194457,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,32768,18432,cutedsl,standard,183.56677999999994,1207959552,6580.491045275187,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,32768,18432,triton,standard,270.9836399999998,1207959552,4457.684427000836,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,32768,18432,cutedsl,standard,653.5348799999997,1887436800,2888.0429457720766,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,32768,18432,triton,standard,1043.94534,1887436800,1807.9843145810678,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,32768,18432,te,fast,174.30628000000033,1207959552,6930.097710765198,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,32768,18432,te,fast,290.13732000000005,1887436800,6505.322376314773,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,32768,18432,cutedsl,fast,187.00938000000016,1207959552,6459.352744766059,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,32768,18432,triton,fast,271.05393999999984,1207959552,4456.52829101101,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,32768,18432,cutedsl,fast,305.3754,1887436800,6180.710037547228,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,32768,18432,triton,fast,847.0848000000001,1887436800,2228.15566989279,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,65536,18432,te,standard,328.9051800000005,2415919104,7345.336136086384,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,65536,18432,te,standard,578.4052999999999,3774873600,6526.346836725044,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,65536,18432,cutedsl,standard,357.2142400000002,2415919104,6763.2217125498655,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,65536,18432,triton,standard,525.5058000000001,2415919104,4597.3214834165465,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,65536,18432,cutedsl,standard,1300.2255999999998,3774873600,2903.2450983890803,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,65536,18432,triton,standard,2070.5012599999995,3774873600,1823.1689460551213,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,65536,18432,te,fast,328.60044,2415919104,7352.148110331197,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,65536,18432,te,fast,580.4678400000004,3774873600,6503.15717749324,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,65536,18432,cutedsl,fast,357.84429999999986,2415919104,6751.313641156226,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,65536,18432,triton,fast,525.6863000000002,2415919104,4595.742944033351,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,65536,18432,cutedsl,fast,714.51132,3774873600,5283.154366259726,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,65536,18432,triton,fast,1681.5067800000006,3774873600,2244.935105167996,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,131072,18432,te,standard,637.3172200000002,4831838208,7581.527779839367,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,131072,18432,te,standard,1156.8352600000003,7549747200,6526.2077160407425,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,131072,18432,cutedsl,standard,684.0555600000001,4831838208,7063.517191498304,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,131072,18432,triton,standard,1035.6333,4831838208,4665.587914177731,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,131072,18432,cutedsl,standard,2585.8832,7549747200,2919.601009047895,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,131072,18432,triton,standard,4134.068099999999,7549747200,1826.2271006130745,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,131072,18432,te,fast,638.22862,4831838208,7570.701244955138,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,131072,18432,te,fast,1173.9500999999993,7549747200,6431.063126107322,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,131072,18432,cutedsl,fast,685.9208799999999,4831838208,7044.308387288051,7928.1
+linear_amax,linear,amax,tokens/rank,dense-MLP down input,0,131072,18432,triton,fast,1035.7114199999996,4831838208,4665.236005604729,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,131072,18432,cutedsl,fast,1457.9776600000002,7549747200,5178.23242915807,7928.1
+linear_quantize_1d,linear,quantize,tokens/rank,dense-MLP down input,0,131072,18432,triton,fast,3350.7642999999994,7549747200,2253.141827970413,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,512,7168,te,standard,6.099860000000051,29360128,4813.246205650581,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,512,7168,te,standard,15.39906000000001,45875200,2979.09093152439,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,512,7168,cutedsl,standard,10.372559999999975,29360128,2830.5575479920167,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,512,7168,triton,standard,20.778959999999984,29360128,1412.973892822356,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,512,7168,cutedsl,standard,20.451240000000045,45875200,2243.1500486034047,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,512,7168,triton,standard,22.9875600000001,45875200,1995.6533011768015,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,512,7168,te,fast,6.19009999999998,29360128,4743.078140902424,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,512,7168,te,fast,12.533219999999965,45875200,3660.288417501658,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,512,7168,cutedsl,fast,10.386639999999787,29360128,2826.720479385114,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,512,7168,triton,fast,20.802620000000026,29360128,1411.3668374464353,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,512,7168,cutedsl,fast,14.863439999999951,45875200,3086.4456680284075,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,512,7168,triton,fast,17.980800000000105,45875200,2551.3436554546925,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,1024,7168,te,standard,9.24674000000002,58720256,6350.37386149063,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,1024,7168,te,standard,25.832199999999997,91750400,3551.7842073071597,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,1024,7168,cutedsl,standard,14.242620000000118,58720256,4122.8549241641995,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,1024,7168,triton,standard,26.021819999999963,58720256,2256.5775952642853,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,1024,7168,cutedsl,standard,36.748840000000015,91750400,2496.688330842551,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,1024,7168,triton,standard,47.03057999999996,91750400,1950.8668615186136,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,1024,7168,te,fast,9.29474000000014,58720256,6317.57918995035,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,1024,7168,te,fast,20.11336000000004,91750400,4561.664485695071,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,1024,7168,cutedsl,fast,14.242040000000152,58720256,4123.022825381713,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,1024,7168,triton,fast,25.945079999999685,58720256,2263.2520693711763,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,1024,7168,cutedsl,fast,26.02380000000003,91750400,3525.6342271305457,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,1024,7168,triton,fast,35.94818000000009,91750400,2552.29611067931,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,2048,7168,te,standard,26.218399999999995,117440512,4479.316510542215,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,2048,7168,te,standard,38.67346000000007,183500800,4744.876719072969,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,2048,7168,cutedsl,standard,23.185959999999785,117440512,5065.156327363676,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,2048,7168,triton,standard,40.0136,117440512,2935.0148949357217,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,2048,7168,cutedsl,standard,57.26087999999995,183500800,3204.645125956851,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,2048,7168,triton,standard,93.01070000000003,183500800,1972.899892162944,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,2048,7168,te,fast,26.24771999999998,117440512,4474.312892700778,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,2048,7168,te,fast,29.645600000000005,183500800,6189.8156893434425,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,2048,7168,cutedsl,fast,23.09245999999998,117440512,5085.664844715552,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,2048,7168,triton,fast,40.06496000000011,117440512,2931.2524460276427,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,2048,7168,cutedsl,fast,42.416640000000136,183500800,4326.151246303323,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,2048,7168,triton,fast,71.87398000000003,183500800,2553.0908403847943,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,4096,7168,te,standard,44.77117999999994,234881024,5246.2549345360185,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,4096,7168,te,standard,67.13727999999996,367001600,5466.435339650344,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,4096,7168,cutedsl,standard,40.13513999999995,234881024,5852.253760669585,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,4096,7168,triton,standard,65.30109999999999,234881024,3596.892303498716,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,4096,7168,cutedsl,standard,107.38762000000001,367001600,3417.541053614932,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,4096,7168,triton,standard,180.98953999999998,367001600,2027.7503329750439,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,4096,7168,te,fast,44.856440000000084,234881024,5236.283218195638,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,4096,7168,te,fast,56.73228000000001,367001600,6469.008472777754,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,4096,7168,cutedsl,fast,40.34820000000001,234881024,5821.350741792692,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,4096,7168,triton,fast,65.34795999999996,234881024,3594.313028287343,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,4096,7168,cutedsl,fast,78.28953999999993,367001600,4687.747558613837,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,4096,7168,triton,fast,139.30456000000007,367001600,2634.526823816821,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,8192,7168,te,standard,77.40318000000002,469762048,6069.027758291066,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,8192,7168,te,standard,125.27092000000002,734003200,5859.32633048436,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,8192,7168,cutedsl,standard,69.77946000000006,469762048,6732.096350416005,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,8192,7168,triton,standard,115.1892800000001,469762048,4078.175052400706,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,8192,7168,cutedsl,standard,207.8267599999998,734003200,3531.8031229472112,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,8192,7168,triton,standard,356.58068,734003200,2058.4491565835815,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,8192,7168,te,fast,77.74984000000002,469762048,6041.968034918141,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,8192,7168,te,fast,110.6081,734003200,6636.070956828659,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,8192,7168,cutedsl,fast,69.7782000000002,469762048,6732.217913331078,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,8192,7168,triton,fast,115.18208000000004,469762048,4078.4299779965754,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,8192,7168,cutedsl,fast,144.75220000000004,734003200,5070.7567829711725,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,8192,7168,triton,fast,273.73986000000014,734003200,2681.389549917939,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,16384,7168,te,standard,137.8841000000001,939524096,6813.868285030684,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,16384,7168,te,standard,241.3724799999997,1468006400,6081.912900758204,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,16384,7168,cutedsl,standard,129.36957999999984,939524096,7262.326243928449,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,16384,7168,triton,standard,215.69487999999993,939524096,4355.801565618991,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,16384,7168,cutedsl,standard,402.12646000000007,1468006400,3650.6088159431233,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,16384,7168,triton,standard,707.3988199999999,1468006400,2075.217484812881,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,16384,7168,te,fast,138.78125999999995,939524096,6769.81961397382,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,16384,7168,te,fast,218.99268000000006,1468006400,6703.449631284477,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,16384,7168,cutedsl,fast,129.49097999999987,939524096,7255.517689340223,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,16384,7168,triton,fast,215.53295999999983,939524096,4359.073879002083,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,16384,7168,cutedsl,fast,273.32029999999986,1468006400,5371.011227486581,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,16384,7168,triton,fast,542.6419599999998,1468006400,2705.294666118338,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,32768,7168,te,standard,257.9628799999999,1879048192,7284.180545666107,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,32768,7168,te,standard,472.5988599999999,2936012800,6212.483881150286,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,32768,7168,cutedsl,standard,250.05787999999978,1879048192,7514.453021836391,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,32768,7168,triton,standard,415.27524,1879048192,4524.825973250897,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,32768,7168,cutedsl,standard,785.0812200000001,2936012800,3739.756760453395,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,32768,7168,triton,standard,1409.5436,2936012800,2082.952808270705,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,32768,7168,te,fast,258.8506599999997,1879048192,7259.197994704754,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,32768,7168,te,fast,437.77145999999976,2936012800,6706.725011265014,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,32768,7168,cutedsl,fast,249.77581999999995,1879048192,7522.938737624804,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,32768,7168,triton,fast,415.3321399999999,1879048192,4524.206077574446,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,32768,7168,cutedsl,fast,529.1647800000001,2936012800,5548.39042764713,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,32768,7168,triton,fast,1080.78306,2936012800,2716.560712933454,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,65536,7168,te,standard,498.7334799999998,3758096384,7535.279933482711,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,65536,7168,te,standard,928.5925199999998,5872025600,6323.576244185126,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,65536,7168,cutedsl,standard,490.20083999999986,3758096384,7666.442154607488,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,65536,7168,triton,standard,813.5139399999998,3758096384,4619.584495380621,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,65536,7168,cutedsl,standard,1556.31864,5872025600,3773.022727530912,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,65536,7168,triton,standard,2812.8381999999997,5872025600,2087.580295233476,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,65536,7168,te,fast,499.68641999999954,3758096384,7520.909581653236,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,65536,7168,te,fast,894.2244599999996,5872025600,6566.612592994831,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,65536,7168,cutedsl,fast,489.5541599999999,3758096384,7676.569195122355,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,65536,7168,triton,fast,813.6905800000001,3758096384,4618.581652991484,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,65536,7168,cutedsl,fast,1041.7023199999996,5872025600,5636.951638928866,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,65536,7168,triton,fast,2156.3597800000002,5872025600,2723.119608546955,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,131072,7168,te,standard,978.4664600000011,7516192768,7681.604914694768,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,131072,7168,te,standard,1843.3870800000002,11744051200,6370.908924890587,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,131072,7168,cutedsl,standard,968.4592999999996,7516192768,7760.979493924012,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,131072,7168,triton,standard,1611.0640199999993,7516192768,4665.359461010124,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,131072,7168,cutedsl,standard,3095.8292400000005,11744051200,3793.50742226338,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,131072,7168,triton,standard,5620.0885,11744051200,2089.655919119423,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,131072,7168,te,fast,978.9131800000016,7516192768,7678.09946945447,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,131072,7168,te,fast,1781.470160000001,11744051200,6592.336747307624,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,131072,7168,cutedsl,fast,968.4090599999998,7516192768,7761.38212502886,7928.1
+grouped_amax,grouped,amax,tokens/expert,gate/up (w1/w3) input,4,131072,7168,triton,fast,1610.8925399999996,7516192768,4665.856089941295,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,131072,7168,cutedsl,fast,2068.5240400000002,11744051200,5677.502882683441,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,gate/up (w1/w3) input,4,131072,7168,triton,fast,4308.0037,11744051200,2726.100537007431,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,512,2048,te,standard,4.568320000000034,8388608,1836.2566545250636,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,512,2048,te,standard,13.304400000000005,13107200,985.1778359039112,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,512,2048,cutedsl,standard,10.064019999999822,8388608,833.5245756665973,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,512,2048,triton,standard,10.10942000000019,8388608,829.78133265804,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,512,2048,cutedsl,standard,19.642920000000004,13107200,667.2735010884328,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,512,2048,triton,standard,8.655399999999984,13107200,1514.3378700002336,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,512,2048,te,fast,4.568359999999867,8388608,1836.2405764870205,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,512,2048,te,fast,10.501800000000065,13107200,1248.0908034813003,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,512,2048,cutedsl,fast,10.06911999999996,8388608,833.1023962372117,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,512,2048,triton,fast,10.123580000000164,8388608,828.6207053235975,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,512,2048,cutedsl,fast,14.050020000000123,13107200,932.895469187936,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,512,2048,triton,fast,7.164179999999954,13107200,1829.5464379733737,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,1024,2048,te,standard,5.2204800000000295,16777216,3213.7305381880415,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,1024,2048,te,standard,13.514919999999993,26214400,1939.6637198000442,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,1024,2048,cutedsl,standard,9.598080000000008,16777216,1747.9762619190492,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,1024,2048,triton,standard,16.710419999999978,16777216,1003.9972663763102,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,1024,2048,cutedsl,standard,18.994580000000102,26214400,1380.0989545438676,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,1024,2048,triton,standard,15.477820000000065,26214400,1693.6752074904534,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,1024,2048,te,fast,5.2134200000000135,16777216,3218.0825638448387,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,1024,2048,te,fast,10.63041999999999,26214400,2465.979707292847,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,1024,2048,cutedsl,fast,9.575740000000081,16777216,1752.054253770451,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,1024,2048,triton,fast,16.705200000000055,16777216,1004.3109929842173,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,1024,2048,cutedsl,fast,13.76131999999996,26214400,1904.9335383524308,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,1024,2048,triton,fast,12.293200000000121,26214400,2132.4309374288014,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,2048,2048,te,standard,6.572820000000021,33554432,5105.028283141771,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,2048,2048,te,standard,14.305919999999924,52428800,3664.8324609672272,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,2048,2048,cutedsl,standard,9.85089999999981,33554432,3406.2300906516816,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,2048,2048,triton,standard,22.325119999999878,33554432,1502.9899951265743,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,2048,2048,cutedsl,standard,19.731839999999966,52428800,2657.0659401252033,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,2048,2048,triton,standard,28.43082000000004,52428800,1844.0832870807076,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,2048,2048,te,fast,6.577400000000047,33554432,5101.473530574354,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,2048,2048,te,fast,11.352400000000046,52428800,4618.300976005055,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,2048,2048,cutedsl,fast,9.84707999999994,33554432,3407.5514771891976,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,2048,2048,triton,fast,22.28227999999993,33554432,1505.879649658837,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,2048,2048,cutedsl,fast,14.287440000000005,52428800,3669.572715615952,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,2048,2048,triton,fast,21.02726000000009,52428800,2493.372888336368,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,4096,2048,te,standard,12.423719999999923,67108864,5401.672284951723,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,4096,2048,te,standard,24.742359999999895,104857600,4237.978915511715,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,4096,2048,cutedsl,standard,14.276500000000167,67108864,4700.65240079846,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,4096,2048,triton,standard,34.13835999999986,67108864,1965.79050663243,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,4096,2048,cutedsl,standard,36.505059999999915,104857600,2872.4127559302806,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,4096,2048,triton,standard,54.05944000000004,104857600,1939.6723310489328,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,4096,2048,te,fast,12.295000000000035,67108864,5458.223993493274,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,4096,2048,te,fast,19.075179999999946,104857600,5497.070014542473,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,4096,2048,cutedsl,fast,14.272760000000185,67108864,4701.884148545841,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,4096,2048,triton,fast,34.125400000000155,67108864,1966.537066232182,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,4096,2048,cutedsl,fast,25.85412000000006,104857600,4055.740439048003,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,4096,2048,triton,fast,42.20120000000006,104857600,2484.7065960209625,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,8192,2048,te,standard,28.443739999999924,134217728,4718.708861774167,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,8192,2048,te,standard,45.78583999999994,209715200,4580.350606213629,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,8192,2048,cutedsl,standard,26.666919999999827,134217728,5033.116985388672,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,8192,2048,triton,standard,53.849680000000006,134217728,2492.451728589659,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,8192,2048,cutedsl,standard,71.61247999999996,209715200,2928.4728025059335,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,8192,2048,triton,standard,105.01199999999993,209715200,1997.0593836894843,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,8192,2048,te,fast,28.60870000000006,134217728,4691.500417705094,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,8192,2048,te,fast,34.11142000000004,209715200,6147.946933900722,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,8192,2048,cutedsl,fast,26.6029000000001,134217728,5045.229204334847,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,8192,2048,triton,fast,53.91764000000025,134217728,2489.3101404289837,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,8192,2048,cutedsl,fast,51.74934000000001,209715200,4052.519317154575,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,8192,2048,triton,fast,81.28484000000007,209715200,2580.003848196045,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,16384,2048,te,standard,49.618060000000014,268435456,5410.035297631546,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,16384,2048,te,standard,74.93395999999996,419430400,5597.333972473899,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,16384,2048,cutedsl,standard,43.46317999999988,268435456,6176.157750077209,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,16384,2048,triton,standard,94.87468000000011,268435456,2829.368763088315,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,16384,2048,cutedsl,standard,123.45548000000008,419430400,3397.4222934453755,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,16384,2048,triton,standard,204.77613999999997,419430400,2048.2386278010713,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,16384,2048,te,fast,49.70250000000004,268435456,5400.844142648756,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,16384,2048,te,fast,63.582200000000014,419430400,6596.663846170782,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,16384,2048,cutedsl,fast,43.87780000000012,268435456,6117.796607851789,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,16384,2048,triton,fast,94.80460000000018,268435456,2831.460245599892,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,16384,2048,cutedsl,fast,87.85225999999994,419430400,4774.269893569047,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,16384,2048,triton,fast,156.98695999999998,419430400,2671.7531188577705,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,32768,2048,te,standard,86.3177399999999,536870912,6219.705381535716,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,32768,2048,te,standard,142.67763999999997,838860800,5879.413200274409,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,32768,2048,cutedsl,standard,78.36363999999992,536870912,6851.020600880722,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,32768,2048,triton,standard,177.52748000000008,536870912,3024.156665773658,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,32768,2048,cutedsl,standard,235.0200799999999,838860800,3569.3154389190927,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,32768,2048,triton,standard,403.61316000000005,838860800,2078.3782174000467,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,32768,2048,te,fast,86.70792000000004,536870912,6191.7171118855085,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,32768,2048,te,fast,124.74512000000003,838860800,6724.5981245599005,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,32768,2048,cutedsl,fast,78.50885999999993,536870912,6838.348079439703,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,32768,2048,triton,fast,177.0714799999999,536870912,3031.9445683743106,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,32768,2048,cutedsl,fast,161.25382000000013,838860800,5202.114281695772,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,32768,2048,triton,fast,309.1297000000001,838860800,2713.620852347735,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,65536,2048,te,standard,154.6808400000001,1073741824,6941.660156487379,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,65536,2048,te,standard,273.7102799999997,1677721600,6129.552751909799,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,65536,2048,cutedsl,standard,146.38721999999996,1073741824,7334.9423808991005,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,65536,2048,triton,standard,341.4347399999999,1073741824,3144.7937137269637,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,65536,2048,cutedsl,standard,454.15310000000005,1677721600,3694.176259063298,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,65536,2048,triton,standard,802.3597199999999,1677721600,2090.9843280766886,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,65536,2048,te,fast,155.84729999999996,1073741824,6889.704370880986,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,65536,2048,te,fast,248.90222000000003,1677721600,6740.4846770751965,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,65536,2048,cutedsl,fast,146.39076000000009,1073741824,7334.765008392602,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,65536,2048,triton,fast,341.3256199999997,1073741824,3145.7990876864187,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,65536,2048,cutedsl,fast,306.44039999999995,1677721600,5474.870806851838,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,65536,2048,triton,fast,613.3861,1677721600,2735.1803374742267,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,131072,2048,te,standard,291.90588000000014,2147483648,7356.7673525452765,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,131072,2048,te,standard,534.38446,3355443200,6279.080795126415,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,131072,2048,cutedsl,standard,284.27624000000003,2147483648,7554.2143374346015,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,131072,2048,triton,standard,668.3932800000007,2147483648,3212.9043068775286,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,131072,2048,cutedsl,standard,893.7544799999997,3355443200,3754.3232230847125,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,131072,2048,triton,standard,1599.46758,3355443200,2097.850085839189,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,131072,2048,te,fast,293.18353999999977,2147483648,7324.707410245479,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,131072,2048,te,fast,498.8219000000001,3355443200,6726.735935210541,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,131072,2048,cutedsl,fast,284.1622799999999,2147483648,7557.243867834961,7928.1
+grouped_amax,grouped,amax,tokens/expert,down (w2) input,4,131072,2048,triton,fast,671.3993800000003,2147483648,3198.5189619924868,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,131072,2048,cutedsl,fast,596.4734400000001,3355443200,5625.469593415592,7928.1
+grouped_quantize_1d,grouped,quantize,tokens/expert,down (w2) input,4,131072,2048,triton,fast,1221.7434200000002,3355443200,2746.438527984869,7928.1
